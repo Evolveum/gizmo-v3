@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/security
+http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+
+    <global-method-security secured-annotations="enabled"/>
+
+    <http pattern="/**" security="none"/>
+
+    <!--<http pattern="/wicket/resource/**" security="none"/>-->
+
+    <!--<http create-session="never" auto-config="true" use-expressions="false">-->
+
+        <!--<intercept-url pattern="/j_spring_security_check"/>-->
+        <!--<intercept-url pattern="/spring_security_login"/>-->
+
+        <!--<intercept-url pattern="/login"/>-->
+
+        <!--&lt;!&ndash;<intercept-url pattern="/app/**" access="isFullyAuthenticated"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;  access="isAuthenticated()"/> &ndash;&gt;-->
+
+        <!--<logout logout-url="/j_spring_security_logout" invalidate-session="true"-->
+                <!--logout-success-url="/app/dashboard"/>-->
+
+        <!--<session-management>-->
+            <!--<concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>-->
+        <!--</session-management>-->
+
+        <!--<form-login login-page="/login" default-target-url="/home"/>-->
+
+        <!--&lt;!&ndash;<intercept-url pattern="/**" access="isFullyAuthenticated"/>&ndash;&gt;-->
+    <!--</http>-->
+
+    <beans:bean id="gizmoAuthenticationProvider"
+                class="sk.lazyman.gizmo.security.GizmoAuthenticationProvider"/>
+
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider ref="gizmoAuthenticationProvider"/>
+    </authentication-manager>
+</beans:beans>

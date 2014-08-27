@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/context
+     http://www.springframework.org/schema/context/spring-context-3.0.xsd
+     http://www.springframework.org/schema/util
+     http://www.springframework.org/schema/util/spring-util-3.2.xsd"
+       default-lazy-init="false" default-autowire="byName">
+
+    <context:annotation-config/>
+    <context:spring-configured/>
+    <context:component-scan base-package="sk.lazyman.gizmo"/>
+
+    <util:properties id="config" location="WEB-INF/config.properties"/>
+
+    <!--<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean" lazy-init="true">-->
+        <!--<property name="jndiName" value="#{config[hibernate.datasource]}"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"-->
+          <!--depends-on="dataSource" lazy-init="true">-->
+
+        <!--<property name="dataSource" value="#{dataSource}"/>-->
+        <!--<property name="hibernateProperties">-->
+            <!--<props>-->
+                <!--<prop key="hibernate.dialect">#{config[hibernate.dialect]}</prop>-->
+                <!--<prop key="hibernate.hbm2ddl.auto">validate</prop>-->
+                <!--<prop key="hibernate.id.new_generator_mappings">true</prop>-->
+            <!--</props>-->
+        <!--</property>-->
+        <!--<property name="packagesToScan">-->
+            <!--<list>-->
+                <!--<value>sk.lazyman.gizmo.data</value>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
+</beans>
