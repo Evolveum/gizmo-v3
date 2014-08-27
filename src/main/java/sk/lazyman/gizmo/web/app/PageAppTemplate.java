@@ -34,7 +34,7 @@ public class PageAppTemplate extends PageTemplate {
 
     private void initLayout() {
         Navbar navbar = new Navbar(ID_NAVBAR);
-        navbar.setBrandName(createStringResource("PageAppTemplate.menu.title"));
+        navbar.setBrandName(createStringResource("GizmoApplication.projectName"));
         navbar.setPosition(Navbar.Position.TOP);
         add(navbar);
 

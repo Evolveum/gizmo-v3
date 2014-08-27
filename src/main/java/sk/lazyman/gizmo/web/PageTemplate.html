@@ -3,19 +3,26 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>
-
+        <wicket:message key="GizmoApplication.projectName"/>
     </title>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-    <script src="js/support/html5shiv.js"></script>
-    <script src="js/support/respond.min.js"></script>
+    <script src="js/html5shiv.js"></script>
+    <script src="js/respond.min.js"></script>
     <![endif]-->
 
     <link type="text/css" rel="stylesheet" href="css/font-awesome.css"/>
 </head>
 <body>
+    <div class="container">
+        <div class="alert alert-danger">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong>Warning!</strong> Best check yo self, you're not looking too good.
+        </div>
+    </div>
+
     <wicket:child/>
 </body>
 </html>

@@ -1,11 +1,13 @@
 package sk.lazyman.gizmo.web;
 
 import de.agilecoders.wicket.core.Bootstrap;
+import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Alert;
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 
@@ -37,5 +39,9 @@ public class PageTemplate extends WebPage{
         super.renderHead(response);
 
         Bootstrap.renderHead(response);
+    }
+
+    public void addAlert(IModel<String> text, Alert.Type type) {
+
     }
 }
