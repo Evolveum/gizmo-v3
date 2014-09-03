@@ -1,68 +1,37 @@
 package sk.lazyman.gizmo.data;
 
+import javax.persistence.*;
+
 /**
  * @author mamut
  */
+@Entity
+@Table(name = "users")
 public class User {
 
-    private long id;
-
+    private Integer id;
     private String userName;
-
     private String ldapDN;
-
     private String password;
-
     private String lastName;
-
     private String firstName;
-
     private String email;
-
     private int role;
-
     private String certHash;
 
-    public User() {
-        this(0, null, null);
-    }
-
-    public User(long id, String firstName, String lastName) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    @Override
-    public String toString() {
-        return "USER: id=" + id + ", firstName=" + firstName + ", lastName=" + lastName +
-                ", userName=" + userName + ", email=" + email + ", ldapDN=" + ldapDN + ", role=" + role;
-    }
-
-    public String getStrId() {
-        return Long.toString(id);
-    }
-
-    public void setId(String id) {
-        this.id = Long.parseLong(id);
-    }
-
-    public void setId(Long id) {
-        this.id = id.longValue();
-    }
-
-    public void setId(User u) {
-        this.id = u.getId();
-    }
-
-    public long getId() {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id")
+    @SequenceGenerator(name = "users_id", sequenceName = "users_id_seq")
+    @Column(name = "ID")
+    public Integer getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
+    @Column(name = "username")
     public String getUserName() {
         return userName;
     }
@@ -71,6 +40,7 @@ public class User {
         this.userName = userName;
     }
 
+    @Column(name = "ldapDN")
     public String getLdapDN() {
         return ldapDN;
     }
@@ -87,6 +57,7 @@ public class User {
         this.password = password;
     }
 
+    @Column(name = "lastname")
     public String getLastName() {
         return lastName;
     }
@@ -95,6 +66,7 @@ public class User {
         this.lastName = lastName;
     }
 
+    @Column(name = "firstname")
     public String getFirstName() {
         return firstName;
     }
@@ -111,6 +83,45 @@ public class User {
         this.email = email;
     }
 
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
+    }
+
+    @Column(name = "cert_hash")
+    public String getCertHash() {
+        return certHash;
+    }
+
+    public void setCertHash(String certHash) {
+        this.certHash = certHash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof User)) {
+            return false;
+        }
+
+        User user = (User) obj;
+        if (user.getId() == id) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + (int) (this.id ^ (this.id >>> 32));
+        return hash;
+    }
+
+    @Transient
     public String getFullName() {
         StringBuilder builder = new StringBuilder();
 
@@ -125,56 +136,12 @@ public class User {
         return builder.toString().trim();
     }
 
-    public int getRole() {
-        return role;
-    }
-
-    public void setRole(int role) {
-        this.role = role;
-    }
-
-    public String getRoleStr() {
-        return Integer.toString(role);
-    }
-
-    public void setRoleStr(String role) {
-        this.role = Integer.parseInt(role);
-    }
-
-    public String getCertHash() {
-        return certHash;
-    }
-
-    public void setCertHash(String certHash) {
-        this.certHash = certHash;
-    }
-
+    @Transient
     public boolean getCommon() {
         if (role == 1) {
             return true;
         }
 
         return false;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof User)) {
-            return false;
-        }
-
-        User user = (User)obj;
-        if (user.getId() == id) {
-            return true;
-        }
-        
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + (int) (this.id ^ (this.id >>> 32));
-        return hash;
     }
 }

@@ -1,27 +1,31 @@
 package sk.lazyman.gizmo.data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 
+/**
+ * @author lazyman
+ */
 @Entity
+@Table(name = "company")
 public class Company implements Serializable {
 
-    private Long id;
+    private Integer id;
     private String name;
     private String description;
 
     @Id
-    @GeneratedValue
-    public Long getId() {
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "company_id")
+    @SequenceGenerator(name = "company_id", sequenceName = "company_id_seq")
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
+    @Column(length = 64)
     public String getName() {
         return name;
     }

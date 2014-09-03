@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 /**
- *
  * @author lazyman
  */
 public class EmailLog {

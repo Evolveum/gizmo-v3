@@ -2,19 +2,30 @@ package sk.lazyman.gizmo.web;
 
 import de.agilecoders.wicket.core.Bootstrap;
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Alert;
-import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.wicket.Component;
-import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import sk.lazyman.gizmo.repository.CompanyRepository;
+import sk.lazyman.gizmo.repository.UserRepository;
 
 /**
  * @author lazyman
  */
-public class PageTemplate extends WebPage{
+public class PageTemplate extends WebPage {
+
+    @SpringBean
+    private CompanyRepository companyRepository;
+    @SpringBean
+    private UserRepository userRepository;
+
+    public PageTemplate() {
+        Injector.get().inject(this);
+    }
 
     public StringResourceModel createStringResource(String resourceKey, Object... objects) {
         return new StringResourceModel(resourceKey, this, new Model<String>(), resourceKey, objects);
@@ -43,5 +54,13 @@ public class PageTemplate extends WebPage{
 
     public void addAlert(IModel<String> text, Alert.Type type) {
 
+    }
+
+    public CompanyRepository getCompanyRepository() {
+        return companyRepository;
+    }
+
+    public UserRepository getUserRepository() {
+        return userRepository;
     }
 }
