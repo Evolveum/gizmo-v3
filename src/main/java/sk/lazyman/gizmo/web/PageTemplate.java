@@ -3,9 +3,11 @@ package sk.lazyman.gizmo.web;
 import de.agilecoders.wicket.core.Bootstrap;
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Alert;
 import org.apache.wicket.Component;
+import org.apache.wicket.devutils.debugbar.DebugBar;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
@@ -18,6 +20,9 @@ import sk.lazyman.gizmo.repository.UserRepository;
  */
 public class PageTemplate extends WebPage {
 
+    private static final String ID_DEBUG_PANEL = "debugPanel";
+    private static final String ID_TITLE = "title";
+
     @SpringBean
     private CompanyRepository companyRepository;
     @SpringBean
@@ -25,6 +30,17 @@ public class PageTemplate extends WebPage {
 
     public PageTemplate() {
         Injector.get().inject(this);
+
+        initLayout();
+    }
+
+    private void initLayout() {
+        Label title = new Label(ID_TITLE, createPageTitleModel());
+        title.setRenderBodyOnly(true);
+        add(title);
+
+        DebugBar debugPanel = new DebugBar(ID_DEBUG_PANEL);
+        add(debugPanel);
     }
 
     public StringResourceModel createStringResource(String resourceKey, Object... objects) {
@@ -50,6 +66,10 @@ public class PageTemplate extends WebPage {
         super.renderHead(response);
 
         Bootstrap.renderHead(response);
+    }
+
+    protected IModel<String> createPageTitleModel() {
+        return createStringResource("page.title");
     }
 
     public void addAlert(IModel<String> text, Alert.Type type) {

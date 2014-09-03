@@ -3,12 +3,16 @@
 <body>
 <wicket:extend>
     <div class="container">
+        <div wicket:id="feedback"/>
+
         <form class="form-signin" role="form" wicket:id="form">
             <h2 class="form-signin-heading"><wicket:message key="PageLogin.heading"/></h2>
-            <input type="text" class="form-control" wicket:id="username"
-                   wicket:message="placeholder:PageLogin.username" required autofocus>
-            <input type="password" class="form-control" wicket:id="password"
-                   wicket:message="placeholder:PageLogin.password" required>
+            <div class="form-group" wicket:id="usernameGroup">
+                <input type="text" class="form-control" wicket:id="username" required autofocus>
+            </div>
+            <div class="form-group" wicket:id="passwordGroup">
+                <input type="password" class="form-control" wicket:id="password" required>
+            </div>
 
             <button class="btn btn-lg btn-primary btn-block" type="submit" wicket:id="signin">
                 <wicket:message key="PageLogin.btn.signIn"/></button>
