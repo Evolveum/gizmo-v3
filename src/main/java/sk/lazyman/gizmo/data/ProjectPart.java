@@ -1,86 +1,73 @@
 package sk.lazyman.gizmo.data;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
+/**
+ * @author lazyman
+ */
+@Entity
+@Table(name = "parts")
 public class ProjectPart implements Serializable {
 
-    private Long id;
-
+    private Integer id;
     private Project project;
-
     private String name;
 
-    public Long getId() {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "parts_id")
+    @SequenceGenerator(name = "parts_id", sequenceName = "parts_id_seq")
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    @ManyToOne
+    @JoinColumn(name = "project_id")
     public Project getProject() {
         return project;
+    }
+
+    @Column(length = 128)
+    public String getName() {
+        return name;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public void setProject(Project project) {
         this.project = project;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getFullName(String delimiter) {
-        StringBuffer retval = new StringBuffer();
-        if (this.getProject() != null) {
-            if (this.getProject().getCustomer() != null && this.getProject().getCustomer().getName() != null) {
-                retval.append(this.getProject().getCustomer().getName());
-                retval.append(delimiter);
-            }
-            if (this.getProject().getName() != null) {
-                retval.append(this.getProject().getName());
-                retval.append(delimiter);
-            }
-        }
-        if (this.getName() != null) {
-            retval.append(this.getName());
-        }
-        return retval.toString();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ProjectPart that = (ProjectPart) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+
+        return true;
     }
 
-    public String getFullName() {
-        return getFullName(" - ");
-    }
-
-    public String getFullNameBr() {
-        return getFullName("<br />");
-    }
-
-    public String getNameProject() {
-        StringBuffer retval = new StringBuffer();
-        if (this.getProject() != null) {
-            if (this.getProject().getName() != null) {
-                retval.append(this.getProject().getName());
-                retval.append(" ");
-            }
-        }
-        if (this.getName() != null) {
-            retval.append(this.getName());
-        }
-        return retval.toString();
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("id=" + id);
-        builder.append(", name=" + name);
-        builder.append("project=[" + getFullName() + "]");
-
-        return builder.toString();
+        final StringBuilder sb = new StringBuilder("ProjectPart{");
+        sb.append("id=").append(id);
+        sb.append(", project=").append(project);
+        sb.append(", name='").append(name).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

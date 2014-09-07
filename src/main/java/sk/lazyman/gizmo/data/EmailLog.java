@@ -1,115 +1,86 @@
 package sk.lazyman.gizmo.data;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author lazyman
  */
+@Entity
+@Table(name = "EmailLog")
 public class EmailLog {
 
-    private long id;
+    private Integer id;
 
     // about mail
     private User sender;
-
     private Date date;
-
     private String mailTo;
-
     private String mailCc;
-
     private String mailBcc;
-
     private boolean successful;
-
     // about selection filter, data in mail
     private Date from;
-
     private Date to;
-
-    private List<User> realizatorList;
-
-    private List<Project> projectList;
-
+    private Set<User> realizatorList;
+    private Set<Project> projectList;
     private double summaryWork;
-
     private double summaryInvoice;
-
     private String comment;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "email_log_id")
+    @SequenceGenerator(name = "email_log_id", sequenceName = "email_log_id_seq")
+    public Integer getId() {
+        return id;
+    }
 
     public String getComment() {
         return comment;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
+    @ManyToOne
+    @JoinColumn(name = "sender")
     public User getSender() {
         return sender;
     }
 
-    public void setSender(User user) {
-        this.sender = user;
-    }
-
+    @Column(name = "sentDate")
     public Date getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
+    @Column(nullable = false)
     public boolean isSuccessful() {
         return successful;
     }
 
-    public void setSuccessful(boolean successful) {
-        this.successful = successful;
-    }
-
-    public List<User> getRealizatorList() {
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "EmailLog_realizator",
+            joinColumns = {@JoinColumn(name = "log_id", nullable = false, updatable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "user_id", nullable = false, updatable = false)})
+    public Set<User> getRealizatorList() {
         return realizatorList;
     }
 
-    public void setRealizatorList(List<User> realizatorList) {
-        this.realizatorList = realizatorList;
-    }
-
-    public List<Project> getProjectList() {
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "EmailLog_project",
+            joinColumns = {@JoinColumn(name = "log_id", nullable = false, updatable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "project_id", nullable = false, updatable = false)})
+    public Set<Project> getProjectList() {
         return projectList;
     }
 
-    public void setProjectList(List<Project> projectList) {
-        this.projectList = projectList;
-    }
-
+    @Column(name = "fromDate")
     public Date getFrom() {
         return from;
     }
 
-    public void setFrom(Date from) {
-        this.from = from;
-    }
-
+    @Column(name = "toDate")
     public Date getTo() {
         return to;
-    }
-
-    public void setTo(Date to) {
-        this.to = to;
     }
 
     public String getMailBcc() {
@@ -124,50 +95,85 @@ public class EmailLog {
         return mailTo;
     }
 
-    public void setMailBcc(String mailBcc) {
-        this.mailBcc = mailBcc;
-    }
-
-    public void setMailCc(String mailCc) {
-        this.mailCc = mailCc;
-    }
-
-    public void setMailTo(String mailTo) {
-        this.mailTo = mailTo;
-    }
-
-    public String getFormattedDate() {
-        DateFormat sdf = new SimpleDateFormat("dd. MMM. yyyy, HH:mm:ss");
-
-        return sdf.format(date);
-    }
-
-    public String getFormattedFromDate() {
-        DateFormat sdf = new SimpleDateFormat("dd. MMM. yyyy");
-
-        return sdf.format(from);
-    }
-
-    public String getFormattedToDate() {
-        DateFormat sdf = new SimpleDateFormat("dd. MMM. yyyy");
-
-        return sdf.format(to);
-    }
-
     public double getSummaryInvoice() {
         return summaryInvoice;
-    }
-
-    public void setSummaryInvoice(double summaryInvoice) {
-        this.summaryInvoice = summaryInvoice;
     }
 
     public double getSummaryWork() {
         return summaryWork;
     }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setMailTo(String mailTo) {
+        this.mailTo = mailTo;
+    }
+
+    public void setMailCc(String mailCc) {
+        this.mailCc = mailCc;
+    }
+
+    public void setMailBcc(String mailBcc) {
+        this.mailBcc = mailBcc;
+    }
+
+    public void setSuccessful(boolean successful) {
+        this.successful = successful;
+    }
+
+    public void setFrom(Date from) {
+        this.from = from;
+    }
+
+    public void setTo(Date to) {
+        this.to = to;
+    }
+
+    public void setRealizatorList(Set<User> realizatorList) {
+        this.realizatorList = realizatorList;
+    }
+
+    public void setProjectList(Set<Project> projectList) {
+        this.projectList = projectList;
+    }
+
     public void setSummaryWork(double summaryWork) {
         this.summaryWork = summaryWork;
+    }
+
+    public void setSummaryInvoice(double summaryInvoice) {
+        this.summaryInvoice = summaryInvoice;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EmailLog emailLog = (EmailLog) o;
+
+        if (id != null ? !id.equals(emailLog.id) : emailLog.id != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override

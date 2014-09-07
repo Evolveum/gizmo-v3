@@ -3,7 +3,7 @@ package sk.lazyman.gizmo.data;
 import javax.persistence.*;
 
 /**
- * @author mamut
+ * @author lazyman
  */
 @Entity
 @Table(name = "users")
@@ -16,7 +16,7 @@ public class User {
     private String lastName;
     private String firstName;
     private String email;
-    private int role;
+    private int role;                   //todo change to Role
     private String certHash;
 
     @Id
@@ -27,17 +27,9 @@ public class User {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     @Column(name = "username")
     public String getUserName() {
         return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     @Column(name = "ldapDN")
@@ -45,16 +37,8 @@ public class User {
         return ldapDN;
     }
 
-    public void setLdapDN(String ldapDN) {
-        this.ldapDN = ldapDN;
-    }
-
     public String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     @Column(name = "lastname")
@@ -62,38 +46,54 @@ public class User {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     @Column(name = "firstname")
     public String getFirstName() {
         return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public int getRole() {
         return role;
-    }
-
-    public void setRole(int role) {
-        this.role = role;
     }
 
     @Column(name = "cert_hash")
     public String getCertHash() {
         return certHash;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setLdapDN(String ldapDN) {
+        this.ldapDN = ldapDN;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
     }
 
     public void setCertHash(String certHash) {
@@ -117,7 +117,7 @@ public class User {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 53 * hash + (int) (this.id ^ (this.id >>> 32));
+        hash = 53 * hash + (this.id ^ (this.id >>> 32));
         return hash;
     }
 
@@ -136,6 +136,7 @@ public class User {
         return builder.toString().trim();
     }
 
+    //todo remove [lazyman]
     @Transient
     public boolean getCommon() {
         if (role == 1) {
