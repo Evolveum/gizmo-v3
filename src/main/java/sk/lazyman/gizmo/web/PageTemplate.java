@@ -12,8 +12,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import sk.lazyman.gizmo.repository.CompanyRepository;
-import sk.lazyman.gizmo.repository.UserRepository;
+import sk.lazyman.gizmo.repository.*;
 
 /**
  * @author lazyman
@@ -27,6 +26,14 @@ public class PageTemplate extends WebPage {
     private CompanyRepository companyRepository;
     @SpringBean
     private UserRepository userRepository;
+    @SpringBean
+    private ProjectRepository projectRepository;
+    @SpringBean
+    private ProjectPartRepository projectPartRepository;
+    @SpringBean
+    private TaskRepository taskRepository;
+    @SpringBean
+    private EmailLogRepository emailLogRepository;
 
     public PageTemplate() {
         Injector.get().inject(this);
@@ -82,5 +89,21 @@ public class PageTemplate extends WebPage {
 
     public UserRepository getUserRepository() {
         return userRepository;
+    }
+
+    public ProjectRepository getProjectRepository() {
+        return projectRepository;
+    }
+
+    public ProjectPartRepository getProjectPartRepository() {
+        return projectPartRepository;
+    }
+
+    public TaskRepository getTaskRepository() {
+        return taskRepository;
+    }
+
+    public EmailLogRepository getEmailLogRepository() {
+        return emailLogRepository;
     }
 }
