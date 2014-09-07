@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface CompanyRepository extends JpaRepository<Company, Integer> {
 
-    @Query("from Company")
+    @Query("from Company c order by c.name")
     public List<Company> listCompanies();
 }
