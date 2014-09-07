@@ -1,13 +1,14 @@
 package sk.lazyman.gizmo.data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * @author lazyman
  */
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements Serializable {
 
     private Integer id;
     private String userName;
