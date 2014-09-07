@@ -7,13 +7,15 @@ import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.FeedbackPanel;
 import sk.lazyman.gizmo.component.FormUtils;
+import sk.lazyman.gizmo.security.GizmoAuthWebSession;
+import sk.lazyman.gizmo.web.app.PageDashboard;
 
 /**
  * @author lazyman
@@ -49,9 +51,8 @@ public class PageLogin extends PageTemplate {
         Form form = new Form(ID_FORM);
         add(form);
 
-        TextField username = new TextField(ID_USERNAME, new PropertyModel(model, LoginDto.F_USERNAME));
+        RequiredTextField username = new RequiredTextField(ID_USERNAME, new PropertyModel(model, LoginDto.F_USERNAME));
         FormUtils.addPlaceholderAndLabel(username, createStringResource("PageLogin.username"));
-        username.setRequired(true);
         form.add(FormUtils.createFormGroup(ID_USERNAME_GROUP, username));
 
         PasswordTextField password = new PasswordTextField(ID_PASSWORD, new PropertyModel(model, LoginDto.F_PASSWORD));
@@ -74,13 +75,13 @@ public class PageLogin extends PageTemplate {
     }
 
     private void loginPerformed(AjaxRequestTarget target, Form<?> form) {
-        form.error("vilkooooo error");
-        form.info("info vilko");
-        form.success("success vilko");
-        form.warn("warn");
-        form.debug("debug");
-        form.fatal("fatal");
-
         target.add(form, PageLogin.this.get(ID_FEEDBACK));
+
+        GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
+
+        LoginDto dto = model.getObject();
+        if (session.authenticate(dto.getUsername(), dto.getPassword())) {
+            setResponsePage(PageDashboard.class);
+        }
     }
 }

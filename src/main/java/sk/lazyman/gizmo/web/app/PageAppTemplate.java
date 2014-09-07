@@ -35,7 +35,7 @@ public class PageAppTemplate extends PageTemplate {
     private void initLayout() {
         Navbar navbar = new Navbar(ID_NAVBAR);
         navbar.setBrandName(createStringResource("GizmoApplication.projectName"));
-        navbar.setPosition(Navbar.Position.TOP);
+        navbar.setPosition(Navbar.Position.STATIC_TOP);
         add(navbar);
 
         TopMenuItem item = new TopMenuItem(createStringResource("PageAppTemplate.menu.dashboard"), PageDashboard.class);
@@ -48,9 +48,6 @@ public class PageAppTemplate extends PageTemplate {
         navbar.addComponents(new ImmutableNavbarComponent(item));
 
         item = new TopMenuItem(createStringResource("PageAppTemplate.menu.vacation"), PageVacation.class);
-        navbar.addComponents(new ImmutableNavbarComponent(item));
-
-        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.drives"), PageDrives.class);
         navbar.addComponents(new ImmutableNavbarComponent(item));
 
         item = new TopMenuItem(createStringResource("PageAppTemplate.menu.emails"), PageEmails.class);
