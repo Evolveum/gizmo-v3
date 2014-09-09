@@ -2,6 +2,7 @@ package sk.lazyman.gizmo.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import sk.lazyman.gizmo.data.User;
 
 import java.util.Collection;
 
@@ -10,6 +11,8 @@ import java.util.Collection;
  */
 public class GizmoPrincipal implements UserDetails {
 
+    private User user;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -17,12 +20,12 @@ public class GizmoPrincipal implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return user.getUserName();
     }
 
     @Override

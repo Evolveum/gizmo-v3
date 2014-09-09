@@ -6,7 +6,6 @@ import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.Request;
-import org.apache.wicket.resource.loader.ComponentStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GizmoAuthWebSession.class);
 
-    @SpringBean(name = "gizmoAuthenticationProvider")
+    @SpringBean(name = "ldapAuthProvider")
     private AuthenticationProvider authenticationProvider;
 
     public GizmoAuthWebSession(Request request) {
@@ -40,9 +39,7 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
 
     @Override
     public Roles getRoles() {
-        Roles roles = new Roles();
-        //todo - used for wicket auth roles...
-        return roles;
+        return new Roles();
     }
 
     public static GizmoAuthWebSession getSession() {
@@ -61,11 +58,10 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             authenticated = authentication.isAuthenticated();
         } catch (AuthenticationException ex) {
-            ComponentStringResourceLoader comp = new ComponentStringResourceLoader();
-            error(comp.loadStringResource(GizmoApplication.class, ex.getMessage(), getLocale(), "", ""));
-
             LOGGER.debug("Couldn't authenticate user.", ex);
             authenticated = false;
+
+            error(ex.getMessage());
         }
 
         return authenticated;
