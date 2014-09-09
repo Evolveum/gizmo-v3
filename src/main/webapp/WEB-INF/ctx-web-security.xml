@@ -3,42 +3,70 @@
              xmlns:beans="http://www.springframework.org/schema/beans"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://www.springframework.org/schema/beans
-http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-http://www.springframework.org/schema/security
-http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/security
+    http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
     <global-method-security secured-annotations="enabled"/>
 
-    <http pattern="/**" security="none"/>
+    <!--<http pattern="/**" security="none"/>-->
 
-    <!--<http pattern="/wicket/resource/**" security="none"/>-->
+    <http pattern="/wicket/resource/**" security="none"/>
 
-    <!--<http create-session="never" auto-config="true" use-expressions="false">-->
+    <http create-session="never" auto-config="true" use-expressions="false">
 
-        <!--<intercept-url pattern="/j_spring_security_check"/>-->
-        <!--<intercept-url pattern="/spring_security_login"/>-->
+        <intercept-url pattern="/j_spring_security_check"/>
+        <intercept-url pattern="/spring_security_login"/>
 
-        <!--<intercept-url pattern="/login"/>-->
+        <intercept-url pattern="/login"/>
 
-        <!--&lt;!&ndash;<intercept-url pattern="/app/**" access="isFullyAuthenticated"/>&ndash;&gt;-->
-        <!--&lt;!&ndash;  access="isAuthenticated()"/> &ndash;&gt;-->
+        <!--<intercept-url pattern="/app/**" access="isFullyAuthenticated"/>-->
+        <!--  access="isAuthenticated()"/> -->
 
-        <!--<logout logout-url="/j_spring_security_logout" invalidate-session="true"-->
-                <!--logout-success-url="/app/dashboard"/>-->
+        <logout logout-url="/j_spring_security_logout" invalidate-session="true"
+                logout-success-url="/app/dashboard"/>
 
-        <!--<session-management>-->
-            <!--<concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>-->
-        <!--</session-management>-->
+        <session-management>
+            <concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>
+        </session-management>
 
-        <!--<form-login login-page="/login" default-target-url="/home"/>-->
+        <form-login login-page="/login" default-target-url="/home"/>
 
-        <!--&lt;!&ndash;<intercept-url pattern="/**" access="isFullyAuthenticated"/>&ndash;&gt;-->
-    <!--</http>-->
-
-    <beans:bean id="gizmoAuthenticationProvider"
-                class="sk.lazyman.gizmo.security.GizmoAuthenticationProvider"/>
+        <!--<intercept-url pattern="/**" access="isFullyAuthenticated"/>-->
+    </http>
 
     <authentication-manager alias="authenticationManager">
-        <authentication-provider ref="gizmoAuthenticationProvider"/>
+        <authentication-provider ref="ldapAuthProvider"/>
     </authentication-manager>
+
+    <beans:bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+        <beans:constructor-arg value="${gizmo.ldap.host}" />
+        <beans:property name="userDn" value="${gizmo.ldap.username}" />
+        <beans:property name="password" value="${gizmo.ldap.password}" />
+    </beans:bean>
+
+    <beans:bean id="ldapAuthProvider"
+                class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+        <beans:constructor-arg ref="ldapBindAuthenticator" />
+        <beans:constructor-arg ref="ldapAuthoritiesPopulator" />
+    </beans:bean>
+
+    <beans:bean id="ldapBindAuthenticator"
+                class="sk.lazyman.gizmo.security.SimpleBindAunthenticator">
+        <beans:constructor-arg ref="contextSource" />
+        <beans:property name="userDnPatterns">
+            <beans:list>
+                <beans:value>${gizmo.ldap.userDnPattern}</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="ldapAuthoritiesPopulator"
+                class="org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator">
+        <beans:constructor-arg ref="contextSource"/>
+        <beans:constructor-arg value="${gizmo.ldap.groupSearchBase}"/>
+        <beans:property name="groupRoleAttribute" value="${gizmo.ldap.groupRoleAttribute}"/>
+        <beans:property name="groupSearchFilter" value="${gizmo.ldap.groupSearchFilter}"/>
+    </beans:bean>
+
 </beans:beans>
