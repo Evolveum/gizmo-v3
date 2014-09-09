@@ -6,6 +6,7 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarExternalLin
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
@@ -20,6 +21,7 @@ import sk.lazyman.gizmo.web.PageTemplate;
 public class PageAppTemplate extends PageTemplate {
 
     private static final String ID_NAVBAR = "navbar";
+    private static final String ID_TITLE = "titleHeader";
 
     public PageAppTemplate() {
         initLayout();
@@ -61,6 +63,9 @@ public class PageAppTemplate extends PageTemplate {
                 new Model<>(RequestCycle.get().getRequest().getContextPath() + "/j_spring_security_logout"));
         logoutLink.setLabel(createStringResource("PageAppTemplate.menu.logout"));
         navbar.addComponents(new ImmutableNavbarComponent(logoutLink, Navbar.ComponentPosition.RIGHT));
+
+        Label title = new Label(ID_TITLE, createPageTitleModel());
+        add(title);
     }
 
     private PageParameters createUserPageParams() {
