@@ -19,6 +19,8 @@ public class EmailLog implements Serializable {
     public static final String F_TO = "to";
     public static final String F_SUMMARY_WORK = "summaryWork";
     public static final String F_SUMMARY_INVOICE = "summaryInvoice";
+    public static final String F_REALIZATOR_LIST = "realizatorList";
+    public static final String F_PROJECT_LIST = "projectList";
 
     private Integer id;
 
