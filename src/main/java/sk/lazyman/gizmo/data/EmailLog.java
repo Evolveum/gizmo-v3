@@ -1,8 +1,8 @@
 package sk.lazyman.gizmo.data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -10,7 +10,15 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "EmailLog")
-public class EmailLog {
+public class EmailLog implements Serializable {
+
+    public static final String F_DATE = "date";
+    public static final String F_SUCCESSFUL = "successful";
+    public static final String F_MAIL_TO = "mailTo";
+    public static final String F_FROM = "from";
+    public static final String F_TO = "to";
+    public static final String F_SUMMARY_WORK = "summaryWork";
+    public static final String F_SUMMARY_INVOICE = "summaryInvoice";
 
     private Integer id;
 

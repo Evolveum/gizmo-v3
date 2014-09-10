@@ -1,4 +1,4 @@
-package sk.lazyman.gizmo.component;
+package sk.lazyman.gizmo.data.provider;
 
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;

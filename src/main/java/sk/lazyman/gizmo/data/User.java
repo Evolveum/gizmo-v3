@@ -1,5 +1,7 @@
 package sk.lazyman.gizmo.data;
 
+import org.apache.commons.lang.StringUtils;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -9,6 +11,16 @@ import java.io.Serializable;
 @Entity
 @Table(name = "users")
 public class User implements Serializable {
+
+    public static final String F_ID = "id";
+    public static final String F_USER_NAME = "userName";
+    public static final String F_LDAP_DN = "ldapDN";
+    public static final String F_PASSWORD = "password";
+    public static final String F_LAST_NAME = "lastName";
+    public static final String F_FIRST_NAME = "firstName";
+    public static final String F_EMAIL = "email";
+    public static final String F_ROLE = "role";
+    public static final String F_CERT_HASH = "certHash";
 
     private Integer id;
     private String userName;
@@ -124,26 +136,6 @@ public class User implements Serializable {
 
     @Transient
     public String getFullName() {
-        StringBuilder builder = new StringBuilder();
-
-        if (firstName != null && !firstName.isEmpty()) {
-            builder.append(firstName + " ");
-        }
-
-        if (lastName != null && !lastName.isEmpty()) {
-            builder.append(lastName);
-        }
-
-        return builder.toString().trim();
-    }
-
-    //todo remove [lazyman]
-    @Transient
-    public boolean getCommon() {
-        if (role == 1) {
-            return true;
-        }
-
-        return false;
+        return StringUtils.join(new Object[]{firstName, lastName}, ' ');
     }
 }

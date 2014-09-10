@@ -9,8 +9,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.LinkColumn;
 import sk.lazyman.gizmo.component.TablePanel;
-import sk.lazyman.gizmo.component.UsersDataProvider;
 import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.data.provider.UsersDataProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,17 +31,17 @@ public class PageUsers extends PageAppTemplate {
         SortableDataProvider provider = new UsersDataProvider(getUserRepository());
         List<IColumn> columns = new ArrayList<>();
 
-        columns.add(new LinkColumn<User>(createStringResource("User.userName"), "userName") {
+        columns.add(new LinkColumn<User>(createStringResource("User.userName"), User.F_USER_NAME) {
 
             @Override
             public void onClick(AjaxRequestTarget target, IModel<User> rowModel) {
                 userDetailsPerformed(target, rowModel.getObject());
             }
         });
-        columns.add(new PropertyColumn(createStringResource("User.firstName"), "firstName"));
-        columns.add(new PropertyColumn(createStringResource("User.lastName"), "lastName"));
-        columns.add(new PropertyColumn(createStringResource("User.email"), "email"));
-        columns.add(new PropertyColumn(createStringResource("User.role"), "role"));
+        columns.add(new PropertyColumn(createStringResource("User.firstName"), User.F_FIRST_NAME));
+        columns.add(new PropertyColumn(createStringResource("User.lastName"), User.F_LAST_NAME));
+        columns.add(new PropertyColumn(createStringResource("User.email"), User.F_EMAIL));
+        columns.add(new PropertyColumn(createStringResource("User.role"), User.F_ROLE));
 
         TablePanel table = new TablePanel(ID_TABLE, provider, columns, 15);
         add(table);

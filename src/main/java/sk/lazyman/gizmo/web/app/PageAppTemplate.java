@@ -12,6 +12,7 @@ import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import sk.lazyman.gizmo.component.FeedbackPanel;
 import sk.lazyman.gizmo.component.TopMenuItem;
 import sk.lazyman.gizmo.web.PageTemplate;
 
@@ -22,6 +23,7 @@ public class PageAppTemplate extends PageTemplate {
 
     private static final String ID_NAVBAR = "navbar";
     private static final String ID_TITLE = "titleHeader";
+    private static final String ID_FEEDBACK = "feedback";
 
     public PageAppTemplate() {
         initLayout();
@@ -66,6 +68,14 @@ public class PageAppTemplate extends PageTemplate {
 
         Label title = new Label(ID_TITLE, createPageTitleModel());
         add(title);
+
+        FeedbackPanel feedback = new FeedbackPanel(ID_FEEDBACK);
+        feedback.setOutputMarkupId(true);
+        add(feedback);
+    }
+
+    protected FeedbackPanel getFeedbackPanel() {
+        return (FeedbackPanel) get(ID_FEEDBACK);
     }
 
     private PageParameters createUserPageParams() {
