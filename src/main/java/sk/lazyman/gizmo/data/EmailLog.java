@@ -67,7 +67,7 @@ public class EmailLog implements Serializable {
         return successful;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "EmailLog_realizator",
             joinColumns = {@JoinColumn(name = "log_id", nullable = false, updatable = false)},
             inverseJoinColumns = {@JoinColumn(name = "user_id", nullable = false, updatable = false)})
@@ -75,7 +75,7 @@ public class EmailLog implements Serializable {
         return realizatorList;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "EmailLog_project",
             joinColumns = {@JoinColumn(name = "log_id", nullable = false, updatable = false)},
             inverseJoinColumns = {@JoinColumn(name = "project_id", nullable = false, updatable = false)})

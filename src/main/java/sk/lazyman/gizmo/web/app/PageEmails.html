@@ -2,6 +2,25 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
+    <form class="form-inline pull-right" role="form" wicket:id="form">
+        <div class="form-group">
+            <label class="sr-only"><wicket:message key="PageEmails.dateFrom"/></label>
+            <input class="form-control input-sm" wicket:id="from"
+                   wicket:message="placeholder:PageEmails.dateFrom">
+        </div>
+        <div class="form-group">
+            <label class="sr-only"><wicket:message key="PageEmails.dateTo"/></label>
+            <input class="form-control input-sm" wicket:id="to"
+                   wicket:message="placeholder:PageEmails.dateTo">
+        </div>
+        <div class="form-group">
+            <label class="sr-only"><wicket:message key="PageEmails.sender"/></label>
+            <select class="form-control input-sm" wicket:id="sender"/>
+        </div>
+        <div class="form-group">
+            <a class="btn btn-sm btn-default" wicket:id="filter"/>
+        </div>
+    </form>
     <div wicket:id="table"/>
 </wicket:extend>
 </body>
