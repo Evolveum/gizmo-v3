@@ -12,9 +12,12 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.basic.MultiLineLabel;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.PropertyModel;
+import org.springframework.data.domain.Sort;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.DateColumn;
@@ -24,12 +27,12 @@ import sk.lazyman.gizmo.data.EmailLog;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.provider.EmailDataProvider;
+import sk.lazyman.gizmo.dto.EmailFilterDto;
+import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.util.GizmoUtils;
+import sk.lazyman.gizmo.util.LoadableModel;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author lazyman
@@ -44,7 +47,17 @@ public class PageEmails extends PageAppTemplate {
     private static final String ID_SENDER = "sender";
     private static final String ID_FILTER = "filter";
 
+    private IModel<EmailFilterDto> filter;
+
     public PageEmails() {
+        filter = new LoadableModel<EmailFilterDto>(false) {
+
+            @Override
+            protected EmailFilterDto load() {
+                return new EmailFilterDto();
+            }
+        };
+
         initLayout();
     }
 
@@ -52,10 +65,28 @@ public class PageEmails extends PageAppTemplate {
         Form form = new Form(ID_FORM);
         add(form);
 
-        form.add(new DateTextField(ID_FROM));
-        form.add(new DateTextField(ID_TO));
+        form.add(new DateTextField(ID_FROM, new PropertyModel<Date>(filter, EmailFilterDto.F_FROM)));
+        form.add(new DateTextField(ID_TO, new PropertyModel<Date>(filter, EmailFilterDto.F_TO)));
 
-        form.add(new DropDownChoice<>(ID_SENDER));
+        form.add(new DropDownChoice<User>(ID_SENDER, new PropertyModel<User>(filter, EmailFilterDto.F_SENDER),
+                createSenderModel(), new IChoiceRenderer<User>() {
+
+            @Override
+            public Object getDisplayValue(User object) {
+                return object.getFullName();
+            }
+
+            @Override
+            public String getIdValue(User object, int index) {
+                return Integer.toString(index);
+            }
+        }) {
+
+            @Override
+            protected String getNullValidKey() {
+                return "PageEmails.sender";
+            }
+        });
 
         form.add(new AjaxSubmitButton(ID_FILTER, createStringResource("PageEmails.filter")) {
 
@@ -187,7 +218,18 @@ public class PageEmails extends PageAppTemplate {
         };
     }
 
-    private void filterLogs(AjaxRequestTarget target) {
+    private IModel<List<User>> createSenderModel() {
+        return new LoadableModel<List<User>>(false) {
 
+            @Override
+            protected List<User> load() {
+                UserRepository repo = getUserRepository();
+                return repo.findAll(new Sort(Sort.Direction.ASC, User.F_FIRST_NAME, User.F_LAST_NAME));
+            }
+        };
+    }
+
+    private void filterLogs(AjaxRequestTarget target) {
+        //todo implement
     }
 }
