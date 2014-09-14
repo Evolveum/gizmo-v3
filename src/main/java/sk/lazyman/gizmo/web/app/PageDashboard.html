@@ -2,30 +2,33 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
-    <form class="form-inline" role="form" wicket:id="form">
+    <form class="form-inline pull-right search" role="form" wicket:id="form">
         <div class="form-group">
-            <label class="sr-only">From</label>
-            <input wicket:id="from" type="text" class="form-control" placeholder="From">
+            <label class="sr-only"><wicket:message key="PageDashboard.dateFrom"/></label>
+            <input class="form-control input-sm" wicket:id="from"
+                   wicket:message="placeholder:PageDashboard.dateFrom">
         </div>
         <div class="form-group">
-            <label class="sr-only">To</label>
-            <input wicket:id="to" type="text" class="form-control" placeholder="To">
+            <label class="sr-only"><wicket:message key="PageDashboard.dateTo"/></label>
+            <input class="form-control input-sm" wicket:id="to"
+                   wicket:message="placeholder:PageDashboard.dateTo">
         </div>
+
         <div class="form-group">
             <label class="sr-only">Project</label>
-            <input type="email" class="form-control" placeholder="Project">
+            <input type="email" class="form-control input-sm" placeholder="Project">
         </div>
         <div class="form-group">
             <label class="sr-only">Realizator</label>
-            <input type="email" class="form-control" placeholder="Realizator">
+            <input type="email" class="form-control input-sm" placeholder="Realizator">
         </div>
-        <button type="submit" class="btn btn-primary">Display</button>
-        <button type="submit" class="btn btn-default">Print</button>
-        <button type="submit" class="btn btn-default">Email</button>
-        <button type="submit" class="btn btn-success">New task</button>
+        <button type="submit" class="btn btn-primary btn-sm">Display</button>
+        <button type="submit" class="btn btn-default btn-sm">Print</button>
+        <button type="submit" class="btn btn-default btn-sm">Email</button>
+        <button type="submit" class="btn btn-success btn-sm">New task</button>
     </form>
 
-    <hr/>
+    <hr />
 
     <div class="row">
         <div class="col-md-3">
@@ -88,14 +91,7 @@
     <hr/>
 
     <div class="row">
-        <table class="table table-condensed table-striped table-hover">
-            <tr>
-                <td>asdf</td>
-            </tr>
-            <tr>
-                <td>asdf</td>
-            </tr>
-        </table>
+        <div wicket:id="table"/>
     </div>
 </wicket:extend>
 </body>

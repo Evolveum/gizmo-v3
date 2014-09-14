@@ -1,6 +1,7 @@
 package sk.lazyman.gizmo.data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -8,7 +9,10 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "tasks")
-public class Task {
+public class Task implements Serializable {
+
+    public static final String F_DATE = "date";
+    public static final String F_DESC = "desc";
 
     private Integer id;
     private ProjectPart projectPart;

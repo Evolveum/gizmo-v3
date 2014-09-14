@@ -2,18 +2,17 @@ package sk.lazyman.gizmo.data.provider;
 
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.Predicate;
-import com.mysema.query.types.PredicateOperation;
-import com.mysema.query.types.expr.BooleanExpression;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import sk.lazyman.gizmo.data.EmailLog;
 import sk.lazyman.gizmo.data.QEmailLog;
-import sk.lazyman.gizmo.dto.EmailFilterDto;
-import sk.lazyman.gizmo.repository.EmailLogRepository;
+import sk.lazyman.gizmo.data.QTask;
+import sk.lazyman.gizmo.data.Task;
+import sk.lazyman.gizmo.dto.TaskFilterDto;
+import sk.lazyman.gizmo.repository.TaskRepository;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,39 +21,39 @@ import java.util.List;
 /**
  * @author lazyman
  */
-public class EmailDataProvider extends SortableDataProvider<EmailLog, String> {
+public class TaskDataProvider extends SortableDataProvider<Task, String> {
 
-    private EmailLogRepository emailRepository;
-    private EmailFilterDto filter;
+    private TaskRepository taskRepository;
+    private TaskFilterDto filter;
 
-    public EmailDataProvider(EmailLogRepository emailRepository) {
-        this.emailRepository = emailRepository;
+    public TaskDataProvider(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
     }
 
     @Override
-    public Iterator<? extends EmailLog> iterator(long first, long count) {
-        Sort sort = new Sort(Sort.Direction.DESC, EmailLog.F_DATE);
+    public Iterator<? extends Task> iterator(long first, long count) {
+        Sort sort = new Sort(Sort.Direction.ASC, Task.F_DATE);
 
         PageRequest page = new PageRequest((int) first, (int) count, sort);
-        Page<EmailLog> found = emailRepository.findAll(createPredicate(), page);
+        Page<Task> found = taskRepository.findAll(createPredicate(), page);
         if (found != null) {
             return found.iterator();
         }
 
-        return new ArrayList<EmailLog>().iterator();
+        return new ArrayList<Task>().iterator();
     }
 
     @Override
     public long size() {
-        return emailRepository.count(createPredicate());
+        return taskRepository.count(createPredicate());
     }
 
     @Override
-    public IModel<EmailLog> model(EmailLog object) {
+    public IModel<Task> model(Task object) {
         return new Model<>(object);
     }
 
-    public void setFilter(EmailFilterDto filter) {
+    public void setFilter(TaskFilterDto filter) {
         this.filter = filter;
     }
 
@@ -65,15 +64,15 @@ public class EmailDataProvider extends SortableDataProvider<EmailLog, String> {
 
         List<Predicate> list = new ArrayList<>();
         if (filter.getFrom() != null) {
-            list.add(QEmailLog.emailLog.date.goe(filter.getFrom()));
+            list.add(QTask.task.date.goe(filter.getFrom()));
         }
 
         if (filter.getTo() != null) {
-            list.add(QEmailLog.emailLog.date.loe(filter.getTo()));
+            list.add(QTask.task.date.loe(filter.getTo()));
         }
 
-        if (filter.getSender() != null) {
-            list.add(QEmailLog.emailLog.sender.eq(filter.getSender()));
+        if (filter.getRealizator() != null) {
+            list.add(QTask.task.realizator.eq(filter.getRealizator()));
         }
 
         if (list.isEmpty()) {

@@ -60,4 +60,8 @@ public class GizmoPrincipal implements UserDetails {
     public Integer getUserId() {
         return user.getId();
     }
+
+    public User getUser() {
+        return user;
+    }
 }

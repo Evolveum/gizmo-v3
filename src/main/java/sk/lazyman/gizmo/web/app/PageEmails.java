@@ -104,8 +104,6 @@ public class PageEmails extends PageAppTemplate {
         SortableDataProvider provider = new EmailDataProvider(getEmailLogRepository());
         List<IColumn> columns = new ArrayList<>();
 
-        //todo add search from/to date and sender
-
         columns.add(new DateColumn(createStringResource("EmailLog.date"), EmailLog.F_DATE, "dd. MMM, yyyy HH:mm:ss"));
         columns.add(new AbstractColumn<EmailLog, String>(createStringResource("EmailLog.sender")) {
 
