@@ -13,15 +13,15 @@
             <input class="form-control input-sm" wicket:id="to"
                    wicket:message="placeholder:PageDashboard.dateTo">
         </div>
-
         <div class="form-group">
             <label class="sr-only">Project</label>
             <input type="email" class="form-control input-sm" placeholder="Project">
         </div>
         <div class="form-group">
-            <label class="sr-only">Realizator</label>
-            <input type="email" class="form-control input-sm" placeholder="Realizator">
+            <label class="sr-only"><wicket:message key="PageDashboard.realizator"/></label>
+            <select class="form-control input-sm" wicket:id="realizator"/>
         </div>
+
         <button type="submit" class="btn btn-primary btn-sm">Display</button>
         <button type="submit" class="btn btn-default btn-sm">Print</button>
         <button type="submit" class="btn btn-default btn-sm">Email</button>

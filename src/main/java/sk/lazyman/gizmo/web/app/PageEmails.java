@@ -69,7 +69,7 @@ public class PageEmails extends PageAppTemplate {
         form.add(new DateTextField(ID_TO, new PropertyModel<Date>(filter, EmailFilterDto.F_TO)));
 
         form.add(new DropDownChoice<User>(ID_SENDER, new PropertyModel<User>(filter, EmailFilterDto.F_SENDER),
-                createSenderModel(), new IChoiceRenderer<User>() {
+                GizmoUtils.createUserModel(getUserRepository()), new IChoiceRenderer<User>() {
 
             @Override
             public Object getDisplayValue(User object) {
@@ -212,17 +212,6 @@ public class PageEmails extends PageAppTemplate {
                 Collections.sort(names);
 
                 return StringUtils.join(names, '\n');
-            }
-        };
-    }
-
-    private IModel<List<User>> createSenderModel() {
-        return new LoadableModel<List<User>>(false) {
-
-            @Override
-            protected List<User> load() {
-                UserRepository repo = getUserRepository();
-                return repo.findAll(new Sort(Sort.Direction.ASC, User.F_FIRST_NAME, User.F_LAST_NAME));
             }
         };
     }
