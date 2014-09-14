@@ -14,6 +14,8 @@ import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import sk.lazyman.gizmo.repository.*;
 
+import javax.persistence.EntityManager;
+
 /**
  * @author lazyman
  */
@@ -22,6 +24,8 @@ public class PageTemplate extends WebPage {
     private static final String ID_DEBUG_PANEL = "debugPanel";
     private static final String ID_TITLE = "title";
 
+    @SpringBean
+    private EntityManager entityManager;
     @SpringBean
     private CompanyRepository companyRepository;
     @SpringBean
@@ -105,5 +109,9 @@ public class PageTemplate extends WebPage {
 
     public EmailLogRepository getEmailLogRepository() {
         return emailLogRepository;
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
     }
 }

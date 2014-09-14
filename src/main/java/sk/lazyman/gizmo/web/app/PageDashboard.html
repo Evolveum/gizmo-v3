@@ -22,64 +22,16 @@
             <select class="form-control input-sm" wicket:id="realizator"/>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-sm">Display</button>
-        <button type="submit" class="btn btn-default btn-sm">Print</button>
-        <button type="submit" class="btn btn-default btn-sm">Email</button>
-        <button type="submit" class="btn btn-success btn-sm">New task</button>
+        <a class="btn btn-primary btn-sm" wicket:id="display"/>
+        <a class="btn btn-default btn-sm" wicket:id="print"/>
+        <a class="btn btn-default btn-sm" wicket:id="email"/>
+        <a class="btn btn-success btn-sm" wicket:id="task"/>
     </form>
 
-    <hr />
+    <div class="clearfix"/>
 
     <div class="row">
-        <div class="col-md-3">
-            <table class="table table-condensed table-bordered">
-                <tr>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td class="success">0/0</td>
-                    <td class="info">0/0</td>
-                </tr>
-                <tr>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td class="info">0/0</td>
-                    <td class="info">0/0</td>
-                </tr>
-                <tr>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td class="info">0/0</td>
-                    <td class="info">0/0</td>
-                </tr>
-                <tr>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td class="info">0/0</td>
-                    <td class="info">0/0</td>
-                </tr>
-                <tr>
-                    <td>0/0</td>
-                    <td>0/0</td>
-                    <td class="active">0/0</td>
-                    <td class="active">0/0</td>
-                    <td class="active">0/0</td>
-                    <td class="active">0/0</td>
-                    <td class="active">0/0</td>
-                </tr>
-            </table>
-        </div>
+        <div class="col-md-3" wicket:id="summary"/>
         <div class="col-md-4">
             b
         </div>

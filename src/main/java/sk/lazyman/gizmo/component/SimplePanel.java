@@ -27,6 +27,10 @@ public class SimplePanel<T> extends Panel {
         return null;
     }
 
+    public void setModel(IModel<T> model) {
+        this.model = model;
+    }
+
     public IModel<T> getModel() {
         return model;
     }

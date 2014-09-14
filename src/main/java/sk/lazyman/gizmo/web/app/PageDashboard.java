@@ -2,25 +2,27 @@ package sk.lazyman.gizmo.web.app;
 
 
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
+import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
-import sk.lazyman.gizmo.component.DateColumn;
-import sk.lazyman.gizmo.component.TablePanel;
+import sk.lazyman.gizmo.component.*;
 import sk.lazyman.gizmo.data.Task;
 import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.data.provider.TaskDataProvider;
-import sk.lazyman.gizmo.dto.EmailFilterDto;
 import sk.lazyman.gizmo.dto.TaskFilterDto;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
@@ -47,11 +49,12 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_BTN_EMAIL = "email";
     private static final String ID_BTN_PRINT = "print";
     private static final String ID_BTN_NEW_TASK = "task";
+    private static final String ID_SUMMARY = "summary";
 
     private IModel<TaskFilterDto> filter;
 
     public PageDashboard() {
-        filter = new LoadableModel<TaskFilterDto>() {
+        filter = new LoadableModel<TaskFilterDto>(false) {
 
             @Override
             protected TaskFilterDto load() {
@@ -95,12 +98,18 @@ public class PageDashboard extends PageAppTemplate {
             }
         });
 
+        initButtons(form);
+
+        SummaryDataProvider summaryProvider = new SummaryDataProvider(this);
+        SummaryPanel summary = new SummaryPanel(ID_SUMMARY, summaryProvider, filter);
+        add(summary);
 
         TaskDataProvider provider = new TaskDataProvider(getTaskRepository());
         provider.setFilter(filter.getObject());
 
         List<IColumn> columns = createColumns();
         TablePanel table = new TablePanel(ID_TABLE, provider, columns, 50);
+        table.setOutputMarkupId(true);
         add(table);
     }
 
@@ -113,11 +122,123 @@ public class PageDashboard extends PageAppTemplate {
 
             @Override
             public void populateItem(Item<ICellPopulator<Task>> cellItem, String componentId, IModel<Task> rowModel) {
-                cellItem.add(new Label(componentId));
+                cellItem.add(new Label(componentId, createInvoceModel(rowModel)));
+            }
+        });
+        columns.add(new AbstractColumn<Task, String>(createStringResource("PageDashboard.realizator")) {
+
+            @Override
+            public void populateItem(Item<ICellPopulator<Task>> cellItem, String componentId, IModel<Task> rowModel) {
+                cellItem.add(new Label(componentId, createRealizatorModel(rowModel)));
+            }
+        });
+        columns.add(new AbstractColumn<Task, String>(createStringResource("PageDashboard.project")) {
+
+            @Override
+            public void populateItem(Item<ICellPopulator<Task>> cellItem, String componentId, IModel<Task> rowModel) {
+                cellItem.add(new Label(componentId, createProjectModel(rowModel)));
             }
         });
         columns.add(new PropertyColumn(createStringResource("Task.desc"), Task.F_DESC));
 
         return columns;
+    }
+
+    private IModel<String> createProjectModel(final IModel<Task> rowModel) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                Task task = rowModel.getObject();
+                return GizmoUtils.describeProjectPart(task.getProjectPart());
+            }
+        };
+    }
+
+    private IModel<String> createRealizatorModel(final IModel<Task> rowModel) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                Task task = rowModel.getObject();
+                return task.getRealizator().getFullName();
+            }
+        };
+    }
+
+    private IModel<String> createInvoceModel(final IModel<Task> rowModel) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                Task task = rowModel.getObject();
+                return StringUtils.join(new Object[]{task.getTaskLength(), " (", task.getInvoiceLength(), ')'});
+            }
+        };
+    }
+
+    private void initButtons(Form form) {
+        AjaxSubmitButton display = new AjaxSubmitButton(ID_BTN_DISPLAY,
+                createStringResource("PageDashboard.display")) {
+
+            @Override
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                displayPerformed(target);
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget target, Form<?> form) {
+                target.add(getFeedbackPanel());
+            }
+        };
+        form.add(display);
+
+        AjaxButton email = new AjaxButton(ID_BTN_EMAIL, createStringResource("PageDashboard.email")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                emailPerformed(target);
+            }
+        };
+        form.add(email);
+
+        AjaxButton print = new AjaxButton(ID_BTN_PRINT, createStringResource("PageDashboard.print")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                printPerformed(target);
+            }
+        };
+        form.add(print);
+
+        AjaxButton task = new AjaxButton(ID_BTN_NEW_TASK, createStringResource("PageDashboard.task")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                newTaskPerformed(target);
+            }
+        };
+        form.add(task);
+    }
+
+    private void displayPerformed(AjaxRequestTarget target) {
+        TablePanel table = (TablePanel) get(ID_TABLE);
+        TaskDataProvider provider = (TaskDataProvider) table.getDataTable().getDataProvider();
+        provider.setFilter(filter.getObject());
+        table.setCurrentPage(0L);
+
+        target.add(get(ID_SUMMARY), table);
+    }
+
+    private void emailPerformed(AjaxRequestTarget target) {
+
+    }
+
+    private void printPerformed(AjaxRequestTarget target) {
+
+    }
+
+    private void newTaskPerformed(AjaxRequestTarget target) {
+
     }
 }
