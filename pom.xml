@@ -23,6 +23,7 @@
         <wicket.version>6.16.0</wicket.version>
         <wicket.bootstrap.version>0.9.5</wicket.bootstrap.version>
         <logback.version>0.9.29</logback.version>
+        <querydsl.version>3.4.3</querydsl.version>
     </properties>
 
     <dependencies>
@@ -60,7 +61,26 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
-            <version>1.6.0.RELEASE</version>
+            <version>1.7.0.RELEASE</version>
+        </dependency>
+
+        <!-- QUERY DSL -->
+        <dependency>
+            <groupId>com.mysema.querydsl</groupId>
+            <artifactId>querydsl-core</artifactId>
+            <version>${querydsl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysema.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <version>${querydsl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysema.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>${querydsl.version}</version>
         </dependency>
 
         <!-- SPRING SECURITY -->
@@ -302,6 +322,25 @@
                         <version>2.17</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>com.mysema.maven</groupId>
+                <artifactId>maven-apt-plugin</artifactId>
+                <version>1.0.2</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Specifies the directory in which the query types are generated -->
+                            <outputDirectory>target/generated-sources</outputDirectory>
+                            <!-- States that the APT code generator should look for JPA annotations -->
+                            <processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

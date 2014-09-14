@@ -18,11 +18,12 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="OFF"/>
-    <logger name="sk.lazyman.gizmo" level="INFO" />
     <root level="WARN">
         <appender-ref ref="GIZMO_LOG"/>
     </root>
+
+    <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="OFF"/>
+    <logger name="sk.lazyman.gizmo" level="INFO" />
 </configuration>
 
 
