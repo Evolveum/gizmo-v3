@@ -230,6 +230,11 @@ public class PageEmails extends PageAppTemplate {
     }
 
     private void filterLogs(AjaxRequestTarget target) {
-        //todo implement
+        TablePanel table = (TablePanel) get(ID_TABLE);
+        EmailDataProvider provider = (EmailDataProvider) table.getDataTable().getDataProvider();
+        provider.setFilter(filter.getObject());
+        table.setCurrentPage(0L);
+
+        target.add(table);
     }
 }

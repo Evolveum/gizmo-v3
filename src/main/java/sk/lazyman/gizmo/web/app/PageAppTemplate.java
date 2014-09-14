@@ -14,6 +14,8 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import sk.lazyman.gizmo.component.FeedbackPanel;
 import sk.lazyman.gizmo.component.TopMenuItem;
+import sk.lazyman.gizmo.security.GizmoPrincipal;
+import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.web.PageTemplate;
 
 /**
@@ -80,7 +82,10 @@ public class PageAppTemplate extends PageTemplate {
 
     private PageParameters createUserPageParams() {
         PageParameters params = new PageParameters();
-        //todo
+
+        GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
+        params.set(PageUser.USER_ID, principal.getUserId());
+
         return params;
     }
 
@@ -89,8 +94,8 @@ public class PageAppTemplate extends PageTemplate {
 
             @Override
             protected String load() {
-                //todo
-                return "Viliam Repan";
+                GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
+                return principal.getFullName();
             }
         };
     }

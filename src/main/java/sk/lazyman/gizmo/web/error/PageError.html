@@ -2,6 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
+    <h1 class="page-header" wicket:id="titleHeader"/>
+
     <div class="container">
         <blockquote class="pull-right">
             <p><wicket:message key="PageError.quote"/></p>
@@ -9,11 +11,13 @@
         </blockquote>
     </div>
 
-    <p><wicket:message key="PageError.message"/></p>
-    <p wicket:id="message"/>
+    <div class="container-fluid">
+        <p><wicket:message key="PageError.message"/></p>
+        <p wicket:id="message"/>
 
-    <div class="main-button-bar">
-        <a class="btn btn-primary">Back</a>
+        <div class="main-button-bar">
+            <a class="btn btn-primary" wicket:id="back"/>
+        </div>
     </div>
 </wicket:extend>
 </body>

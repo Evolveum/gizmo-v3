@@ -4,6 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sk.lazyman.gizmo.data.User;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -13,9 +14,13 @@ public class GizmoPrincipal implements UserDetails {
 
     private User user;
 
+    public GizmoPrincipal(User user) {
+        this.user = user;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -46,5 +51,13 @@ public class GizmoPrincipal implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    public String getFullName() {
+        return user.getFullName();
+    }
+
+    public Integer getUserId() {
+        return user.getId();
     }
 }

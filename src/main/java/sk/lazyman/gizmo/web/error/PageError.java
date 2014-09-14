@@ -1,13 +1,16 @@
 package sk.lazyman.gizmo.web.error;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.http.WebResponse;
 import org.wicketstuff.annotation.mount.MountPath;
+import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
 import sk.lazyman.gizmo.web.PageTemplate;
+import sk.lazyman.gizmo.web.app.PageDashboard;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,6 +25,7 @@ public class PageError extends PageTemplate {
 
     private static final String ID_MESSAGE = "message";
     private static final String ID_BACK = "back";
+    private static final String ID_TITLE = "titleHeader";
 
     private Integer code;
     private String exClass;
@@ -47,6 +51,9 @@ public class PageError extends PageTemplate {
             exMessage = ex.getMessage();
         }
 
+        Label title = new Label(ID_TITLE, createPageTitleModel());
+        add(title);
+
         final IModel<String> message = new AbstractReadOnlyModel<String>() {
 
             @Override
@@ -70,14 +77,14 @@ public class PageError extends PageTemplate {
         });
         add(label);
 
-//        AjaxButton back = new AjaxButton(ID_BACK, createStringResource("PageError.button.back")) {
-//
-//            @Override
-//            public void onClick(AjaxRequestTarget target) {
-//                setResponsePage(PageDashboard.class);
-//            }
-//        };
-//        add(back);
+        AjaxButton back = new AjaxButton(ID_BACK, createStringResource("PageError.button.back")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                setResponsePage(PageDashboard.class);
+            }
+        };
+        add(back);
     }
 
     private int getCode() {

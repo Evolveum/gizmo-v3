@@ -8,7 +8,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 /**
  * @author lazyman
  */
-@MountPath("/app/dashboard")
+@MountPath(value = "/app/dashboard", alt = "/app")
 public class PageDashboard extends PageAppTemplate {
 
     private static final String ID_FORM = "form";

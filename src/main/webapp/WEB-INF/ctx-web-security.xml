@@ -9,8 +9,6 @@
 
     <global-method-security secured-annotations="enabled"/>
 
-    <!--<http pattern="/**" security="none"/>-->
-
     <http pattern="/wicket/resource/**" security="none"/>
 
     <http create-session="never" auto-config="true" use-expressions="false">
@@ -18,10 +16,9 @@
         <intercept-url pattern="/j_spring_security_check"/>
         <intercept-url pattern="/spring_security_login"/>
 
-        <intercept-url pattern="/login"/>
+        <intercept-url pattern="/login" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
 
-        <!--<intercept-url pattern="/app/**" access="isFullyAuthenticated"/>-->
-        <!--  access="isAuthenticated()"/> -->
+        <intercept-url pattern="/app/**" access="IS_AUTHENTICATED_FULLY"/>
 
         <logout logout-url="/j_spring_security_logout" invalidate-session="true"
                 logout-success-url="/app/dashboard"/>
@@ -30,13 +27,11 @@
             <concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>
         </session-management>
 
-        <form-login login-page="/login" default-target-url="/home"/>
-
-        <!--<intercept-url pattern="/**" access="isFullyAuthenticated"/>-->
+        <form-login login-page="/login" default-target-url="/app"/>
     </http>
 
     <authentication-manager alias="authenticationManager">
-        <authentication-provider ref="ldapAuthProvider"/>
+        <authentication-provider ref="authProvider"/>
     </authentication-manager>
 
     <beans:bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
@@ -45,10 +40,9 @@
         <beans:property name="password" value="${gizmo.ldap.password}" />
     </beans:bean>
 
-    <beans:bean id="ldapAuthProvider"
-                class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+    <beans:bean id="authProvider"
+                class="sk.lazyman.gizmo.security.GizmoAuthenticationProvider">
         <beans:constructor-arg ref="ldapBindAuthenticator" />
-        <beans:constructor-arg ref="ldapAuthoritiesPopulator" />
     </beans:bean>
 
     <beans:bean id="ldapBindAuthenticator"

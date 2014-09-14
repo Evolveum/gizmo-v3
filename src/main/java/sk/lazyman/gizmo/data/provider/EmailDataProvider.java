@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import sk.lazyman.gizmo.data.EmailLog;
+import sk.lazyman.gizmo.dto.EmailFilterDto;
 import sk.lazyman.gizmo.repository.EmailLogRepository;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Iterator;
 public class EmailDataProvider extends SortableDataProvider<EmailLog, String> {
 
     private EmailLogRepository emailRepository;
+    private EmailFilterDto filter;
 
     public EmailDataProvider(EmailLogRepository emailRepository) {
         this.emailRepository = emailRepository;
@@ -44,5 +46,9 @@ public class EmailDataProvider extends SortableDataProvider<EmailLog, String> {
     @Override
     public IModel<EmailLog> model(EmailLog object) {
         return new Model<>(object);
+    }
+
+    public void setFilter(EmailFilterDto filter) {
+        this.filter = filter;
     }
 }

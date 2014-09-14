@@ -24,7 +24,7 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GizmoAuthWebSession.class);
 
-    @SpringBean(name = "ldapAuthProvider")
+    @SpringBean(name = "authProvider")
     private AuthenticationProvider authenticationProvider;
 
     public GizmoAuthWebSession(Request request) {
