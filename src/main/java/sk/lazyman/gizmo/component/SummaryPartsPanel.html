@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
+<wicket:panel>
+    <table class="table table-condensed table-striped table-bordered">
+        <thead>
+            <tr>
+                <th><wicket:message key="SummaryPartsPanel.part"/></th>
+                <th><wicket:message key="SummaryPartsPanel.work"/></th>
+                <th><wicket:message key="SummaryPartsPanel.invoice"/></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr wicket:id="partRepeater">
+                <td><span wicket:id="part"/></td>
+                <td><span wicket:id="work"/></td>
+                <td><span wicket:id="invoice"/></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr class="info">
+                <td><wicket:message key="SummaryPartsPanel.summary"/></td>
+                <td><span wicket:id="sumWork"/></td>
+                <td><span wicket:id="sumInvoice"/></td>
+            </tr>
+        </tfoot>
+    </table>
+</wicket:panel>
+</html>

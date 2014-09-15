@@ -22,6 +22,7 @@ import sk.lazyman.gizmo.component.*;
 import sk.lazyman.gizmo.data.Task;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
+import sk.lazyman.gizmo.data.provider.SummaryPartsProvider;
 import sk.lazyman.gizmo.data.provider.TaskDataProvider;
 import sk.lazyman.gizmo.dto.TaskFilterDto;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
@@ -50,6 +51,7 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_BTN_PRINT = "print";
     private static final String ID_BTN_NEW_TASK = "task";
     private static final String ID_SUMMARY = "summary";
+    private static final String ID_SUMMARY_PARTS = "summaryParts";
 
     private IModel<TaskFilterDto> filter;
 
@@ -103,6 +105,10 @@ public class PageDashboard extends PageAppTemplate {
         SummaryDataProvider summaryProvider = new SummaryDataProvider(this);
         SummaryPanel summary = new SummaryPanel(ID_SUMMARY, summaryProvider, filter);
         add(summary);
+
+        SummaryPartsProvider partsProvider = new SummaryPartsProvider(this);
+        SummaryPartsPanel summaryParts = new SummaryPartsPanel(ID_SUMMARY_PARTS, partsProvider, filter);
+        add(summaryParts);
 
         TaskDataProvider provider = new TaskDataProvider(getTaskRepository());
         provider.setFilter(filter.getObject());
@@ -227,7 +233,7 @@ public class PageDashboard extends PageAppTemplate {
         provider.setFilter(filter.getObject());
         table.setCurrentPage(0L);
 
-        target.add(get(ID_SUMMARY), table);
+        target.add(get(ID_SUMMARY), get(ID_SUMMARY_PARTS), table);
     }
 
     private void emailPerformed(AjaxRequestTarget target) {
