@@ -26,7 +26,7 @@ public class GizmoUtils {
         return StringUtils.join(new Object[]{project.getName(), project.getCustomer().getName()}, " - ");
     }
 
-    public static String describeProjectPart(ProjectPart part) {
+    public static String describeProjectPart(ProjectPart part, String delimiter) {
         if (part == null) {
             return null;
         }
@@ -38,7 +38,7 @@ public class GizmoUtils {
         }
 
         if (sb.length() != 0) {
-            sb.append(' ');
+            sb.append(delimiter);
         }
 
         if (part.getProject() != null) {
@@ -47,7 +47,7 @@ public class GizmoUtils {
         }
 
         if (sb.length() != 0) {
-            sb.append(' ');
+            sb.append(delimiter);
         }
 
         sb.append(part.getName());

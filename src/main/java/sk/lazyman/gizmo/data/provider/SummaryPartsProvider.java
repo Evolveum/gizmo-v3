@@ -4,14 +4,16 @@ import com.mysema.query.BooleanBuilder;
 import com.mysema.query.Tuple;
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.Predicate;
+import sk.lazyman.gizmo.data.ProjectPart;
+import sk.lazyman.gizmo.data.QProjectPart;
 import sk.lazyman.gizmo.data.QTask;
 import sk.lazyman.gizmo.dto.PartSummary;
 import sk.lazyman.gizmo.dto.TaskFilterDto;
+import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.web.PageTemplate;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lazyman
@@ -53,18 +55,46 @@ public class SummaryPartsProvider implements Serializable {
             bb.orAllOf(list.toArray(new Predicate[list.size()]));
             query.where(bb);
         }
-        query.groupBy(QTask.task.projectPart.name);
+        query.groupBy(QTask.task.projectPart.id);
 
-        List<Tuple> tuples = query.list(QTask.task.projectPart.name,
+        List<Tuple> tuples = query.list(QTask.task.projectPart.id,
                 QTask.task.taskLength.sum(), QTask.task.invoiceLength.sum());
         if (tuples != null) {
+            List<Integer> ids = new ArrayList<>();
             for (Tuple tuple : tuples) {
-                PartSummary summary = new PartSummary(tuple.get(0, String.class),
-                        tuple.get(1, Double.class), tuple.get(2, Double.class));
+                ids.add(tuple.get(0, Integer.class));
+            }
+            Map<Integer, ProjectPart> map = getProjectParts(ids);
+
+            for (Tuple tuple : tuples) {
+                ProjectPart part = map.get(tuple.get(0, Integer.class));
+                String name = part != null ? GizmoUtils.describeProjectPart(part, " - ") : null;
+                PartSummary summary = new PartSummary(name, tuple.get(1, Double.class), tuple.get(2, Double.class));
                 result.add(summary);
             }
         }
 
+        Collections.sort(result);
+
         return result;
+    }
+
+    private Map<Integer, ProjectPart> getProjectParts(List<Integer> ids) {
+        JPAQuery query = new JPAQuery(page.getEntityManager());
+        query.from(QProjectPart.projectPart);
+        query.where(QProjectPart.projectPart.id.in(ids));
+
+        Map<Integer, ProjectPart> map = new HashMap<>();
+
+        List<ProjectPart> parts = query.list(QProjectPart.projectPart);
+        if (parts == null) {
+            return map;
+        }
+
+        for (ProjectPart part: parts) {
+            map.put(part.getId(), part);
+        }
+
+        return map;
     }
 }

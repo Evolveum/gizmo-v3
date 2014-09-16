@@ -156,7 +156,7 @@ public class PageDashboard extends PageAppTemplate {
             @Override
             public String getObject() {
                 Task task = rowModel.getObject();
-                return GizmoUtils.describeProjectPart(task.getProjectPart());
+                return GizmoUtils.describeProjectPart(task.getProjectPart(), " ");
             }
         };
     }
