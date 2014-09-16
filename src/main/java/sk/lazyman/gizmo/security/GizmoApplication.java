@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.wicketstuff.annotation.scan.AnnotatedMountScanner;
+import sk.lazyman.gizmo.theme.GizmoThemeProvider;
 import sk.lazyman.gizmo.web.PageLogin;
 import sk.lazyman.gizmo.web.PageTemplate;
 import sk.lazyman.gizmo.web.app.PageAppTemplate;
@@ -61,6 +62,7 @@ public class GizmoApplication extends AuthenticatedWebApplication {
 
         IBootstrapSettings settings = new BootstrapSettings();
         settings.setAutoAppendResources(false);
+        settings.setThemeProvider(new GizmoThemeProvider());
         Bootstrap.install(this, settings);
         BootstrapLess.install(this);
 
