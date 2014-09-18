@@ -7,7 +7,7 @@ import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
-import sk.lazyman.gizmo.data.provider.SummaryPartsProvider;
+import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.dto.PartSummary;
 import sk.lazyman.gizmo.dto.TaskFilterDto;
 
@@ -26,7 +26,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
     private static final String ID_SUM_WORK = "sumWork";
     private static final String ID_SUM_INVOICE = "sumInvoice";
 
-    public SummaryPartsPanel(String id, final SummaryPartsProvider provider, final IModel<TaskFilterDto> model) {
+    public SummaryPartsPanel(String id, final SummaryPartsDataProvider provider, final IModel<TaskFilterDto> model) {
         super(id);
 
         setModel(new LoadableDetachableModel<List<PartSummary>>() {
@@ -46,7 +46,6 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
 
             @Override
             protected void populateItem(final ListItem<PartSummary> item) {
-                //todo fix full part name
                 Label part = new Label(ID_PART, new PropertyModel<>(item.getModel(), PartSummary.F_NAME));
                 part.setRenderBodyOnly(true);
                 item.add(part);
@@ -78,13 +77,45 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
         };
         add(repeater);
 
-        Label sumWork = new Label(ID_SUM_WORK);
+        Label sumWork = new Label(ID_SUM_WORK, createSumWorkModel());
         sumWork.setRenderBodyOnly(true);
         add(sumWork);
 
-        Label sumInvoice = new Label(ID_SUM_INVOICE);
+        Label sumInvoice = new Label(ID_SUM_INVOICE, createSumInvoiceModel());
         sumInvoice.setRenderBodyOnly(true);
         add(sumInvoice);
+    }
+
+    private IModel<String> createSumWorkModel() {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                double sum = 0d;
+                List<PartSummary> list = getModelObject();
+                for (PartSummary part : list) {
+                    sum += part.getLength();
+                }
+
+                return createLenght(sum);
+            }
+        };
+    }
+
+    private IModel<String> createSumInvoiceModel() {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                double sum = 0d;
+                List<PartSummary> list = getModelObject();
+                for (PartSummary part : list) {
+                    sum += part.getInvoice();
+                }
+
+                return createLenght(sum);
+            }
+        };
     }
 
     private String createLenght(Double hours) {

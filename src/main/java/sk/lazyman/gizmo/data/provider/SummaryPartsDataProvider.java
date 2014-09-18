@@ -18,11 +18,11 @@ import java.util.*;
 /**
  * @author lazyman
  */
-public class SummaryPartsProvider implements Serializable {
+public class SummaryPartsDataProvider implements Serializable {
 
     private PageTemplate page;
 
-    public SummaryPartsProvider(PageTemplate page) {
+    public SummaryPartsDataProvider(PageTemplate page) {
         this.page = page;
     }
 

@@ -15,14 +15,13 @@ import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.*;
 import sk.lazyman.gizmo.data.Task;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
-import sk.lazyman.gizmo.data.provider.SummaryPartsProvider;
+import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.data.provider.TaskDataProvider;
 import sk.lazyman.gizmo.dto.TaskFilterDto;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
@@ -106,7 +105,7 @@ public class PageDashboard extends PageAppTemplate {
         SummaryPanel summary = new SummaryPanel(ID_SUMMARY, summaryProvider, filter);
         add(summary);
 
-        SummaryPartsProvider partsProvider = new SummaryPartsProvider(this);
+        SummaryPartsDataProvider partsProvider = new SummaryPartsDataProvider(this);
         SummaryPartsPanel summaryParts = new SummaryPartsPanel(ID_SUMMARY_PARTS, partsProvider, filter);
         add(summaryParts);
 

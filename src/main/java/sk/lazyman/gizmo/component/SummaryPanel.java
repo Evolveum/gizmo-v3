@@ -1,5 +1,6 @@
 package sk.lazyman.gizmo.component;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.Loop;
@@ -10,6 +11,7 @@ import org.apache.wicket.model.LoadableDetachableModel;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
 import sk.lazyman.gizmo.dto.TaskFilterDto;
+import sk.lazyman.gizmo.dto.TaskLength;
 
 /**
  * @author lazyman
@@ -44,8 +46,10 @@ public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
 
                     @Override
                     protected void populateItem(final LoopItem dayItem) {
+                        final int index = item.getIndex() * 7 + dayItem.getIndex();
+
                         //todo handle item class attribute
-                        Label label = new Label(ID_LABEL, "0/0");
+                        Label label = new Label(ID_LABEL, createDayModel(index));
                         label.setRenderBodyOnly(true);
 
                         dayItem.add(label);
@@ -55,7 +59,6 @@ public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
 
                             @Override
                             public String getObject() {
-                                int index = item.getIndex() * 7 + dayItem.getIndex();
                                 if (dto.isWeekend(index)) {
                                     return "success";
                                 }
@@ -72,6 +75,21 @@ public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
             }
         };
         add(weekRepeater);
+    }
+
+    private IModel<String> createDayModel(final int index) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                SummaryPanelDto dto = getModelObject();
+                TaskLength length = dto.getTaskLength(index);
+                if (length == null) {
+                    length = new TaskLength(0, 0);
+                }
+                return StringUtils.join(new Object[]{length.getLength(), length.getInvoice()}, '/');
+            }
+        };
     }
 
     private IModel<Integer> createWeekModel() {

@@ -86,4 +86,19 @@ public class SummaryPanelDto implements Serializable {
         cal.add(Calendar.DAY_OF_YEAR, i);
         return cal.getTime();
     }
+
+    public TaskLength getTaskLength(int index) {
+        //todo not working correctly
+        return dates.get(getDayForIndex(index));
+    }
+
+    public boolean isFullDayDone(int index) {
+        //todo implement if it's workday and >=8 hours logged then it's true
+        return true;
+    }
+
+    public boolean isToday(int index) {
+        //todo implement
+        return false;
+    }
 }
