@@ -43,14 +43,6 @@ public class GizmoApplication extends AuthenticatedWebApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GizmoApplication.class);
 
-    private static final Set<Package> PAGE_PACKAGES = new HashSet<>();
-
-    static {
-        PAGE_PACKAGES.add(PageTemplate.class.getPackage());
-        PAGE_PACKAGES.add(PageAppTemplate.class.getPackage());
-        PAGE_PACKAGES.add(PageError.class.getPackage());
-    }
-
     @Override
     public Class<PageDashboard> getHomePage() {
         return PageDashboard.class;
