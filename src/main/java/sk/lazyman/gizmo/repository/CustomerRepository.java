@@ -2,15 +2,15 @@ package sk.lazyman.gizmo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import sk.lazyman.gizmo.data.Company;
+import sk.lazyman.gizmo.data.Customer;
 
 import java.util.List;
 
 /**
  * @author lazyman
  */
-public interface CompanyRepository extends JpaRepository<Company, Integer> {
+public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
-    @Query("from Company c order by c.name")
-    public List<Company> listCompanies();
+    @Query("from Customer c order by c.name")
+    public List<Customer> listCustomers();
 }

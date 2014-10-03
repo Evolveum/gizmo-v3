@@ -4,11 +4,11 @@ import com.mysema.query.BooleanBuilder;
 import com.mysema.query.Tuple;
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.Predicate;
-import sk.lazyman.gizmo.data.ProjectPart;
-import sk.lazyman.gizmo.data.QProjectPart;
-import sk.lazyman.gizmo.data.QTask;
+import sk.lazyman.gizmo.data.Part;
+import sk.lazyman.gizmo.data.QPart;
+import sk.lazyman.gizmo.data.QWork;
 import sk.lazyman.gizmo.dto.PartSummary;
-import sk.lazyman.gizmo.dto.TaskFilterDto;
+import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.web.PageTemplate;
 
@@ -34,40 +34,40 @@ public class SummaryPartsDataProvider implements Serializable {
      * @param filter
      * @return
      */
-    public List<PartSummary> createSummary(TaskFilterDto filter) {
+    public List<PartSummary> createSummary(WorkFilterDto filter) {
         List<PartSummary> result = new ArrayList<>();
 
         List<Predicate> list = new ArrayList<>();
         if (filter.getRealizator() != null) {
-            list.add(QTask.task.realizator.eq(filter.getRealizator()));
+            list.add(QWork.work.realizator.eq(filter.getRealizator()));
         }
         if (filter.getFrom() != null) {
-            list.add(QTask.task.date.goe(filter.getFrom()));
+            list.add(QWork.work.date.goe(filter.getFrom()));
         }
         if (filter.getTo() != null) {
-            list.add(QTask.task.date.loe(filter.getTo()));
+            list.add(QWork.work.date.loe(filter.getTo()));
         }
 
         JPAQuery query = new JPAQuery(page.getEntityManager());
-        query.from(QTask.task);
+        query.from(QWork.work);
         if (!list.isEmpty()) {
             BooleanBuilder bb = new BooleanBuilder();
             bb.orAllOf(list.toArray(new Predicate[list.size()]));
             query.where(bb);
         }
-        query.groupBy(QTask.task.projectPart.id);
+        query.groupBy(QWork.work.part.id);
 
-        List<Tuple> tuples = query.list(QTask.task.projectPart.id,
-                QTask.task.taskLength.sum(), QTask.task.invoiceLength.sum());
+        List<Tuple> tuples = query.list(QWork.work.part.id,
+                QWork.work.workLength.sum(), QWork.work.invoiceLength.sum());
         if (tuples != null) {
             List<Integer> ids = new ArrayList<>();
             for (Tuple tuple : tuples) {
                 ids.add(tuple.get(0, Integer.class));
             }
-            Map<Integer, ProjectPart> map = getProjectParts(ids);
+            Map<Integer, Part> map = getProjectParts(ids);
 
             for (Tuple tuple : tuples) {
-                ProjectPart part = map.get(tuple.get(0, Integer.class));
+                Part part = map.get(tuple.get(0, Integer.class));
                 String name = part != null ? GizmoUtils.describeProjectPart(part, " - ") : null;
                 PartSummary summary = new PartSummary(name, tuple.get(1, Double.class), tuple.get(2, Double.class));
                 result.add(summary);
@@ -79,19 +79,19 @@ public class SummaryPartsDataProvider implements Serializable {
         return result;
     }
 
-    private Map<Integer, ProjectPart> getProjectParts(List<Integer> ids) {
+    private Map<Integer, Part> getProjectParts(List<Integer> ids) {
         JPAQuery query = new JPAQuery(page.getEntityManager());
-        query.from(QProjectPart.projectPart);
-        query.where(QProjectPart.projectPart.id.in(ids));
+        query.from(QPart.part);
+        query.where(QPart.part.id.in(ids));
 
-        Map<Integer, ProjectPart> map = new HashMap<>();
+        Map<Integer, Part> map = new HashMap<>();
 
-        List<ProjectPart> parts = query.list(QProjectPart.projectPart);
+        List<Part> parts = query.list(QPart.part);
         if (parts == null) {
             return map;
         }
 
-        for (ProjectPart part: parts) {
+        for (Part part : parts) {
             map.put(part.getId(), part);
         }
 

@@ -31,17 +31,16 @@ public class PageUsers extends PageAppTemplate {
         SortableDataProvider provider = new UsersDataProvider(getUserRepository());
         List<IColumn> columns = new ArrayList<>();
 
-        columns.add(new LinkColumn<User>(createStringResource("User.userName"), User.F_USER_NAME) {
+        columns.add(new LinkColumn<User>(createStringResource("User.name"), User.F_NAME) {
 
             @Override
             public void onClick(AjaxRequestTarget target, IModel<User> rowModel) {
                 userDetailsPerformed(target, rowModel.getObject());
             }
         });
-        columns.add(new PropertyColumn(createStringResource("User.firstName"), User.F_FIRST_NAME));
-        columns.add(new PropertyColumn(createStringResource("User.lastName"), User.F_LAST_NAME));
-        columns.add(new PropertyColumn(createStringResource("User.email"), User.F_EMAIL));
-        columns.add(new PropertyColumn(createStringResource("User.role"), User.F_ROLE));
+        columns.add(new PropertyColumn(createStringResource("User.givenName"), User.F_GIVEN_NAME));
+        columns.add(new PropertyColumn(createStringResource("User.familyName"), User.F_FAMILY_NAME));
+        columns.add(new PropertyColumn(createStringResource("User.ldapDn"), User.F_LDAP_DN));
 
         TablePanel table = new TablePanel(ID_TABLE, provider, columns, 15);
         add(table);

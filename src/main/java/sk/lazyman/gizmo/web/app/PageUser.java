@@ -23,11 +23,10 @@ public class PageUser extends PageAppTemplate {
     public static final String USER_ID = "userId";
 
     private static final String ID_FORM = "form";
-    private static final String ID_USERNAME = "username";
-    private static final String ID_FIRST_NAME = "firstName";
-    private static final String ID_LAST_NAME = "lastName";
-    private static final String ID_EMAIL = "email";
-    private static final String ID_ROLE = "role";
+    private static final String ID_NAME = "name";
+    private static final String ID_GIVEN_NAME = "givenName";
+    private static final String ID_FAMILY_NAME = "familyName";
+    private static final String ID_LDAP_DN = "ldapDn";
     private static final String ID_SAVE = "save";
     private static final String ID_CANCEL = "cancel";
 
@@ -64,20 +63,20 @@ public class PageUser extends PageAppTemplate {
         Form form = new Form(ID_FORM);
         add(form);
 
-        TextFormGroup username = new TextFormGroup(ID_USERNAME, new PropertyModel<String>(model, User.F_USER_NAME),
-                createStringResource("User.userName"), LABEL_SIZE, TEXT_SIZE, true);
+        TextFormGroup username = new TextFormGroup(ID_NAME, new PropertyModel<String>(model, User.F_NAME),
+                createStringResource("User.name"), LABEL_SIZE, TEXT_SIZE, true);
         form.add(username);
 
-        TextFormGroup firstName = new TextFormGroup(ID_FIRST_NAME, new PropertyModel<String>(model, User.F_FIRST_NAME),
-                createStringResource("User.firstName"), LABEL_SIZE, TEXT_SIZE, true);
+        TextFormGroup firstName = new TextFormGroup(ID_GIVEN_NAME, new PropertyModel<String>(model, User.F_GIVEN_NAME),
+                createStringResource("User.givenName"), LABEL_SIZE, TEXT_SIZE, true);
         form.add(firstName);
 
-        TextFormGroup lastName = new TextFormGroup(ID_LAST_NAME, new PropertyModel<String>(model, User.F_LAST_NAME),
-                createStringResource("User.lastName"), LABEL_SIZE, TEXT_SIZE, true);
+        TextFormGroup lastName = new TextFormGroup(ID_FAMILY_NAME, new PropertyModel<String>(model, User.F_FAMILY_NAME),
+                createStringResource("User.familyName"), LABEL_SIZE, TEXT_SIZE, true);
         form.add(lastName);
 
-        TextFormGroup email = new TextFormGroup(ID_EMAIL, new PropertyModel<String>(model, User.F_EMAIL),
-                createStringResource("User.email"), LABEL_SIZE, TEXT_SIZE, true);
+        TextFormGroup email = new TextFormGroup(ID_LDAP_DN, new PropertyModel<String>(model, User.F_LDAP_DN),
+                createStringResource("User.ldapDn"), LABEL_SIZE, TEXT_SIZE, true);
         form.add(email);
 
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {

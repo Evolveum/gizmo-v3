@@ -2,8 +2,6 @@ package sk.lazyman.gizmo.data.provider;
 
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.Predicate;
-import com.mysema.query.types.PredicateOperation;
-import com.mysema.query.types.expr.BooleanExpression;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -33,7 +31,7 @@ public class EmailDataProvider extends SortableDataProvider<EmailLog, String> {
 
     @Override
     public Iterator<? extends EmailLog> iterator(long first, long count) {
-        Sort sort = new Sort(Sort.Direction.DESC, EmailLog.F_DATE);
+        Sort sort = new Sort(Sort.Direction.DESC, EmailLog.F_SENT_DATE);
 
         PageRequest page = new PageRequest((int) first, (int) count, sort);
         Page<EmailLog> found = emailRepository.findAll(createPredicate(), page);
@@ -65,11 +63,11 @@ public class EmailDataProvider extends SortableDataProvider<EmailLog, String> {
 
         List<Predicate> list = new ArrayList<>();
         if (filter.getFrom() != null) {
-            list.add(QEmailLog.emailLog.date.goe(filter.getFrom()));
+            list.add(QEmailLog.emailLog.sentDate.goe(filter.getFrom()));
         }
 
         if (filter.getTo() != null) {
-            list.add(QEmailLog.emailLog.date.loe(filter.getTo()));
+            list.add(QEmailLog.emailLog.sentDate.loe(filter.getTo()));
         }
 
         if (filter.getSender() != null) {

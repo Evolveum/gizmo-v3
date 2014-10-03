@@ -12,6 +12,6 @@ import java.util.List;
  */
 public interface ProjectRepository extends JpaRepository<Project, Integer> {
 
-    @Query("from Project p where p.customer.id = :companyId order by p.name")
-    public List<Project> findProjects(@Param("companyId") Integer companyId);
+    @Query("from Project p where p.customer.id = :customerId order by p.name")
+    public List<Project> findProjects(@Param("customerId") Integer companyId);
 }

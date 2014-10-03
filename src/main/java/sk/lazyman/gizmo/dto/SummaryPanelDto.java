@@ -11,14 +11,14 @@ import java.util.Map;
  */
 public class SummaryPanelDto implements Serializable {
 
-    private TaskFilterDto filter;
+    private WorkFilterDto filter;
     private Map<Date, TaskLength> dates = new HashMap<>();
 
-    public SummaryPanelDto(TaskFilterDto filter) {
+    public SummaryPanelDto(WorkFilterDto filter) {
         this.filter = filter;
     }
 
-    public TaskFilterDto getFilter() {
+    public WorkFilterDto getFilter() {
         return filter;
     }
 

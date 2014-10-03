@@ -9,7 +9,7 @@ import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
 import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.dto.PartSummary;
-import sk.lazyman.gizmo.dto.TaskFilterDto;
+import sk.lazyman.gizmo.dto.WorkFilterDto;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -26,7 +26,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
     private static final String ID_SUM_WORK = "sumWork";
     private static final String ID_SUM_INVOICE = "sumInvoice";
 
-    public SummaryPartsPanel(String id, final SummaryPartsDataProvider provider, final IModel<TaskFilterDto> model) {
+    public SummaryPartsPanel(String id, final SummaryPartsDataProvider provider, final IModel<WorkFilterDto> model) {
         super(id);
 
         setModel(new LoadableDetachableModel<List<PartSummary>>() {

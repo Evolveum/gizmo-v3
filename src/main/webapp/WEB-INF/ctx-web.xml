@@ -37,7 +37,7 @@
         <property name="jpaPropertyMap">
             <props>
                 <prop key="hibernate.dialect">${gizmo.hibernate.dialect}</prop>
-                <prop key="hibernate.hbm2ddl.auto">validate</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
                 <prop key="hibernate.id.new_generator_mappings">true</prop>
                 <prop key="hibernate.show_sql">true</prop>
             </props>

@@ -38,7 +38,7 @@ public class GizmoAuthenticationProvider implements AuthenticationProvider {
 
         DirContextOperations ctx = ldapBindAuthenticator.authenticate(authentication);
 
-        User user = userRepository.findUserByUserName((String) authentication.getPrincipal());
+        User user = userRepository.findUserByName((String) authentication.getPrincipal());
         if (user == null) {
             throw new BadCredentialsException("Couldn't find user in gizmo database.");
         }

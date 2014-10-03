@@ -64,7 +64,7 @@ public class Project implements Serializable {
         this.customer = customer;
     }
 
-    public void setDesc(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 

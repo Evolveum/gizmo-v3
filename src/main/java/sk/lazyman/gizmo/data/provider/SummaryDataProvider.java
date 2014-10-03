@@ -6,10 +6,10 @@ import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.Predicate;
 import com.mysema.query.types.expr.DateTimeExpression;
 import com.mysema.query.types.template.DateTimeTemplate;
-import sk.lazyman.gizmo.data.QTask;
+import sk.lazyman.gizmo.data.QWork;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
-import sk.lazyman.gizmo.dto.TaskFilterDto;
 import sk.lazyman.gizmo.dto.TaskLength;
+import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.web.PageTemplate;
 
 import java.io.Serializable;
@@ -36,22 +36,22 @@ public class SummaryDataProvider implements Serializable {
      * @param filter
      * @return
      */
-    public SummaryPanelDto createSummary(TaskFilterDto filter) {
+    public SummaryPanelDto createSummary(WorkFilterDto filter) {
         SummaryPanelDto dto = new SummaryPanelDto(filter);
 
         List<Predicate> list = new ArrayList<>();
         if (filter.getRealizator() != null) {
-            list.add(QTask.task.realizator.eq(filter.getRealizator()));
+            list.add(QWork.work.realizator.eq(filter.getRealizator()));
         }
         if (filter.getFrom() != null) {
-            list.add(QTask.task.date.goe(filter.getFrom()));
+            list.add(QWork.work.date.goe(filter.getFrom()));
         }
         if (filter.getTo() != null) {
-            list.add(QTask.task.date.loe(filter.getTo()));
+            list.add(QWork.work.date.loe(filter.getTo()));
         }
 
         JPAQuery query = new JPAQuery(page.getEntityManager());
-        query.from(QTask.task);
+        query.from(QWork.work);
         if (!list.isEmpty()) {
             BooleanBuilder bb = new BooleanBuilder();
             bb.orAllOf(list.toArray(new Predicate[list.size()]));
@@ -60,7 +60,7 @@ public class SummaryDataProvider implements Serializable {
         query.groupBy(createDateTruncExpression());
 
         List<Tuple> tuples = query.list(createDateTruncExpression(),
-                QTask.task.taskLength.sum(), QTask.task.invoiceLength.sum());
+                QWork.work.workLength.sum(), QWork.work.invoiceLength.sum());
         if (tuples != null) {
             for (Tuple tuple : tuples) {
                 TaskLength task = new TaskLength(tuple.get(1, Double.class), tuple.get(1, Double.class));
@@ -72,6 +72,6 @@ public class SummaryDataProvider implements Serializable {
     }
 
     private DateTimeExpression createDateTruncExpression() {
-        return DateTimeTemplate.create(Date.class, "date_trunc('day',{0})", QTask.task.date);
+        return DateTimeTemplate.create(Date.class, "date_trunc('day',{0})", QWork.work.date);
     }
 }

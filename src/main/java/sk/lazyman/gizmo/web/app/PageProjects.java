@@ -6,9 +6,9 @@ import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.ProjectItemList;
-import sk.lazyman.gizmo.data.Company;
+import sk.lazyman.gizmo.data.Customer;
+import sk.lazyman.gizmo.data.Part;
 import sk.lazyman.gizmo.data.Project;
-import sk.lazyman.gizmo.data.ProjectPart;
 import sk.lazyman.gizmo.dto.ProjectListItem;
 import sk.lazyman.gizmo.util.LoadableModel;
 
@@ -26,15 +26,15 @@ public class PageProjects extends PageAppTemplate {
     private static final String ID_PROJECT_LIST = "projectList";
     private static final String ID_PROJECT_PART_LIST = "projectPartList";
 
-    private LoadableModel<List<ProjectListItem<Company>>> companies;
+    private LoadableModel<List<ProjectListItem<Customer>>> companies;
     private LoadableModel<List<ProjectListItem<Project>>> projects;
-    private LoadableModel<List<ProjectListItem<ProjectPart>>> parts;
+    private LoadableModel<List<ProjectListItem<Part>>> parts;
 
     public PageProjects() {
-        companies = new LoadableModel<List<ProjectListItem<Company>>>(false) {
+        companies = new LoadableModel<List<ProjectListItem<Customer>>>(false) {
 
             @Override
-            protected List<ProjectListItem<Company>> load() {
+            protected List<ProjectListItem<Customer>> load() {
                 return loadCompanies();
             }
         };
@@ -47,10 +47,10 @@ public class PageProjects extends PageAppTemplate {
             }
         };
 
-        parts = new LoadableModel<List<ProjectListItem<ProjectPart>>>(false) {
+        parts = new LoadableModel<List<ProjectListItem<Part>>>(false) {
 
             @Override
-            protected List<ProjectListItem<ProjectPart>> load() {
+            protected List<ProjectListItem<Part>> load() {
                 return loadProjectParts();
             }
         };
@@ -58,18 +58,18 @@ public class PageProjects extends PageAppTemplate {
         initLayout();
     }
 
-    private List<ProjectListItem<ProjectPart>> loadProjectParts() {
-        List<ProjectListItem<ProjectPart>> items = new ArrayList<>();
+    private List<ProjectListItem<Part>> loadProjectParts() {
+        List<ProjectListItem<Part>> items = new ArrayList<>();
 
         Project project = getSelectedItem(projects.getObject());
         if (project == null) {
             return items;
         }
 
-        List<ProjectPart> projects = getProjectPartRepository().findProjectParts(project.getId());
+        List<Part> projects = getProjectPartRepository().findParts(project.getId());
         if (projects != null) {
-            for (ProjectPart part : projects) {
-                ProjectListItem item = new ProjectListItem<ProjectPart>(part) {
+            for (Part part : projects) {
+                ProjectListItem item = new ProjectListItem<Part>(part) {
 
                     @Override
                     public String getName() {
@@ -86,7 +86,7 @@ public class PageProjects extends PageAppTemplate {
     private List<ProjectListItem<Project>> loadProjects() {
         List<ProjectListItem<Project>> items = new ArrayList<>();
 
-        Company company = getSelectedItem(companies.getObject());
+        Customer company = getSelectedItem(companies.getObject());
         if (company == null) {
             return items;
         }
@@ -103,7 +103,7 @@ public class PageProjects extends PageAppTemplate {
 
                     @Override
                     public String getDescription() {
-                        return getData().getDesc();
+                        return getData().getDescription();
                     }
                 };
                 items.add(item);
@@ -113,13 +113,13 @@ public class PageProjects extends PageAppTemplate {
         return items;
     }
 
-    private List<ProjectListItem<Company>> loadCompanies() {
-        List<ProjectListItem<Company>> items = new ArrayList<>();
+    private List<ProjectListItem<Customer>> loadCompanies() {
+        List<ProjectListItem<Customer>> items = new ArrayList<>();
 
-        List<Company> companies = getCompanyRepository().listCompanies();
+        List<Customer> companies = getCustomerRepository().listCustomers();
         if (companies != null) {
-            for (Company company : companies) {
-                ProjectListItem item = new ProjectListItem<Company>(company) {
+            for (Customer company : companies) {
+                ProjectListItem item = new ProjectListItem<Customer>(company) {
 
                     @Override
                     public String getName() {
@@ -158,16 +158,16 @@ public class PageProjects extends PageAppTemplate {
     }
 
     private void initLayout() {
-        ProjectItemList companyList = new ProjectItemList<Company>(ID_COMPANY_LIST, companies) {
+        ProjectItemList companyList = new ProjectItemList<Customer>(ID_COMPANY_LIST, companies) {
 
             @Override
-            protected void itemSelected(AjaxRequestTarget target, ProjectListItem<Company> selected) {
+            protected void itemSelected(AjaxRequestTarget target, ProjectListItem<Customer> selected) {
                 super.itemSelected(target, selected);
                 companySelected(target, selected);
             }
 
             @Override
-            protected void editPerformed(AjaxRequestTarget target, ProjectListItem<Company> selected) {
+            protected void editPerformed(AjaxRequestTarget target, ProjectListItem<Customer> selected) {
                 super.editPerformed(target, selected);
                 companyEdited(target, selected);
             }
@@ -190,16 +190,16 @@ public class PageProjects extends PageAppTemplate {
         };
         add(projectList);
 
-        ProjectItemList projectPartList = new ProjectItemList<ProjectPart>(ID_PROJECT_PART_LIST, parts) {
+        ProjectItemList projectPartList = new ProjectItemList<Part>(ID_PROJECT_PART_LIST, parts) {
 
             @Override
-            protected void itemSelected(AjaxRequestTarget target, ProjectListItem<ProjectPart> selected) {
+            protected void itemSelected(AjaxRequestTarget target, ProjectListItem<Part> selected) {
                 super.itemSelected(target, selected);
                 projectPartSelected(target, selected);
             }
 
             @Override
-            protected void editPerformed(AjaxRequestTarget target, ProjectListItem<ProjectPart> selected) {
+            protected void editPerformed(AjaxRequestTarget target, ProjectListItem<Part> selected) {
                 super.editPerformed(target, selected);
                 projectPartEdited(target, selected);
             }

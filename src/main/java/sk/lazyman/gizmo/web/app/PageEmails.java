@@ -17,7 +17,6 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
-import org.springframework.data.domain.Sort;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.DateColumn;
@@ -28,7 +27,6 @@ import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.provider.EmailDataProvider;
 import sk.lazyman.gizmo.dto.EmailFilterDto;
-import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
@@ -104,7 +102,8 @@ public class PageEmails extends PageAppTemplate {
         SortableDataProvider provider = new EmailDataProvider(getEmailLogRepository());
         List<IColumn> columns = new ArrayList<>();
 
-        columns.add(new DateColumn(createStringResource("EmailLog.date"), EmailLog.F_DATE, "dd. MMM, yyyy HH:mm:ss"));
+        columns.add(new DateColumn(createStringResource("EmailLog.date"),
+                EmailLog.F_SENT_DATE, "dd. MMM, yyyy HH:mm:ss"));
         columns.add(new AbstractColumn<EmailLog, String>(createStringResource("EmailLog.sender")) {
 
             @Override
@@ -143,8 +142,8 @@ public class PageEmails extends PageAppTemplate {
             }
         });
         columns.add(new PropertyColumn(createStringResource("EmailLog.mailTo"), EmailLog.F_MAIL_TO));
-        columns.add(new DateColumn(createStringResource("EmailLog.from"), EmailLog.F_FROM, "dd. MMM, yyyy"));
-        columns.add(new DateColumn(createStringResource("EmailLog.to"), EmailLog.F_TO, "dd. MMM, yyyy"));
+        columns.add(new DateColumn(createStringResource("EmailLog.from"), EmailLog.F_FROM_DATE, "dd. MMM, yyyy"));
+        columns.add(new DateColumn(createStringResource("EmailLog.to"), EmailLog.F_TO_DATE, "dd. MMM, yyyy"));
         columns.add(new PropertyColumn(createStringResource("EmailLog.summaryWork"), EmailLog.F_SUMMARY_WORK));
         columns.add(new PropertyColumn(createStringResource("EmailLog.summaryInvoice"), EmailLog.F_SUMMARY_INVOICE));
         columns.add(new AbstractColumn<EmailLog, String>(createStringResource("EmailLog.realizators")) {

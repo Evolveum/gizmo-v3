@@ -3,9 +3,9 @@ package sk.lazyman.gizmo.util;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.model.IModel;
 import org.springframework.data.domain.Sort;
-import sk.lazyman.gizmo.data.Company;
+import sk.lazyman.gizmo.data.Customer;
+import sk.lazyman.gizmo.data.Part;
 import sk.lazyman.gizmo.data.Project;
-import sk.lazyman.gizmo.data.ProjectPart;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.repository.UserRepository;
 
@@ -26,14 +26,14 @@ public class GizmoUtils {
         return StringUtils.join(new Object[]{project.getName(), project.getCustomer().getName()}, " - ");
     }
 
-    public static String describeProjectPart(ProjectPart part, String delimiter) {
+    public static String describeProjectPart(Part part, String delimiter) {
         if (part == null) {
             return null;
         }
 
         StringBuilder sb = new StringBuilder();
         if (part.getProject() != null && part.getProject().getCustomer() != null) {
-            Company c =  part.getProject().getCustomer();
+            Customer c = part.getProject().getCustomer();
             sb.append(c.getName());
         }
 
@@ -42,7 +42,7 @@ public class GizmoUtils {
         }
 
         if (part.getProject() != null) {
-            Project p =  part.getProject();
+            Project p = part.getProject();
             sb.append(p.getName());
         }
 
@@ -83,7 +83,7 @@ public class GizmoUtils {
 
             @Override
             protected List<User> load() {
-                return repo.findAll(new Sort(Sort.Direction.ASC, User.F_FIRST_NAME, User.F_LAST_NAME));
+                return repo.findAll(new Sort(Sort.Direction.ASC, User.F_GIVEN_NAME, User.F_FAMILY_NAME));
             }
         };
     }

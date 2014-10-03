@@ -10,7 +10,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
-import sk.lazyman.gizmo.dto.TaskFilterDto;
+import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.dto.TaskLength;
 
 /**
@@ -22,7 +22,7 @@ public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
     private static final String ID_DAY_REPEATER = "dayRepeater";
     private static final String ID_LABEL = "label";
 
-    public SummaryPanel(String id, final SummaryDataProvider provider, final IModel<TaskFilterDto> model) {
+    public SummaryPanel(String id, final SummaryDataProvider provider, final IModel<WorkFilterDto> model) {
         super(id);
 
         setModel(new LoadableDetachableModel<SummaryPanelDto>() {

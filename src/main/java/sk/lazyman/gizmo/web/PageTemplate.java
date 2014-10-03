@@ -27,15 +27,15 @@ public class PageTemplate extends WebPage {
     @SpringBean
     private EntityManager entityManager;
     @SpringBean
-    private CompanyRepository companyRepository;
+    private CustomerRepository customerRepository;
     @SpringBean
     private UserRepository userRepository;
     @SpringBean
     private ProjectRepository projectRepository;
     @SpringBean
-    private ProjectPartRepository projectPartRepository;
+    private PartRepository projectPartRepository;
     @SpringBean
-    private TaskRepository taskRepository;
+    private WorkRepository taskRepository;
     @SpringBean
     private EmailLogRepository emailLogRepository;
 
@@ -87,8 +87,8 @@ public class PageTemplate extends WebPage {
 
     }
 
-    public CompanyRepository getCompanyRepository() {
-        return companyRepository;
+    public CustomerRepository getCustomerRepository() {
+        return customerRepository;
     }
 
     public UserRepository getUserRepository() {
@@ -99,11 +99,11 @@ public class PageTemplate extends WebPage {
         return projectRepository;
     }
 
-    public ProjectPartRepository getProjectPartRepository() {
+    public PartRepository getProjectPartRepository() {
         return projectPartRepository;
     }
 
-    public TaskRepository getTaskRepository() {
+    public WorkRepository getTaskRepository() {
         return taskRepository;
     }
 

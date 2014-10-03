@@ -18,12 +18,12 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.*;
-import sk.lazyman.gizmo.data.Task;
+import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
-import sk.lazyman.gizmo.data.provider.TaskDataProvider;
-import sk.lazyman.gizmo.dto.TaskFilterDto;
+import sk.lazyman.gizmo.data.provider.WorkDataProvider;
+import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
@@ -52,14 +52,14 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_SUMMARY = "summary";
     private static final String ID_SUMMARY_PARTS = "summaryParts";
 
-    private IModel<TaskFilterDto> filter;
+    private IModel<WorkFilterDto> filter;
 
     public PageDashboard() {
-        filter = new LoadableModel<TaskFilterDto>(false) {
+        filter = new LoadableModel<WorkFilterDto>(false) {
 
             @Override
-            protected TaskFilterDto load() {
-                TaskFilterDto dto = new TaskFilterDto();
+            protected WorkFilterDto load() {
+                WorkFilterDto dto = new WorkFilterDto();
                 dto.setFrom(GizmoUtils.createTaskDefaultFrom());
                 dto.setTo(GizmoUtils.createTaskDefaultTo());
 
@@ -76,10 +76,10 @@ public class PageDashboard extends PageAppTemplate {
         Form form = new Form(ID_FORM);
         add(form);
 
-        form.add(new DateTextField(ID_FROM, new PropertyModel<Date>(filter, TaskFilterDto.F_FROM)));
-        form.add(new DateTextField(ID_TO, new PropertyModel<Date>(filter, TaskFilterDto.F_TO)));
+        form.add(new DateTextField(ID_FROM, new PropertyModel<Date>(filter, WorkFilterDto.F_FROM)));
+        form.add(new DateTextField(ID_TO, new PropertyModel<Date>(filter, WorkFilterDto.F_TO)));
 
-        form.add(new DropDownChoice<User>(ID_REALIZATOR, new PropertyModel<User>(filter, TaskFilterDto.F_REALIZATOR),
+        form.add(new DropDownChoice<User>(ID_REALIZATOR, new PropertyModel<User>(filter, WorkFilterDto.F_REALIZATOR),
                 GizmoUtils.createUserModel(getUserRepository()), new IChoiceRenderer<User>() {
 
             @Override
@@ -109,7 +109,7 @@ public class PageDashboard extends PageAppTemplate {
         SummaryPartsPanel summaryParts = new SummaryPartsPanel(ID_SUMMARY_PARTS, partsProvider, filter);
         add(summaryParts);
 
-        TaskDataProvider provider = new TaskDataProvider(getTaskRepository());
+        WorkDataProvider provider = new WorkDataProvider(getTaskRepository());
         provider.setFilter(filter.getObject());
 
         List<IColumn> columns = createColumns();
@@ -122,62 +122,62 @@ public class PageDashboard extends PageAppTemplate {
     private List<IColumn> createColumns() {
         List<IColumn> columns = new ArrayList<>();
 
-        columns.add(new DateColumn(createStringResource("Task.date"), Task.F_DATE, "EEE dd. MMM. yyyy"));
-        columns.add(new AbstractColumn<Task, String>(createStringResource("PageDashboard.length")) {
+        columns.add(new DateColumn(createStringResource("Task.date"), Work.F_DATE, "EEE dd. MMM. yyyy"));
+        columns.add(new AbstractColumn<Work, String>(createStringResource("PageDashboard.length")) {
 
             @Override
-            public void populateItem(Item<ICellPopulator<Task>> cellItem, String componentId, IModel<Task> rowModel) {
+            public void populateItem(Item<ICellPopulator<Work>> cellItem, String componentId, IModel<Work> rowModel) {
                 cellItem.add(new Label(componentId, createInvoceModel(rowModel)));
             }
         });
-        columns.add(new AbstractColumn<Task, String>(createStringResource("PageDashboard.realizator")) {
+        columns.add(new AbstractColumn<Work, String>(createStringResource("PageDashboard.realizator")) {
 
             @Override
-            public void populateItem(Item<ICellPopulator<Task>> cellItem, String componentId, IModel<Task> rowModel) {
+            public void populateItem(Item<ICellPopulator<Work>> cellItem, String componentId, IModel<Work> rowModel) {
                 cellItem.add(new Label(componentId, createRealizatorModel(rowModel)));
             }
         });
-        columns.add(new AbstractColumn<Task, String>(createStringResource("PageDashboard.project")) {
+        columns.add(new AbstractColumn<Work, String>(createStringResource("PageDashboard.project")) {
 
             @Override
-            public void populateItem(Item<ICellPopulator<Task>> cellItem, String componentId, IModel<Task> rowModel) {
+            public void populateItem(Item<ICellPopulator<Work>> cellItem, String componentId, IModel<Work> rowModel) {
                 cellItem.add(new Label(componentId, createProjectModel(rowModel)));
             }
         });
-        columns.add(new PropertyColumn(createStringResource("Task.desc"), Task.F_DESC));
+        columns.add(new PropertyColumn(createStringResource("Task.desc"), Work.F_DESCRIPTION));
 
         return columns;
     }
 
-    private IModel<String> createProjectModel(final IModel<Task> rowModel) {
+    private IModel<String> createProjectModel(final IModel<Work> rowModel) {
         return new AbstractReadOnlyModel<String>() {
 
             @Override
             public String getObject() {
-                Task task = rowModel.getObject();
-                return GizmoUtils.describeProjectPart(task.getProjectPart(), " ");
+                Work work = rowModel.getObject();
+                return GizmoUtils.describeProjectPart(work.getPart(), " ");
             }
         };
     }
 
-    private IModel<String> createRealizatorModel(final IModel<Task> rowModel) {
+    private IModel<String> createRealizatorModel(final IModel<Work> rowModel) {
         return new AbstractReadOnlyModel<String>() {
 
             @Override
             public String getObject() {
-                Task task = rowModel.getObject();
-                return task.getRealizator().getFullName();
+                Work work = rowModel.getObject();
+                return work.getRealizator().getFullName();
             }
         };
     }
 
-    private IModel<String> createInvoceModel(final IModel<Task> rowModel) {
+    private IModel<String> createInvoceModel(final IModel<Work> rowModel) {
         return new AbstractReadOnlyModel<String>() {
 
             @Override
             public String getObject() {
-                Task task = rowModel.getObject();
-                return StringUtils.join(new Object[]{task.getTaskLength(), " (", task.getInvoiceLength(), ')'});
+                Work work = rowModel.getObject();
+                return StringUtils.join(new Object[]{work.getWorkLength(), " (", work.getInvoiceLength(), ')'});
             }
         };
     }
@@ -228,7 +228,7 @@ public class PageDashboard extends PageAppTemplate {
 
     private void displayPerformed(AjaxRequestTarget target) {
         TablePanel table = (TablePanel) get(ID_TABLE);
-        TaskDataProvider provider = (TaskDataProvider) table.getDataTable().getDataProvider();
+        WorkDataProvider provider = (WorkDataProvider) table.getDataTable().getDataProvider();
         provider.setFilter(filter.getObject());
         table.setCurrentPage(0L);
 

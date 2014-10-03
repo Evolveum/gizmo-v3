@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * @author lazyman
  */
-public class TaskFilterDto implements Serializable {
+public class WorkFilterDto implements Serializable {
 
     public static final String F_FROM = "from";
     public static final String F_TO = "to";

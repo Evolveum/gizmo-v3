@@ -8,11 +8,10 @@ import org.apache.wicket.model.Model;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import sk.lazyman.gizmo.data.QEmailLog;
-import sk.lazyman.gizmo.data.QTask;
-import sk.lazyman.gizmo.data.Task;
-import sk.lazyman.gizmo.dto.TaskFilterDto;
-import sk.lazyman.gizmo.repository.TaskRepository;
+import sk.lazyman.gizmo.data.QWork;
+import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.dto.WorkFilterDto;
+import sk.lazyman.gizmo.repository.WorkRepository;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,39 +20,39 @@ import java.util.List;
 /**
  * @author lazyman
  */
-public class TaskDataProvider extends SortableDataProvider<Task, String> {
+public class WorkDataProvider extends SortableDataProvider<Work, String> {
 
-    private TaskRepository taskRepository;
-    private TaskFilterDto filter;
+    private WorkRepository workRepository;
+    private WorkFilterDto filter;
 
-    public TaskDataProvider(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
+    public WorkDataProvider(WorkRepository workRepository) {
+        this.workRepository = workRepository;
     }
 
     @Override
-    public Iterator<? extends Task> iterator(long first, long count) {
-        Sort sort = new Sort(Sort.Direction.ASC, Task.F_DATE);
+    public Iterator<? extends Work> iterator(long first, long count) {
+        Sort sort = new Sort(Sort.Direction.ASC, Work.F_DATE);
 
         PageRequest page = new PageRequest((int) first, (int) count, sort);
-        Page<Task> found = taskRepository.findAll(createPredicate(), page);
+        Page<Work> found = workRepository.findAll(createPredicate(), page);
         if (found != null) {
             return found.iterator();
         }
 
-        return new ArrayList<Task>().iterator();
+        return new ArrayList<Work>().iterator();
     }
 
     @Override
     public long size() {
-        return taskRepository.count(createPredicate());
+        return workRepository.count(createPredicate());
     }
 
     @Override
-    public IModel<Task> model(Task object) {
+    public IModel<Work> model(Work object) {
         return new Model<>(object);
     }
 
-    public void setFilter(TaskFilterDto filter) {
+    public void setFilter(WorkFilterDto filter) {
         this.filter = filter;
     }
 
@@ -64,15 +63,15 @@ public class TaskDataProvider extends SortableDataProvider<Task, String> {
 
         List<Predicate> list = new ArrayList<>();
         if (filter.getFrom() != null) {
-            list.add(QTask.task.date.goe(filter.getFrom()));
+            list.add(QWork.work.date.goe(filter.getFrom()));
         }
 
         if (filter.getTo() != null) {
-            list.add(QTask.task.date.loe(filter.getTo()));
+            list.add(QWork.work.date.loe(filter.getTo()));
         }
 
         if (filter.getRealizator() != null) {
-            list.add(QTask.task.realizator.eq(filter.getRealizator()));
+            list.add(QWork.work.realizator.eq(filter.getRealizator()));
         }
 
         if (list.isEmpty()) {
