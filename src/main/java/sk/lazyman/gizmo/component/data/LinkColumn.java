@@ -1,4 +1,4 @@
-package sk.lazyman.gizmo.component;
+package sk.lazyman.gizmo.component.data;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;

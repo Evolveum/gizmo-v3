@@ -80,11 +80,14 @@ public class SummaryPartsDataProvider implements Serializable {
     }
 
     private Map<Integer, Part> getProjectParts(List<Integer> ids) {
+        Map<Integer, Part> map = new HashMap<>();
+        if (ids.isEmpty()) {
+            return map;
+        }
+
         JPAQuery query = new JPAQuery(page.getEntityManager());
         query.from(QPart.part);
         query.where(QPart.part.id.in(ids));
-
-        Map<Integer, Part> map = new HashMap<>();
 
         List<Part> parts = query.list(QPart.part);
         if (parts == null) {

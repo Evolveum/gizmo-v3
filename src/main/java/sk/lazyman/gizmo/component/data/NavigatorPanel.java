@@ -1,4 +1,4 @@
-package sk.lazyman.gizmo.component;
+package sk.lazyman.gizmo.component.data;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
@@ -12,6 +12,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.AbstractRepeater;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
 
 /**
  * @author lazyman

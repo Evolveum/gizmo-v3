@@ -31,7 +31,8 @@ public class PageUser extends PageAppTemplate {
     private static final String ID_CANCEL = "cancel";
 
     private static final String LABEL_SIZE = "col-sm-3 col-md-2 control-label";
-    private static final String TEXT_SIZE = "col-sm-7 col-md-4";
+    private static final String TEXT_SIZE = "col-sm-5 col-md-4";
+    private static final String FEEDBACK_SIZE = "col-sm-4 col-md-4";
 
     private IModel<User> model;
 
@@ -64,19 +65,19 @@ public class PageUser extends PageAppTemplate {
         add(form);
 
         TextFormGroup username = new TextFormGroup(ID_NAME, new PropertyModel<String>(model, User.F_NAME),
-                createStringResource("User.name"), LABEL_SIZE, TEXT_SIZE, true);
+                createStringResource("User.name"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(username);
 
         TextFormGroup firstName = new TextFormGroup(ID_GIVEN_NAME, new PropertyModel<String>(model, User.F_GIVEN_NAME),
-                createStringResource("User.givenName"), LABEL_SIZE, TEXT_SIZE, true);
+                createStringResource("User.givenName"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(firstName);
 
         TextFormGroup lastName = new TextFormGroup(ID_FAMILY_NAME, new PropertyModel<String>(model, User.F_FAMILY_NAME),
-                createStringResource("User.familyName"), LABEL_SIZE, TEXT_SIZE, true);
+                createStringResource("User.familyName"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(lastName);
 
         TextFormGroup email = new TextFormGroup(ID_LDAP_DN, new PropertyModel<String>(model, User.F_LDAP_DN),
-                createStringResource("User.ldapDn"), LABEL_SIZE, TEXT_SIZE, true);
+                createStringResource("User.ldapDn"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(email);
 
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {

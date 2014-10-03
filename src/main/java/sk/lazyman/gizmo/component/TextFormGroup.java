@@ -18,18 +18,21 @@ public class TextFormGroup extends SimplePanel<String> {
     private static final String ID_TEXT = "text";
     private static final String ID_TEXT_WRAPPER = "textWrapper";
     private static final String ID_LABEL = "label";
+    private static final String ID_FEEDBACK_WRAPPER = "feedbackWrapper";
     private static final String ID_FEEDBACK = "feedback";
 
     public TextFormGroup(String id, IModel<String> value, IModel<String> label, String labelSize, String textSize,
-                         boolean required) {
+                         String feedbackSize, boolean required) {
         super(id, value);
 
         add(AttributeModifier.append("class", "form-group"));
 
-        initLayout(label, labelSize, textSize, required);
+        initLayout(label, labelSize, textSize, feedbackSize, required);
     }
 
-    private void initLayout(IModel<String> label, String labelSize, String textSize, boolean required) {
+    private void initLayout(IModel<String> label, String labelSize, String textSize, String feedbackSize,
+                            boolean required) {
+
         Label l = new Label(ID_LABEL, label);
         if (StringUtils.isNotEmpty(labelSize)) {
             l.add(AttributeAppender.prepend("class", labelSize));
@@ -46,9 +49,15 @@ public class TextFormGroup extends SimplePanel<String> {
         text.setLabel(label);
         textWrapper.add(text);
 
+        WebMarkupContainer feedbackWrapper = new WebMarkupContainer(ID_FEEDBACK_WRAPPER);
+        if (StringUtils.isNotEmpty(textSize)) {
+            textWrapper.add(AttributeAppender.prepend("class", feedbackSize));
+        }
+        add(feedbackWrapper);
+
         FeedbackPanel feedback = new FeedbackPanel(ID_FEEDBACK, new ComponentFeedbackMessageFilter(text));
         feedback.setOutputMarkupId(true);
-        textWrapper.add(feedback);
+        feedbackWrapper.add(feedback);
     }
 
     protected TextField createText(IModel<String> model, IModel<String> label, boolean required) {

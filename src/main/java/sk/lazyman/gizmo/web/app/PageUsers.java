@@ -7,8 +7,8 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvid
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
-import sk.lazyman.gizmo.component.LinkColumn;
-import sk.lazyman.gizmo.component.TablePanel;
+import sk.lazyman.gizmo.component.data.LinkColumn;
+import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.provider.UsersDataProvider;
 

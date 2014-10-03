@@ -18,6 +18,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.*;
+import sk.lazyman.gizmo.component.data.DateColumn;
+import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
@@ -122,7 +124,7 @@ public class PageDashboard extends PageAppTemplate {
     private List<IColumn> createColumns() {
         List<IColumn> columns = new ArrayList<>();
 
-        columns.add(new DateColumn(createStringResource("Task.date"), Work.F_DATE, "EEE dd. MMM. yyyy"));
+        columns.add(new DateColumn(createStringResource("Work.date"), Work.F_DATE, "EEE dd. MMM. yyyy"));
         columns.add(new AbstractColumn<Work, String>(createStringResource("PageDashboard.length")) {
 
             @Override
@@ -144,7 +146,7 @@ public class PageDashboard extends PageAppTemplate {
                 cellItem.add(new Label(componentId, createProjectModel(rowModel)));
             }
         });
-        columns.add(new PropertyColumn(createStringResource("Task.desc"), Work.F_DESCRIPTION));
+        columns.add(new PropertyColumn(createStringResource("Work.description"), Work.F_DESCRIPTION));
 
         return columns;
     }

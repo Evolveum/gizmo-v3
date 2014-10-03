@@ -14,6 +14,8 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.repository.UserRepository;
 
+import javax.naming.Name;
+
 /**
  * @author lazyman
  */
@@ -32,21 +34,22 @@ public class GizmoAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        if (StringUtils.isBlank((String) authentication.getPrincipal())) {
+        String principal = (String) authentication.getPrincipal();
+        if (StringUtils.isBlank(principal)) {
             throw new BadCredentialsException("web.security.provider.invalid");
         }
 
         DirContextOperations ctx = ldapBindAuthenticator.authenticate(authentication);
 
-        User user = userRepository.findUserByName((String) authentication.getPrincipal());
+        User user = userRepository.findUserByName(principal);
         if (user == null) {
-            throw new BadCredentialsException("Couldn't find user in gizmo database.");
+            user = createUser(ctx, principal);
         }
-        GizmoPrincipal principal = new GizmoPrincipal(user);
+        GizmoPrincipal gizmoPrincipal = new GizmoPrincipal(user);
 
         LOGGER.debug("User '{}' authenticated ({}), authorities: {}", new Object[]{authentication.getPrincipal(),
-                authentication.getClass().getSimpleName(), principal.getAuthorities()});
-        return new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+                authentication.getClass().getSimpleName(), gizmoPrincipal.getAuthorities()});
+        return new UsernamePasswordAuthenticationToken(gizmoPrincipal, null, gizmoPrincipal.getAuthorities());
     }
 
     @Override
@@ -59,5 +62,15 @@ public class GizmoAuthenticationProvider implements AuthenticationProvider {
         }
 
         return false;
+    }
+
+    private User createUser(DirContextOperations ctx, String name) {
+        User user = new User();
+        user.setFamilyName(ctx.getStringAttribute("sn"));
+        user.setGivenName(ctx.getStringAttribute("givenName"));
+        user.setName(name);
+        user.setLdapDn(ctx.getNameInNamespace());
+
+        return userRepository.save(user);
     }
 }

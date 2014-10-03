@@ -1,4 +1,4 @@
-package sk.lazyman.gizmo.component;
+package sk.lazyman.gizmo.component.data;
 
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.AttributeModifier;
@@ -9,6 +9,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDat
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
 
 import java.util.List;
 
