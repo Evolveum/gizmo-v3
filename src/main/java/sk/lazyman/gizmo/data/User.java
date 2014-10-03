@@ -9,133 +9,84 @@ import java.io.Serializable;
  * @author lazyman
  */
 @Entity
-@Table(name = "users")
 public class User implements Serializable {
 
     public static final String F_ID = "id";
-    public static final String F_USER_NAME = "userName";
-    public static final String F_LDAP_DN = "ldapDN";
-    public static final String F_PASSWORD = "password";
-    public static final String F_LAST_NAME = "lastName";
-    public static final String F_FIRST_NAME = "firstName";
-    public static final String F_EMAIL = "email";
-    public static final String F_ROLE = "role";
-    public static final String F_CERT_HASH = "certHash";
+    public static final String F_NAME = "name";
+    public static final String F_GIVEN_NAME = "givenName";
+    public static final String F_FAMILY_NAME = "familyName";
+    public static final String F_LDAP_DN = "ldapDn";
 
     private Integer id;
-    private String userName;
-    private String ldapDN;
-    private String password;
-    private String lastName;
-    private String firstName;
-    private String email;
-    private int role;                   //todo change to Role
-    private String certHash;
+    private String name;
+    private String givenName;
+    private String familyName;
+    private String ldapDn;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id")
-    @SequenceGenerator(name = "users_id", sequenceName = "users_id_seq")
-    @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id")
+    @SequenceGenerator(name = "user_id", sequenceName = "user_id_seq")
     public Integer getId() {
         return id;
     }
 
-    @Column(name = "username")
-    public String getUserName() {
-        return userName;
+    @Column(unique = true)
+    public String getName() {
+        return name;
     }
 
-    @Column(name = "ldapDN")
-    public String getLdapDN() {
-        return ldapDN;
+    public String getGivenName() {
+        return givenName;
     }
 
-    public String getPassword() {
-        return password;
+    public String getFamilyName() {
+        return familyName;
     }
 
-    @Column(name = "lastname")
-    public String getLastName() {
-        return lastName;
-    }
-
-    @Column(name = "firstname")
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public int getRole() {
-        return role;
-    }
-
-    @Column(name = "cert_hash")
-    public String getCertHash() {
-        return certHash;
+    @Column(unique = true)
+    public String getLdapDn() {
+        return ldapDn;
     }
 
     public void setId(Integer id) {
         this.id = id;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setLdapDN(String ldapDN) {
-        this.ldapDN = ldapDN;
+    public void setGivenName(String givenName) {
+        this.givenName = givenName;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setFamilyName(String familyName) {
+        this.familyName = familyName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setRole(int role) {
-        this.role = role;
-    }
-
-    public void setCertHash(String certHash) {
-        this.certHash = certHash;
+    public void setLdapDn(String ldapDn) {
+        this.ldapDn = ldapDn;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof User)) {
-            return false;
-        }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        User user = (User) obj;
-        if (user.getId() == id) {
-            return true;
-        }
+        User user = (User) o;
 
-        return false;
+        if (id != null ? !id.equals(user.id) : user.id != null) return false;
+
+        return true;
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + (this.id ^ (this.id >>> 32));
-        return hash;
+        return id != null ? id.hashCode() : 0;
     }
 
     @Transient
     public String getFullName() {
-        return StringUtils.join(new Object[]{firstName, lastName}, ' ');
+        return StringUtils.join(new Object[]{givenName, familyName}, ' ');
     }
 }

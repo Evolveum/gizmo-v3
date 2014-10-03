@@ -9,36 +9,40 @@ import java.util.Set;
  * @author lazyman
  */
 @Entity
-@Table(name = "EmailLog")
 public class EmailLog implements Serializable {
 
-    public static final String F_DATE = "date";
+    public static final String F_ID = "id";
+    public static final String F_SENDER = "sender";
+    public static final String F_SENT_DATE = "sentDate";
     public static final String F_SUCCESSFUL = "successful";
     public static final String F_MAIL_TO = "mailTo";
-    public static final String F_FROM = "from";
-    public static final String F_TO = "to";
+    public static final String F_MAIL_CC = "mailCc";
+    public static final String F_MAIL_BCC = "mailBcc";
+    public static final String F_FROM_DATE = "fromDate";
+    public static final String F_TO_DATE = "toDate";
     public static final String F_SUMMARY_WORK = "summaryWork";
     public static final String F_SUMMARY_INVOICE = "summaryInvoice";
     public static final String F_REALIZATOR_LIST = "realizatorList";
     public static final String F_PROJECT_LIST = "projectList";
+    public static final String F_DESCRIPTION = "description";
 
     private Integer id;
 
     // about mail
     private User sender;
-    private Date date;
+    private Date sentDate;
     private String mailTo;
     private String mailCc;
     private String mailBcc;
     private boolean successful;
     // about selection filter, data in mail
-    private Date from;
-    private Date to;
+    private Date fromDate;
+    private Date toDate;
     private Set<User> realizatorList;
     private Set<Project> projectList;
     private double summaryWork;
     private double summaryInvoice;
-    private String comment;
+    private String description;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "email_log_id")
@@ -47,19 +51,18 @@ public class EmailLog implements Serializable {
         return id;
     }
 
-    public String getComment() {
-        return comment;
+    @Column(length = 1000)
+    public String getDescription() {
+        return description;
     }
 
     @ManyToOne
-    @JoinColumn(name = "sender")
     public User getSender() {
         return sender;
     }
 
-    @Column(name = "sentDate")
-    public Date getDate() {
-        return date;
+    public Date getSentDate() {
+        return sentDate;
     }
 
     @Column(nullable = false)
@@ -68,29 +71,25 @@ public class EmailLog implements Serializable {
     }
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "EmailLog_realizator",
-            joinColumns = {@JoinColumn(name = "log_id", nullable = false, updatable = false)},
-            inverseJoinColumns = {@JoinColumn(name = "user_id", nullable = false, updatable = false)})
+//    @JoinTable(joinColumns = {@JoinColumn(name = "log_id", nullable = false, updatable = false)},
+//            inverseJoinColumns = {@JoinColumn(name = "user_id", nullable = false, updatable = false)})
     public Set<User> getRealizatorList() {
         return realizatorList;
     }
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "EmailLog_project",
-            joinColumns = {@JoinColumn(name = "log_id", nullable = false, updatable = false)},
-            inverseJoinColumns = {@JoinColumn(name = "project_id", nullable = false, updatable = false)})
+//    @JoinTable(joinColumns = {@JoinColumn(name = "log_id", nullable = false, updatable = false)},
+//            inverseJoinColumns = {@JoinColumn(name = "project_id", nullable = false, updatable = false)})
     public Set<Project> getProjectList() {
         return projectList;
     }
 
-    @Column(name = "fromDate")
-    public Date getFrom() {
-        return from;
+    public Date getFromDate() {
+        return fromDate;
     }
 
-    @Column(name = "toDate")
-    public Date getTo() {
-        return to;
+    public Date getToDate() {
+        return toDate;
     }
 
     public String getMailBcc() {
@@ -121,8 +120,8 @@ public class EmailLog implements Serializable {
         this.sender = sender;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setSentDate(Date sentDate) {
+        this.sentDate = sentDate;
     }
 
     public void setMailTo(String mailTo) {
@@ -141,12 +140,12 @@ public class EmailLog implements Serializable {
         this.successful = successful;
     }
 
-    public void setFrom(Date from) {
-        this.from = from;
+    public void setFromDate(Date fromDate) {
+        this.fromDate = fromDate;
     }
 
-    public void setTo(Date to) {
-        this.to = to;
+    public void setToDate(Date toDate) {
+        this.toDate = toDate;
     }
 
     public void setRealizatorList(Set<User> realizatorList) {
@@ -165,8 +164,8 @@ public class EmailLog implements Serializable {
         this.summaryInvoice = summaryInvoice;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -190,14 +189,14 @@ public class EmailLog implements Serializable {
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("date: " + date);
+        builder.append("sentDate: " + sentDate);
         builder.append(", sender: " + sender.getFullName());
-        builder.append(", mail to: " + mailTo);
+        builder.append(", mail toDate: " + mailTo);
         builder.append(", mail cc: " + mailCc);
         builder.append(", mail bcc: " + mailBcc + "\n");
 
-        builder.append("from: " + from);
-        builder.append(", to: " + to);
+        builder.append("fromDate: " + fromDate);
+        builder.append(", toDate: " + toDate);
         builder.append(", summary work: " + summaryWork);
         builder.append(", summary invoice: " + summaryInvoice + "\n");
 

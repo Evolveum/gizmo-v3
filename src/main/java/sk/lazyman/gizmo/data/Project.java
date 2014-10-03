@@ -7,13 +7,19 @@ import java.io.Serializable;
  * @author lazyman
  */
 @Entity
-@Table(name = "project")
 public class Project implements Serializable {
+
+    public static final String F_ID = "id";
+    public static final String F_NAME = "name";
+    public static final String F_DESCRIPTION = "description";
+    public static final String F_CUSTOMER = "customer";
+    public static final String F_CLOSED = "closed";
+    public static final String F_COMMERCIAL = "commercial";
 
     private Integer id;
     private String name;
-    private Company customer;
-    private String desc;
+    private String description;
+    private Customer customer;
     private boolean closed;
     private boolean commercial;
 
@@ -37,14 +43,13 @@ public class Project implements Serializable {
     }
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
-    public Company getCustomer() {
+    public Customer getCustomer() {
         return customer;
     }
 
-    @Column(name = "description", length = 1024)
-    public String getDesc() {
-        return desc;
+    @Column(length = 1000)
+    public String getDescription() {
+        return description;
     }
 
     public void setId(Integer id) {
@@ -55,12 +60,12 @@ public class Project implements Serializable {
         this.name = name;
     }
 
-    public void setCustomer(Company customer) {
+    public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setDesc(String description) {
+        this.description = description;
     }
 
     public void setClosed(boolean closed) {
@@ -90,12 +95,14 @@ public class Project implements Serializable {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("id=" + id);
-        builder.append(", name=" + name);
-        builder.append(", customer=[" + customer);
-        builder.append("], desc= " + desc);
-
-        return builder.toString();
+        final StringBuilder sb = new StringBuilder("Project{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", customer=").append(customer);
+        sb.append(", closed=").append(closed);
+        sb.append(", commercial=").append(commercial);
+        sb.append('}');
+        return sb.toString();
     }
 }

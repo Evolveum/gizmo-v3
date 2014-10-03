@@ -7,29 +7,41 @@ import java.io.Serializable;
  * @author lazyman
  */
 @Entity
-@Table(name = "parts")
-public class ProjectPart implements Serializable {
+public class Part implements Serializable {
+
+    public static final String F_ID = "id";
+    public static final String F_PROJECT = "project";
+    public static final String F_NAME = "name";
+    public static final String F_DESCRIPTION = "description";
 
     private Integer id;
-    private Project project;
     private String name;
+    private String description;
+    private Project project;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "parts_id")
-    @SequenceGenerator(name = "parts_id", sequenceName = "parts_id_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "part_id")
+    @SequenceGenerator(name = "part_id", sequenceName = "part_id_seq")
     public Integer getId() {
         return id;
     }
 
     @ManyToOne
-    @JoinColumn(name = "project_id")
     public Project getProject() {
         return project;
     }
 
-    @Column(length = 128)
     public String getName() {
         return name;
+    }
+
+    @Column(length = 1000)
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setId(Integer id) {
@@ -49,7 +61,7 @@ public class ProjectPart implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ProjectPart that = (ProjectPart) o;
+        Part that = (Part) o;
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
 
@@ -63,7 +75,7 @@ public class ProjectPart implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ProjectPart{");
+        final StringBuilder sb = new StringBuilder("Part{");
         sb.append("id=").append(id);
         sb.append(", project=").append(project);
         sb.append(", name='").append(name).append('\'');
