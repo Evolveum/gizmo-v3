@@ -8,6 +8,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 
 /**
@@ -25,7 +26,18 @@ public class TextFormGroup extends SimplePanel<String> {
                          String feedbackSize, boolean required) {
         super(id, value);
 
-        add(AttributeModifier.append("class", "form-group"));
+        add(AttributeModifier.append("class", new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                String hasError = "";
+                if (getField().hasErrorMessage()) {
+                    hasError = " has-error";
+                }
+
+                return "form-group" + hasError;
+            }
+        }));
 
         initLayout(label, labelSize, textSize, feedbackSize, required);
     }
@@ -55,7 +67,7 @@ public class TextFormGroup extends SimplePanel<String> {
         }
         add(feedbackWrapper);
 
-        FeedbackPanel feedback = new FeedbackPanel(ID_FEEDBACK, new ComponentFeedbackMessageFilter(text));
+        FormGroupFeedback feedback = new FormGroupFeedback(ID_FEEDBACK, new ComponentFeedbackMessageFilter(text));
         feedback.setOutputMarkupId(true);
         feedbackWrapper.add(feedback);
     }

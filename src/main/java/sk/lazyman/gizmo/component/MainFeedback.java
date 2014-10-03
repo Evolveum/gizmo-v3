@@ -7,9 +7,9 @@ import org.apache.wicket.feedback.FeedbackMessagesModel;
 /**
  * @author lazyman
  */
-public class FeedbackPanel extends org.apache.wicket.markup.html.panel.FeedbackPanel {
+public class MainFeedback extends org.apache.wicket.markup.html.panel.FeedbackPanel {
 
-    public FeedbackPanel(String id) {
+    public MainFeedback(String id) {
         super(id);
     }
 

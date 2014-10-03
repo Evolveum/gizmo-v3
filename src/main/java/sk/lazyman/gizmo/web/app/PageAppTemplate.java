@@ -12,7 +12,7 @@ import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import sk.lazyman.gizmo.component.FeedbackPanel;
+import sk.lazyman.gizmo.component.MainFeedback;
 import sk.lazyman.gizmo.component.TopMenuItem;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
@@ -68,13 +68,13 @@ public class PageAppTemplate extends PageTemplate {
         Label title = new Label(ID_TITLE, createPageTitleModel());
         add(title);
 
-        FeedbackPanel feedback = new FeedbackPanel(ID_FEEDBACK);
+        MainFeedback feedback = new MainFeedback(ID_FEEDBACK);
         feedback.setOutputMarkupId(true);
         add(feedback);
     }
 
-    protected FeedbackPanel getFeedbackPanel() {
-        return (FeedbackPanel) get(ID_FEEDBACK);
+    protected MainFeedback getFeedbackPanel() {
+        return (MainFeedback) get(ID_FEEDBACK);
     }
 
     private PageParameters createUserPageParams() {
