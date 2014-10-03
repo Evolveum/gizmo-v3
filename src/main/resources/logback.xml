@@ -23,7 +23,8 @@
     </root>
 
     <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="OFF"/>
-    <logger name="sk.lazyman.gizmo" level="INFO" />
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="sk.lazyman.gizmo" level="TRACE" />
 </configuration>
 
 

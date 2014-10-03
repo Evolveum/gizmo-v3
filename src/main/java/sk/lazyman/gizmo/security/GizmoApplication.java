@@ -78,8 +78,7 @@ public class GizmoApplication extends AuthenticatedWebApplication {
         appSettings.setInternalErrorPage(PageError.class);
         appSettings.setPageExpiredErrorPage(PageError.class);
 
-        //todo uncomment
-//        new AnnotatedMountScanner().scanPackage(PageTemplate.class.getPackage().getName()).mount(this);
+        new AnnotatedMountScanner().scanPackage(PageTemplate.class.getPackage().getName()).mount(this);
 
         mount(new MountedMapper("/error", PageError.class, new UrlPathPageParametersEncoder()));
         mount(new MountedMapper("/error/401", PageError401.class, new UrlPathPageParametersEncoder()));
