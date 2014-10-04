@@ -38,7 +38,7 @@ public class Work implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_id")
-    @SequenceGenerator(name = "task_id", sequenceName = "task_id_seq")
+    @SequenceGenerator(name = "task_id", sequenceName = "g_task_id_seq")
     public Integer getId() {
         return id;
     }

@@ -21,7 +21,7 @@ public class ContactValue implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "contact_value_id")
-    @SequenceGenerator(name = "contact_value_id", sequenceName = "contact_value_id_seq")
+    @SequenceGenerator(name = "contact_value_id", sequenceName = "g_contact_value_id_seq")
     public Integer getId() {
         return id;
     }

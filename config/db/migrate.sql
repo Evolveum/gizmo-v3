@@ -1,0 +1,1 @@
+insert into g_user (id,name,givenname,familyname,ldapdn) select id, username, firstname, lastname, ldapdn from users;
