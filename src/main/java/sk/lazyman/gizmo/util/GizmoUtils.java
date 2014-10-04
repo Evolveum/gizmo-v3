@@ -18,6 +18,8 @@ import java.util.List;
  */
 public class GizmoUtils {
 
+    public static final int DESCRIPTION_SIZE = 1000;
+
     public static String describeProject(Project project) {
         if (project == null) {
             return null;

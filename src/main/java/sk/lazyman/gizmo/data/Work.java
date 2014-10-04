@@ -3,6 +3,7 @@ package sk.lazyman.gizmo.data;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @author lazyman
@@ -25,6 +26,8 @@ public class Work implements Serializable {
     private Customer customer;
     //if it's work
     private Part part;
+
+    private Set<Attachment> attachments;
 
     private User realizator;
     private double invoiceLength;
@@ -53,6 +56,11 @@ public class Work implements Serializable {
     @ManyToOne
     public User getRealizator() {
         return realizator;
+    }
+
+    @OneToMany(mappedBy = Attachment.F_WORK)
+    public Set<Attachment> getAttachments() {
+        return attachments;
     }
 
     public double getInvoiceLength() {
@@ -111,6 +119,10 @@ public class Work implements Serializable {
         this.description = description;
     }
 
+    public void setAttachments(Set<Attachment> attachments) {
+        this.attachments = attachments;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -140,6 +152,7 @@ public class Work implements Serializable {
         sb.append(", date=").append(date);
         sb.append(", trackId='").append(trackId).append('\'');
         sb.append(", description='").append(description).append('\'');
+        sb.append(", attachments='").append(attachments).append('\'');
         sb.append('}');
         return sb.toString();
     }

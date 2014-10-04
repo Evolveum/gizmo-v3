@@ -62,7 +62,7 @@ public class Contact implements Serializable {
         return country;
     }
 
-    @OneToMany
+    @OneToMany(mappedBy = ContactValue.F_CONTACT)
     public Set<ContactValue> getContacts() {
         return contacts;
     }

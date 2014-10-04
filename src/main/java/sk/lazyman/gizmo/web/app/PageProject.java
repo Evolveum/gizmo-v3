@@ -5,6 +5,6 @@ import org.wicketstuff.annotation.mount.MountPath;
 /**
  * @author lazyman
  */
-@MountPath("/app/vacation")
-public class PageVacation extends PageAppTemplate {
+@MountPath("/app/project")
+public class PageProject extends PageAppTemplate {
 }

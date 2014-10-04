@@ -1,5 +1,7 @@
 package sk.lazyman.gizmo.data;
 
+import sk.lazyman.gizmo.util.GizmoUtils;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -51,7 +53,7 @@ public class EmailLog implements Serializable {
         return id;
     }
 
-    @Column(length = 1000)
+    @Column(length = GizmoUtils.DESCRIPTION_SIZE)
     public String getDescription() {
         return description;
     }

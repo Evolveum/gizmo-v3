@@ -12,10 +12,12 @@ public class ContactValue implements Serializable {
     public static final String F_ID = "id";
     public static final String F_TYPE = "type";
     public static final String F_VALUE = "value";
+    public static final String F_CONTACT = "contact";
 
     private Integer id;
     private ContactType type;
     private String value;
+    private Contact contact;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "contact_value_id")
@@ -31,6 +33,15 @@ public class ContactValue implements Serializable {
 
     public String getValue() {
         return value;
+    }
+
+    @ManyToOne
+    public Contact getContact() {
+        return contact;
+    }
+
+    public void setContact(Contact contact) {
+        this.contact = contact;
     }
 
     public void setId(Integer id) {

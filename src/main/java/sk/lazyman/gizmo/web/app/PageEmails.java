@@ -102,7 +102,7 @@ public class PageEmails extends PageAppTemplate {
         SortableDataProvider provider = new EmailDataProvider(getEmailLogRepository());
         List<IColumn> columns = new ArrayList<>();
 
-        columns.add(new DateColumn(createStringResource("EmailLog.date"),
+        columns.add(new DateColumn(createStringResource("EmailLog.sentDate"),
                 EmailLog.F_SENT_DATE, "dd. MMM, yyyy HH:mm:ss"));
         columns.add(new AbstractColumn<EmailLog, String>(createStringResource("EmailLog.sender")) {
 
@@ -142,8 +142,8 @@ public class PageEmails extends PageAppTemplate {
             }
         });
         columns.add(new PropertyColumn(createStringResource("EmailLog.mailTo"), EmailLog.F_MAIL_TO));
-        columns.add(new DateColumn(createStringResource("EmailLog.from"), EmailLog.F_FROM_DATE, "dd. MMM, yyyy"));
-        columns.add(new DateColumn(createStringResource("EmailLog.to"), EmailLog.F_TO_DATE, "dd. MMM, yyyy"));
+        columns.add(new DateColumn(createStringResource("EmailLog.fromDate"), EmailLog.F_FROM_DATE, "dd. MMM, yyyy"));
+        columns.add(new DateColumn(createStringResource("EmailLog.toDate"), EmailLog.F_TO_DATE, "dd. MMM, yyyy"));
         columns.add(new PropertyColumn(createStringResource("EmailLog.summaryWork"), EmailLog.F_SUMMARY_WORK));
         columns.add(new PropertyColumn(createStringResource("EmailLog.summaryInvoice"), EmailLog.F_SUMMARY_INVOICE));
         columns.add(new AbstractColumn<EmailLog, String>(createStringResource("EmailLog.realizators")) {

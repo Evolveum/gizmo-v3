@@ -1,7 +1,10 @@
 package sk.lazyman.gizmo.data;
 
+import sk.lazyman.gizmo.util.GizmoUtils;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * @author lazyman
@@ -20,6 +23,7 @@ public class Customer implements Serializable {
     private String description;
     private CustomerType type;
     private Customer partner;
+    private Set<Notification> notifications;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_id")
@@ -32,7 +36,7 @@ public class Customer implements Serializable {
         return name;
     }
 
-    @Column(length = 1000)
+    @Column(length = GizmoUtils.DESCRIPTION_SIZE)
     public String getDescription() {
         return description;
     }
@@ -45,6 +49,15 @@ public class Customer implements Serializable {
     @ManyToOne
     public Customer getPartner() {
         return partner;
+    }
+
+    @OneToMany(mappedBy = Notification.F_CUSTOMER)
+    public Set<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(Set<Notification> notifications) {
+        this.notifications = notifications;
     }
 
     public void setId(Integer id) {

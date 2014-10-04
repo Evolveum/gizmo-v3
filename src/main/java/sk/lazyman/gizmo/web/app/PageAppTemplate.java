@@ -47,6 +47,9 @@ public class PageAppTemplate extends PageTemplate {
         TopMenuItem item = new TopMenuItem(createStringResource("PageAppTemplate.menu.dashboard"), PageDashboard.class);
         navbar.addComponents(new ImmutableNavbarComponent(item));
 
+        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.customers"), PageCustomers.class);
+        navbar.addComponents(new ImmutableNavbarComponent(item));
+
         item = new TopMenuItem(createStringResource("PageAppTemplate.menu.projects"), PageProjects.class);
         navbar.addComponents(new ImmutableNavbarComponent(item));
 

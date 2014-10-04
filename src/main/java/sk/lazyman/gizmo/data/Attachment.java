@@ -1,7 +1,5 @@
 package sk.lazyman.gizmo.data;
 
-import sk.lazyman.gizmo.util.GizmoUtils;
-
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -9,53 +7,52 @@ import java.io.Serializable;
  * @author lazyman
  */
 @Entity
-public class Part implements Serializable {
+public class Attachment implements Serializable {
 
     public static final String F_ID = "id";
-    public static final String F_PROJECT = "project";
     public static final String F_NAME = "name";
-    public static final String F_DESCRIPTION = "description";
+    public static final String F_VALUE = "value";
+    public static final String F_WORK = "work";
 
     private Integer id;
     private String name;
-    private String description;
-    private Project project;
+    private byte[] value;
+    private Work work;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "part_id")
-    @SequenceGenerator(name = "part_id", sequenceName = "part_id_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "attachment_id")
+    @SequenceGenerator(name = "attachment_id", sequenceName = "attachment_id_seq")
     public Integer getId() {
         return id;
     }
 
     @ManyToOne
-    public Project getProject() {
-        return project;
+    public Work getWork() {
+        return work;
     }
 
     public String getName() {
         return name;
     }
 
-    @Column(length = GizmoUtils.DESCRIPTION_SIZE)
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public byte[] getValue() {
+        return value;
     }
 
     public void setId(Integer id) {
         this.id = id;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setValue(byte[] value) {
+        this.value = value;
+    }
+
+    public void setWork(Work work) {
+        this.work = work;
     }
 
     @Override
@@ -63,7 +60,7 @@ public class Part implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Part that = (Part) o;
+        Attachment that = (Attachment) o;
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
 
@@ -77,10 +74,10 @@ public class Part implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Part{");
+        final StringBuilder sb = new StringBuilder("Attachment{");
         sb.append("id=").append(id);
-        sb.append(", project=").append(project);
         sb.append(", name='").append(name).append('\'');
+        sb.append(", work='").append(work).append('\'');
         sb.append('}');
         return sb.toString();
     }
