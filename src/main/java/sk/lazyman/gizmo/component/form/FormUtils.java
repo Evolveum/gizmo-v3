@@ -1,4 +1,4 @@
-package sk.lazyman.gizmo.component;
+package sk.lazyman.gizmo.component.form;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;

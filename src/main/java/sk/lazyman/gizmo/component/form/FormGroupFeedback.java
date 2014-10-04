@@ -1,4 +1,4 @@
-package sk.lazyman.gizmo.component;
+package sk.lazyman.gizmo.component.form;
 
 import org.apache.wicket.feedback.IFeedbackMessageFilter;
 

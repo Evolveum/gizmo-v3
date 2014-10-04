@@ -222,7 +222,7 @@ public class PageDashboard extends PageAppTemplate {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                newTaskPerformed(target);
+                newWorkPerformed(target);
             }
         };
         form.add(task);
@@ -245,7 +245,7 @@ public class PageDashboard extends PageAppTemplate {
 
     }
 
-    private void newTaskPerformed(AjaxRequestTarget target) {
-
+    private void newWorkPerformed(AjaxRequestTarget target) {
+        setResponsePage(PageWork.class);
     }
 }

@@ -13,7 +13,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.MainFeedback;
-import sk.lazyman.gizmo.component.FormUtils;
+import sk.lazyman.gizmo.component.form.FormUtils;
 import sk.lazyman.gizmo.security.GizmoAuthWebSession;
 import sk.lazyman.gizmo.web.app.PageDashboard;
 

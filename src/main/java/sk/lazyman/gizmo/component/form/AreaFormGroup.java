@@ -1,4 +1,4 @@
-package sk.lazyman.gizmo.component;
+package sk.lazyman.gizmo.component.form;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
@@ -6,15 +6,16 @@ import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.feedback.ComponentFeedbackMessageFilter;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import sk.lazyman.gizmo.component.SimplePanel;
 
 /**
  * @author lazyman
  */
-public class TextFormGroup extends SimplePanel<String> {
+public class AreaFormGroup extends SimplePanel<String> {
 
     private static final String ID_TEXT = "text";
     private static final String ID_TEXT_WRAPPER = "textWrapper";
@@ -22,7 +23,9 @@ public class TextFormGroup extends SimplePanel<String> {
     private static final String ID_FEEDBACK_WRAPPER = "feedbackWrapper";
     private static final String ID_FEEDBACK = "feedback";
 
-    public TextFormGroup(String id, IModel<String> value, IModel<String> label, String labelSize, String textSize,
+    private int rows = 2;
+
+    public AreaFormGroup(String id, IModel<String> value, IModel<String> label, String labelSize, String textSize,
                          String feedbackSize, boolean required) {
         super(id, value);
 
@@ -57,7 +60,7 @@ public class TextFormGroup extends SimplePanel<String> {
         }
         add(textWrapper);
 
-        TextField text = createText(getModel(), label, required);
+        TextArea text = createText(getModel(), label, required);
         text.setLabel(label);
         textWrapper.add(text);
 
@@ -72,15 +75,26 @@ public class TextFormGroup extends SimplePanel<String> {
         feedbackWrapper.add(feedback);
     }
 
-    protected TextField createText(IModel<String> model, IModel<String> label, boolean required) {
-        TextField text = new TextField(ID_TEXT, model);
+    protected TextArea createText(IModel<String> model, IModel<String> label, boolean required) {
+        TextArea text = new TextArea(ID_TEXT, model);
         text.setRequired(required);
         text.add(AttributeAppender.replace("placeholder", label));
+        text.add(AttributeAppender.replace("rows", new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                return Integer.toString(rows);
+            }
+        }));
 
         return text;
     }
 
-    public TextField getField(){
-        return (TextField) get(ID_TEXT_WRAPPER + ":" + ID_TEXT);
+    public TextArea getField(){
+        return (TextArea) get(ID_TEXT_WRAPPER + ":" + ID_TEXT);
+    }
+
+    public void setRows(int rows) {
+        this.rows = rows;
     }
 }
