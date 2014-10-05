@@ -1,0 +1,6 @@
+DB migration
+
+1/ pg_dump -C -b gizmojsf > gizmojsf.sql
+2/ change db name in script to new db
+3/ psql < gizmojsf.sql
+4/ psql < migrate.sql

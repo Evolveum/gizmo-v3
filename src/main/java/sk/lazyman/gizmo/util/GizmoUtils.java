@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class GizmoUtils {
 
-    public static final int DESCRIPTION_SIZE = 1000;
+    public static final int DESCRIPTION_SIZE = 3000;
 
     public static String describeProject(Project project) {
         if (project == null) {
@@ -65,7 +65,7 @@ public class GizmoUtils {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
-        cal.add(Calendar.MONTH, -1);
+        cal.add(Calendar.MONTH, -2);
 
         return cal.getTime();
     }
