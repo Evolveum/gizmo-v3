@@ -52,7 +52,11 @@ public class PageEmails extends PageAppTemplate {
 
             @Override
             protected EmailFilterDto load() {
-                return new EmailFilterDto();
+                EmailFilterDto dto = new EmailFilterDto();
+                dto.setFrom(GizmoUtils.createWorkDefaultFrom());
+                dto.setTo(GizmoUtils.createWorkDefaultTo());
+
+                return dto;
             }
         };
 
@@ -99,7 +103,8 @@ public class PageEmails extends PageAppTemplate {
             }
         });
 
-        SortableDataProvider provider = new EmailDataProvider(getEmailLogRepository());
+        EmailDataProvider provider = new EmailDataProvider(getEmailLogRepository());
+        provider.setFilter(filter.getObject());
         List<IColumn> columns = new ArrayList<>();
 
         columns.add(new DateColumn(createStringResource("EmailLog.sentDate"),

@@ -62,8 +62,8 @@ public class PageDashboard extends PageAppTemplate {
             @Override
             protected WorkFilterDto load() {
                 WorkFilterDto dto = new WorkFilterDto();
-                dto.setFrom(GizmoUtils.createTaskDefaultFrom());
-                dto.setTo(GizmoUtils.createTaskDefaultTo());
+                dto.setFrom(GizmoUtils.createWorkDefaultFrom());
+                dto.setTo(GizmoUtils.createWorkDefaultTo());
 
                 GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
                 dto.setRealizator(principal.getUser());

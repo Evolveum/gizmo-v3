@@ -57,7 +57,7 @@ public class GizmoUtils {
         return sb.toString();
     }
 
-    public static Date createTaskDefaultFrom() {
+    public static Date createWorkDefaultFrom() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -70,9 +70,9 @@ public class GizmoUtils {
         return cal.getTime();
     }
 
-    public static Date createTaskDefaultTo() {
+    public static Date createWorkDefaultTo() {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(createTaskDefaultFrom());
+        cal.setTime(createWorkDefaultFrom());
 
         cal.add(Calendar.MONTH, 1);
         cal.add(Calendar.MILLISECOND, -1);
