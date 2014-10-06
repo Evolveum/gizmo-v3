@@ -24,6 +24,7 @@
         <wicket.bootstrap.version>0.9.5</wicket.bootstrap.version>
         <logback.version>0.9.29</logback.version>
         <querydsl.version>3.4.3</querydsl.version>
+        <boostrap.switch.version>3.0.2</boostrap.switch.version>
     </properties>
 
     <dependencies>
@@ -156,6 +157,11 @@
             <groupId>de.agilecoders.wicket</groupId>
             <artifactId>wicket-bootstrap-less</artifactId>
             <version>${wicket.bootstrap.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap-switch</artifactId>
+            <version>${boostrap.switch.version}</version>
         </dependency>
 
         <!-- HIBERNATE -->

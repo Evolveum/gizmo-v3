@@ -3,11 +3,13 @@ package sk.lazyman.gizmo.web.app;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
+import sk.lazyman.gizmo.component.form.CheckFormGroup;
 import sk.lazyman.gizmo.component.form.DateFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.Work;
@@ -30,7 +32,9 @@ public class PageWork extends PageAppTemplate {
     private static final String ID_TRACK_ID = "trackId";
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
-    private static final String ID_ = "";
+    private static final String ID_IS_WORK_LOG = "isWorkLog";
+    private static final String ID_PART = "part";
+    private static final String ID_CUSTOMER = "customer";
 
     private static final String LABEL_SIZE = "col-sm-3 col-md-2 control-label";
     private static final String TEXT_SIZE = "col-sm-5 col-md-4";
@@ -57,6 +61,18 @@ public class PageWork extends PageAppTemplate {
         FormGroup username = new FormGroup(ID_REALIZATOR, new PropertyModel<String>(model, Work.F_REALIZATOR),
                 createStringResource("Work.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(username);
+
+        FormGroup isWorkLog = new CheckFormGroup(ID_IS_WORK_LOG, new Model<>(Boolean.TRUE),
+                createStringResource("PageWork.isWorkLog"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        form.add(isWorkLog);
+
+        FormGroup customer = new FormGroup(ID_CUSTOMER, new Model(),
+                createStringResource("Work.customer"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        form.add(customer);
+
+        FormGroup part = new FormGroup(ID_PART, new Model(),
+                createStringResource("Work.part"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        form.add(part);
 
         FormGroup date = new DateFormGroup(ID_DATE, new PropertyModel<Date>(model, Work.F_DATE),
                 createStringResource("Work.date"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);

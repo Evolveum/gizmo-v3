@@ -9,9 +9,13 @@ import sk.lazyman.gizmo.component.SimplePanel;
  */
 public abstract class FormInput<T> extends SimplePanel<T> {
 
-    protected FormInput(String id, IModel<T> model) {
+    protected static final String ID_INPUT = "input";
+
+    public FormInput(String id, IModel<T> model) {
         super(id, model);
     }
 
-    public abstract FormComponent getFormComponent();
+    public FormComponent getFormComponent() {
+        return (FormComponent) get(ID_INPUT);
+    }
 }
