@@ -9,7 +9,7 @@ import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
-import sk.lazyman.gizmo.component.form.TextFormGroup;
+import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.util.LoadableModel;
@@ -64,19 +64,19 @@ public class PageUser extends PageAppTemplate {
         Form form = new Form(ID_FORM);
         add(form);
 
-        TextFormGroup username = new TextFormGroup(ID_NAME, new PropertyModel<String>(model, User.F_NAME),
+        FormGroup username = new FormGroup(ID_NAME, new PropertyModel<String>(model, User.F_NAME),
                 createStringResource("User.name"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(username);
 
-        TextFormGroup firstName = new TextFormGroup(ID_GIVEN_NAME, new PropertyModel<String>(model, User.F_GIVEN_NAME),
+        FormGroup firstName = new FormGroup(ID_GIVEN_NAME, new PropertyModel<String>(model, User.F_GIVEN_NAME),
                 createStringResource("User.givenName"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(firstName);
 
-        TextFormGroup lastName = new TextFormGroup(ID_FAMILY_NAME, new PropertyModel<String>(model, User.F_FAMILY_NAME),
+        FormGroup lastName = new FormGroup(ID_FAMILY_NAME, new PropertyModel<String>(model, User.F_FAMILY_NAME),
                 createStringResource("User.familyName"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(lastName);
 
-        TextFormGroup email = new TextFormGroup(ID_LDAP_DN, new PropertyModel<String>(model, User.F_LDAP_DN),
+        FormGroup email = new FormGroup(ID_LDAP_DN, new PropertyModel<String>(model, User.F_LDAP_DN),
                 createStringResource("User.ldapDn"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(email);
 
@@ -115,6 +115,7 @@ public class PageUser extends PageAppTemplate {
 
             setResponsePage(PageUsers.class);
         } catch (Exception ex) {
+            //todo show error message
             target.add(getFeedbackPanel());
         }
     }
