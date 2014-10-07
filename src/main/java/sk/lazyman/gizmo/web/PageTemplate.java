@@ -35,7 +35,7 @@ public class PageTemplate extends WebPage {
     @SpringBean
     private PartRepository projectPartRepository;
     @SpringBean
-    private WorkRepository taskRepository;
+    private WorkRepository workRepository;
     @SpringBean
     private EmailLogRepository emailLogRepository;
 
@@ -52,6 +52,10 @@ public class PageTemplate extends WebPage {
 
         DebugBar debugPanel = new DebugBar(ID_DEBUG_PANEL);
         add(debugPanel);
+    }
+
+    public String translateString(String resourceKey, Object... objects) {
+        return createStringResource(resourceKey, objects).getString();
     }
 
     public StringResourceModel createStringResource(String resourceKey, Object... objects) {
@@ -103,8 +107,8 @@ public class PageTemplate extends WebPage {
         return projectPartRepository;
     }
 
-    public WorkRepository getTaskRepository() {
-        return taskRepository;
+    public WorkRepository getWorkRepository() {
+        return workRepository;
     }
 
     public EmailLogRepository getEmailLogRepository() {

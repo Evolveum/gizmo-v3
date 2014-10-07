@@ -1,31 +1,36 @@
 package sk.lazyman.gizmo.web.app;
 
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
-import sk.lazyman.gizmo.component.form.AreaFormGroup;
-import sk.lazyman.gizmo.component.form.CheckFormGroup;
-import sk.lazyman.gizmo.component.form.DateFormGroup;
-import sk.lazyman.gizmo.component.form.FormGroup;
+import sk.lazyman.gizmo.component.form.*;
+import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.repository.UserRepository;
+import sk.lazyman.gizmo.repository.WorkRepository;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lazyman
  */
 @MountPath("/app/work")
 public class PageWork extends PageAppTemplate {
+
+    public static final String WORK_ID = "workId";
 
     private static final String ID_FORM = "form";
     private static final String ID_REALIZATOR = "realizator";
@@ -44,6 +49,7 @@ public class PageWork extends PageAppTemplate {
     private static final String TEXT_SIZE = "col-sm-5 col-md-4";
     private static final String FEEDBACK_SIZE = "col-sm-4 col-md-4";
 
+    private IModel<List<User>> users;
     private IModel<Work> model;
 
     public PageWork() {
@@ -51,20 +57,66 @@ public class PageWork extends PageAppTemplate {
 
             @Override
             protected Work load() {
-                return new Work();
+                return loadWork();
+            }
+        };
+
+        users= new LoadableModel<List<User>>(false) {
+
+            @Override
+            protected List<User> load() {
+                return loadUsers();
             }
         };
 
         initLayout();
     }
 
+    private List<User> loadUsers() {
+        UserRepository repository = getUserRepository();
+        return repository.listUsers();
+    }
+
+    private Work loadWork() {
+        PageParameters params = getPageParameters();
+        StringValue val = params.get(WORK_ID);
+        String workId = val != null ? val.toString() : null;
+
+        if (workId == null || !workId.matches("[0-9]+")) {
+            return new Work();
+        }
+
+        WorkRepository repository = getWorkRepository();
+        Work work = repository.findOne(Integer.parseInt(workId));
+        if (work == null) {
+            getSession().error(translateString("Message.couldntFindWork", workId));
+            throw new RestartResponseException(PageWork.class);
+        }
+
+        return work;
+    }
+
     private void initLayout() {
         Form form = new Form(ID_FORM);
         add(form);
 
-        FormGroup username = new FormGroup(ID_REALIZATOR, new PropertyModel<String>(model, Work.F_REALIZATOR),
+        DropDownFormGroup<User> realizator = new DropDownFormGroup<>(ID_REALIZATOR,
+                new PropertyModel<User>(model, Work.F_REALIZATOR),
                 createStringResource("Work.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-        form.add(username);
+        realizator.setRenderer(new IChoiceRenderer<User>() {
+
+            @Override
+            public Object getDisplayValue(User object) {
+                return object != null ? object.getFullName() : null;
+            }
+
+            @Override
+            public String getIdValue(User object, int index) {
+                return Integer.toString(index);
+            }
+        });
+        realizator.setChoices(users);
+        form.add(realizator);
 
         CheckFormGroup isWorkLog = new CheckFormGroup(ID_IS_WORK_LOG, new Model<>(Boolean.TRUE),
                 createStringResource("PageWork.isWorkLog"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
@@ -107,6 +159,8 @@ public class PageWork extends PageAppTemplate {
         FormGroup trackId = new FormGroup(ID_TRACK_ID, new PropertyModel<String>(model, Work.F_TRACK_ID),
                 createStringResource("Work.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(trackId);
+
+        initButtons(form);
     }
 
     private void initButtons(Form form) {

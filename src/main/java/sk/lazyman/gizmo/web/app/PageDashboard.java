@@ -16,9 +16,11 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.*;
 import sk.lazyman.gizmo.component.data.DateColumn;
+import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.data.User;
@@ -31,6 +33,8 @@ import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -111,7 +115,7 @@ public class PageDashboard extends PageAppTemplate {
         SummaryPartsPanel summaryParts = new SummaryPartsPanel(ID_SUMMARY_PARTS, partsProvider, filter);
         add(summaryParts);
 
-        WorkDataProvider provider = new WorkDataProvider(getTaskRepository());
+        WorkDataProvider provider = new WorkDataProvider(getWorkRepository());
         provider.setFilter(filter.getObject());
 
         List<IColumn> columns = createColumns();
@@ -124,7 +128,30 @@ public class PageDashboard extends PageAppTemplate {
     private List<IColumn> createColumns() {
         List<IColumn> columns = new ArrayList<>();
 
-        columns.add(new DateColumn(createStringResource("Work.date"), Work.F_DATE, "EEE dd. MMM. yyyy"));
+        columns.add(new LinkColumn<Work>(createStringResource("Work.date"), Work.F_DATE) {
+
+            @Override
+            protected IModel<String> createLinkModel(final IModel<Work> rowModel) {
+                return new AbstractReadOnlyModel<String>() {
+                    @Override
+                    public String getObject() {
+                        PropertyModel<Date> propertyModel = new PropertyModel<>(rowModel, getPropertyExpression());
+                        Date date = propertyModel.getObject();
+                        if (date == null) {
+                            return null;
+                        }
+
+                        DateFormat df = new SimpleDateFormat("EEE dd. MMM. yyyy");
+                        return df.format(date);
+                    }
+                };
+            }
+
+            @Override
+            public void onClick(AjaxRequestTarget target, IModel<Work> rowModel) {
+                workDetailsPerformed(target, rowModel.getObject());
+            }
+        });
         columns.add(new AbstractColumn<Work, String>(createStringResource("PageDashboard.length")) {
 
             @Override
@@ -247,5 +274,12 @@ public class PageDashboard extends PageAppTemplate {
 
     private void newWorkPerformed(AjaxRequestTarget target) {
         setResponsePage(PageWork.class);
+    }
+
+    private void workDetailsPerformed(AjaxRequestTarget target, Work work) {
+        PageParameters params = new PageParameters();
+        params.add(PageWork.WORK_ID, work.getId());
+
+        setResponsePage(PageWork.class, params);
     }
 }

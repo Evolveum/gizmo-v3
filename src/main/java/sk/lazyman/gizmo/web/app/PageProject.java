@@ -1,5 +1,6 @@
 package sk.lazyman.gizmo.web.app;
 
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
@@ -14,7 +15,6 @@ import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.CheckFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.Project;
-import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.util.LoadableModel;
 
@@ -63,9 +63,10 @@ public class PageProject extends PageAppTemplate {
         }
 
         ProjectRepository repository = getProjectRepository();
-        Project project = repository.getOne(Integer.parseInt(projectId));
+        Project project = repository.findOne(Integer.parseInt(projectId));
         if (project == null) {
-            project = new Project();
+            getSession().error(translateString("Message.couldntFindProject", projectId));
+            throw new RestartResponseException(PageProject.class);
         }
 
         return project;
