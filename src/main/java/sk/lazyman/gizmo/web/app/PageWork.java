@@ -1,7 +1,11 @@
 package sk.lazyman.gizmo.web.app;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -62,8 +66,17 @@ public class PageWork extends PageAppTemplate {
                 createStringResource("Work.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(username);
 
-        FormGroup isWorkLog = new CheckFormGroup(ID_IS_WORK_LOG, new Model<>(Boolean.TRUE),
+        CheckFormGroup isWorkLog = new CheckFormGroup(ID_IS_WORK_LOG, new Model<>(Boolean.TRUE),
                 createStringResource("PageWork.isWorkLog"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        FormComponent check = isWorkLog.getFormComponent();
+        check.add(new AjaxFormComponentUpdatingBehavior("click") {
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                //todo not working
+                System.out.println("asdf");
+            }
+        });
         form.add(isWorkLog);
 
         FormGroup customer = new FormGroup(ID_CUSTOMER, new Model(),
@@ -94,7 +107,9 @@ public class PageWork extends PageAppTemplate {
         FormGroup trackId = new FormGroup(ID_TRACK_ID, new PropertyModel<String>(model, Work.F_TRACK_ID),
                 createStringResource("Work.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(trackId);
+    }
 
+    private void initButtons(Form form) {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override
