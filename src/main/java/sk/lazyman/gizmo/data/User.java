@@ -16,12 +16,14 @@ public class User implements Serializable {
     public static final String F_GIVEN_NAME = "givenName";
     public static final String F_FAMILY_NAME = "familyName";
     public static final String F_LDAP_DN = "ldapDn";
+    public static final String F_ENABLED = "enabled";
 
     private Integer id;
     private String name;
     private String givenName;
     private String familyName;
     private String ldapDn;
+    private boolean enabled;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id")
@@ -46,6 +48,14 @@ public class User implements Serializable {
     @Column(unique = true)
     public String getLdapDn() {
         return ldapDn;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public void setId(Integer id) {

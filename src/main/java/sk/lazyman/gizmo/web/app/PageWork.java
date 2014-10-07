@@ -74,7 +74,7 @@ public class PageWork extends PageAppTemplate {
 
     private List<User> loadUsers() {
         UserRepository repository = getUserRepository();
-        return repository.listUsers();
+        return repository.listUsersOrderByGivenFamilyName();
     }
 
     private Work loadWork() {
