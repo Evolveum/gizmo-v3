@@ -17,12 +17,14 @@ public class User implements Serializable {
     public static final String F_FAMILY_NAME = "familyName";
     public static final String F_LDAP_DN = "ldapDn";
     public static final String F_ENABLED = "enabled";
+    public static final String F_PASSWORD = "password";
 
     private Integer id;
     private String name;
     private String givenName;
     private String familyName;
     private String ldapDn;
+    private String password;
     private boolean enabled;
 
     @Id
@@ -52,6 +54,14 @@ public class User implements Serializable {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setEnabled(boolean enabled) {
@@ -98,5 +108,18 @@ public class User implements Serializable {
     @Transient
     public String getFullName() {
         return StringUtils.join(new Object[]{givenName, familyName}, ' ');
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("User{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", givenName='").append(givenName).append('\'');
+        sb.append(", familyName='").append(familyName).append('\'');
+        sb.append(", enabled=").append(enabled);
+        sb.append(", ldapDn='").append(ldapDn).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }
