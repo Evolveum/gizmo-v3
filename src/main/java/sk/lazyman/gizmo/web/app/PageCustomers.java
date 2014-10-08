@@ -4,14 +4,15 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
+import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.springframework.data.domain.Sort;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.Customer;
-import sk.lazyman.gizmo.data.User;
-import sk.lazyman.gizmo.data.provider.CustomerDataProvider;
+import sk.lazyman.gizmo.data.provider.BasicDataProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,9 @@ public class PageCustomers extends PageAppTemplate {
     }
 
     private void initLayout() {
-        SortableDataProvider provider = new CustomerDataProvider(getCustomerRepository());
+        BasicDataProvider provider = new BasicDataProvider(getCustomerRepository(), 25);
+        provider.setSort(new Sort(Sort.Direction.ASC, Customer.F_NAME, Customer.F_TYPE));
+
         List<IColumn> columns = new ArrayList<>();
 
         columns.add(new LinkColumn<Customer>(createStringResource("Customer.name"), Customer.F_NAME) {

@@ -2,61 +2,31 @@ package sk.lazyman.gizmo.data.provider;
 
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.Predicate;
-import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
 import sk.lazyman.gizmo.data.EmailLog;
 import sk.lazyman.gizmo.data.QEmailLog;
 import sk.lazyman.gizmo.dto.EmailFilterDto;
-import sk.lazyman.gizmo.repository.EmailLogRepository;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author lazyman
  */
-public class EmailDataProvider extends SortableDataProvider<EmailLog, String> {
+public class EmailDataProvider extends BasicDataProvider<EmailLog> {
 
-    private EmailLogRepository emailRepository;
     private EmailFilterDto filter;
 
-    public EmailDataProvider(EmailLogRepository emailRepository) {
-        this.emailRepository = emailRepository;
-    }
-
-    @Override
-    public Iterator<? extends EmailLog> iterator(long first, long count) {
-        Sort sort = new Sort(Sort.Direction.DESC, EmailLog.F_SENT_DATE);
-
-        PageRequest page = new PageRequest((int) first, (int) count, sort);
-        Page<EmailLog> found = emailRepository.findAll(createPredicate(), page);
-        if (found != null) {
-            return found.iterator();
-        }
-
-        return new ArrayList<EmailLog>().iterator();
-    }
-
-    @Override
-    public long size() {
-        return emailRepository.count(createPredicate());
-    }
-
-    @Override
-    public IModel<EmailLog> model(EmailLog object) {
-        return new Model<>(object);
+    public EmailDataProvider(JpaRepository<EmailLog, Integer> repository, int itemsPerPage) {
+        super(repository, itemsPerPage);
     }
 
     public void setFilter(EmailFilterDto filter) {
         this.filter = filter;
     }
 
-    private Predicate createPredicate() {
+    @Override
+    public Predicate getPredicate() {
         if (filter == null) {
             return null;
         }

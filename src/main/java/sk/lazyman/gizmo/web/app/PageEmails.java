@@ -17,6 +17,7 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.springframework.data.domain.Sort;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.data.DateColumn;
@@ -25,6 +26,7 @@ import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.EmailLog;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.data.provider.BasicDataProvider;
 import sk.lazyman.gizmo.data.provider.EmailDataProvider;
 import sk.lazyman.gizmo.dto.EmailFilterDto;
 import sk.lazyman.gizmo.util.GizmoUtils;
@@ -103,10 +105,10 @@ public class PageEmails extends PageAppTemplate {
             }
         });
 
-        EmailDataProvider provider = new EmailDataProvider(getEmailLogRepository());
-        provider.setFilter(filter.getObject());
-        List<IColumn> columns = new ArrayList<>();
+        BasicDataProvider provider = new EmailDataProvider(getEmailLogRepository(), 15);
+        provider.setSort(new Sort(Sort.Direction.DESC, EmailLog.F_SENT_DATE));
 
+        List<IColumn> columns = new ArrayList<>();
         columns.add(new DateColumn(createStringResource("EmailLog.sentDate"),
                 EmailLog.F_SENT_DATE, "dd. MMM, yyyy HH:mm:ss"));
         columns.add(new AbstractColumn<EmailLog, String>(createStringResource("EmailLog.sender")) {
