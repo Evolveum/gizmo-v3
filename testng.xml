@@ -3,7 +3,7 @@
 <suite name="unit" parallel="false">
     <test name="Web Tests" preserve-order="true" parallel="false" verbose="10">
         <classes>
-             <class name="sk.lazyman.gizmo.SpringApplicationContextTest"/>
+             <!--<class name="sk.lazyman.gizmo.SpringApplicationContextTest"/>-->
         </classes>
     </test>
 </suite>
