@@ -1,18 +1,18 @@
 package sk.lazyman.gizmo.web.app;
 
-import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.springframework.data.domain.Sort;
 import org.wicketstuff.annotation.mount.MountPath;
-import sk.lazyman.gizmo.component.ProjectItemList;
+import sk.lazyman.gizmo.component.data.LinkColumn;
+import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.Customer;
-import sk.lazyman.gizmo.data.Part;
 import sk.lazyman.gizmo.data.Project;
-import sk.lazyman.gizmo.dto.ProjectListItem;
-import sk.lazyman.gizmo.util.LoadableModel;
+import sk.lazyman.gizmo.data.provider.BasicDataProvider;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,217 +22,39 @@ import java.util.List;
 @MountPath("/app/projects")
 public class PageProjects extends PageAppTemplate {
 
-    private static final String ID_COMPANY_LIST = "companyList";
-    private static final String ID_PROJECT_LIST = "projectList";
-    private static final String ID_PROJECT_PART_LIST = "projectPartList";
-
-    private LoadableModel<List<ProjectListItem<Customer>>> companies;
-    private LoadableModel<List<ProjectListItem<Project>>> projects;
-    private LoadableModel<List<ProjectListItem<Part>>> parts;
+    private static final String ID_TABLE = "table";
 
     public PageProjects() {
-        companies = new LoadableModel<List<ProjectListItem<Customer>>>(false) {
-
-            @Override
-            protected List<ProjectListItem<Customer>> load() {
-                return loadCompanies();
-            }
-        };
-
-        projects = new LoadableModel<List<ProjectListItem<Project>>>(false) {
-
-            @Override
-            protected List<ProjectListItem<Project>> load() {
-                return loadProjects();
-            }
-        };
-
-        parts = new LoadableModel<List<ProjectListItem<Part>>>(false) {
-
-            @Override
-            protected List<ProjectListItem<Part>> load() {
-                return loadProjectParts();
-            }
-        };
-
         initLayout();
     }
 
-    private List<ProjectListItem<Part>> loadProjectParts() {
-        List<ProjectListItem<Part>> items = new ArrayList<>();
-
-        Project project = getSelectedItem(projects.getObject());
-        if (project == null) {
-            return items;
-        }
-
-        List<Part> projects = getProjectPartRepository().findParts(project.getId());
-        if (projects != null) {
-            for (Part part : projects) {
-                ProjectListItem item = new ProjectListItem<Part>(part) {
-
-                    @Override
-                    public String getName() {
-                        return getData().getName();
-                    }
-                };
-                items.add(item);
-            }
-        }
-
-        return items;
-    }
-
-    private List<ProjectListItem<Project>> loadProjects() {
-        List<ProjectListItem<Project>> items = new ArrayList<>();
-
-        Customer company = getSelectedItem(companies.getObject());
-        if (company == null) {
-            return items;
-        }
-
-        List<Project> projects = getProjectRepository().findProjects(company.getId());
-        if (projects != null) {
-            for (Project project : projects) {
-                ProjectListItem item = new ProjectListItem<Project>(project) {
-
-                    @Override
-                    public String getName() {
-                        return getData().getName();
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return getData().getDescription();
-                    }
-                };
-                items.add(item);
-            }
-        }
-
-        return items;
-    }
-
-    private List<ProjectListItem<Customer>> loadCompanies() {
-        List<ProjectListItem<Customer>> items = new ArrayList<>();
-
-        List<Customer> companies = getCustomerRepository().listCustomers();
-        if (companies != null) {
-            for (Customer company : companies) {
-                ProjectListItem item = new ProjectListItem<Customer>(company) {
-
-                    @Override
-                    public String getName() {
-                        return getData().getName();
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return getData().getDescription();
-                    }
-                };
-                items.add(item);
-            }
-        }
-
-        return items;
-    }
-
-    private <T extends Serializable> T getSelectedItem(List<ProjectListItem<T>> list) {
-        for (ProjectListItem<T> item : list) {
-            if (!item.isSelected()) {
-                continue;
-            }
-
-            return item.getData();
-        }
-
-        return null;
-    }
-
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-        response.render(CssHeaderItem.forReference(
-                new LessResourceReference(PageProjects.class, "PageProjects.less")));
-    }
-
     private void initLayout() {
-        ProjectItemList companyList = new ProjectItemList<Customer>(ID_COMPANY_LIST, companies) {
+        BasicDataProvider provider = new BasicDataProvider(getProjectRepository(), 25);
+        provider.setSort(new Sort(new Sort.Order(Sort.Direction.ASC, Project.F_NAME),
+                new Sort.Order(Sort.Direction.DESC, Project.F_COMMERCIAL)));
+
+        List<IColumn> columns = new ArrayList<>();
+
+        columns.add(new LinkColumn<Project>(createStringResource("Project.name"), Project.F_NAME) {
 
             @Override
-            protected void itemSelected(AjaxRequestTarget target, ProjectListItem<Customer> selected) {
-                super.itemSelected(target, selected);
-                companySelected(target, selected);
+            public void onClick(AjaxRequestTarget target, IModel<Project> rowModel) {
+                customerDetailsPerformed(target, rowModel.getObject());
             }
+        });
+        columns.add(new PropertyColumn(createStringResource("Project.customer"), Project.F_CUSTOMER + "." + Customer.F_NAME));
+        columns.add(new PropertyColumn(createStringResource("Project.description"), Project.F_DESCRIPTION));
+        columns.add(new PropertyColumn(createStringResource("Project.commercial"), Project.F_COMMERCIAL));
+        columns.add(new PropertyColumn(createStringResource("Project.closed"), Project.F_CLOSED));
 
-            @Override
-            protected void editPerformed(AjaxRequestTarget target, ProjectListItem<Customer> selected) {
-                super.editPerformed(target, selected);
-                companyEdited(target, selected);
-            }
-        };
-        add(companyList);
-
-        ProjectItemList projectList = new ProjectItemList<Project>(ID_PROJECT_LIST, projects) {
-
-            @Override
-            protected void itemSelected(AjaxRequestTarget target, ProjectListItem<Project> selected) {
-                super.itemSelected(target, selected);
-                projectSelected(target, selected);
-            }
-
-            @Override
-            protected void editPerformed(AjaxRequestTarget target, ProjectListItem<Project> selected) {
-                super.editPerformed(target, selected);
-                projectEdited(target, selected);
-            }
-        };
-        add(projectList);
-
-        ProjectItemList projectPartList = new ProjectItemList<Part>(ID_PROJECT_PART_LIST, parts) {
-
-            @Override
-            protected void itemSelected(AjaxRequestTarget target, ProjectListItem<Part> selected) {
-                super.itemSelected(target, selected);
-                projectPartSelected(target, selected);
-            }
-
-            @Override
-            protected void editPerformed(AjaxRequestTarget target, ProjectListItem<Part> selected) {
-                super.editPerformed(target, selected);
-                projectPartEdited(target, selected);
-            }
-        };
-        add(projectPartList);
+        TablePanel table = new TablePanel(ID_TABLE, provider, columns, 25);
+        add(table);
     }
 
-    private void companySelected(AjaxRequestTarget target, ProjectListItem selected) {
-        projects.reset();
-        target.add(get(ID_PROJECT_LIST));
+    private void customerDetailsPerformed(AjaxRequestTarget target, Project customer) {
+        PageParameters params = new PageParameters();
+        params.set(PageProject.PROJECT_ID, customer.getId());
 
-        parts.reset();
-        target.add(get(ID_PROJECT_PART_LIST));
-    }
-
-    private void companyEdited(AjaxRequestTarget target, ProjectListItem selected) {
-        //todo implement
-    }
-
-    private void projectSelected(AjaxRequestTarget target, ProjectListItem selected) {
-        parts.reset();
-        target.add(get(ID_PROJECT_PART_LIST));
-    }
-
-    private void projectEdited(AjaxRequestTarget target, ProjectListItem selected) {
-        //todo implement
-    }
-
-    private void projectPartSelected(AjaxRequestTarget target, ProjectListItem selected) {
-
-    }
-
-    private void projectPartEdited(AjaxRequestTarget target, ProjectListItem selected) {
-        //todo implement
+        setResponsePage(PageProject.class, params);
     }
 }
