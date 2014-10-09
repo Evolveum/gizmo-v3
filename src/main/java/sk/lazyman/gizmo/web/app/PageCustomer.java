@@ -6,7 +6,7 @@ import org.wicketstuff.annotation.mount.MountPath;
  * @author lazyman
  */
 @MountPath("/app/customer")
-public class PageCustomer extends PageAppTemplate {
+public class PageCustomer extends PageAppCustomers {
 
     public static final String CUSTOMER_ID = "customerId";
 

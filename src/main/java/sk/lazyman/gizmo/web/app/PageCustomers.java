@@ -21,7 +21,7 @@ import java.util.List;
  * @author lazyman
  */
 @MountPath("/app/customers")
-public class PageCustomers extends PageAppTemplate {
+public class PageCustomers extends PageAppCustomers {
 
     private static final String ID_TABLE = "table";
 

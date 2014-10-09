@@ -1,12 +1,12 @@
 package sk.lazyman.gizmo.web.app;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.ImmutableNavbarComponent;
-import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.Navbar;
-import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarExternalLink;
+import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.*;
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.AbstractLink;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
@@ -14,9 +14,13 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import sk.lazyman.gizmo.component.MainFeedback;
 import sk.lazyman.gizmo.component.TopMenuItem;
+import sk.lazyman.gizmo.component.TopMenuItemLink;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.web.PageTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author lazyman
@@ -47,11 +51,35 @@ public class PageAppTemplate extends PageTemplate {
         TopMenuItem item = new TopMenuItem(createStringResource("PageAppTemplate.menu.dashboard"), PageDashboard.class);
         navbar.addComponents(new ImmutableNavbarComponent(item));
 
-        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.customers"), PageCustomers.class);
-        navbar.addComponents(new ImmutableNavbarComponent(item));
+        NavbarDropDownButton drop = new NavbarDropDownButton(createStringResource("PageAppTemplate.menu.customers")) {
 
-        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.projects"), PageProjects.class);
-        navbar.addComponents(new ImmutableNavbarComponent(item));
+            @Override
+            protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
+                List<AbstractLink> list = new ArrayList<>();
+                list.add(new TopMenuItemLink(buttonMarkupId,
+                        createStringResource("PageAppTemplate.menu.listCustomers"), PageCustomers.class));
+                list.add(new TopMenuItemLink(buttonMarkupId,
+                        createStringResource("PageAppTemplate.menu.newCustomer"), PageCustomer.class));
+
+                return list;
+            }
+        };
+        navbar.addComponents(new ImmutableNavbarComponent(drop));
+
+        drop = new NavbarDropDownButton(createStringResource("PageAppTemplate.menu.projects")) {
+
+            @Override
+            protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
+                List<AbstractLink> list = new ArrayList<>();
+                list.add(new TopMenuItemLink(buttonMarkupId,
+                        createStringResource("PageAppTemplate.menu.listProjects"), PageProjects.class));
+                list.add(new TopMenuItemLink(buttonMarkupId,
+                        createStringResource("PageAppTemplate.menu.newProject"), PageProject.class));
+
+                return list;
+            }
+        };
+        navbar.addComponents(new ImmutableNavbarComponent(drop));
 
         item = new TopMenuItem(createStringResource("PageAppTemplate.menu.users"), PageUsers.class);
         navbar.addComponents(new ImmutableNavbarComponent(item));

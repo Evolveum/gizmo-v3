@@ -18,7 +18,7 @@ import sk.lazyman.gizmo.util.LoadableModel;
  * @author lazyman
  */
 @MountPath("/app/user")
-public class PageUser extends PageAppTemplate {
+public class PageUser extends PageAppUsers {
 
     public static final String USER_ID = "userId";
 

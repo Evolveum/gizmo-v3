@@ -22,7 +22,7 @@ import sk.lazyman.gizmo.util.LoadableModel;
  * @author lazyman
  */
 @MountPath("/app/project")
-public class PageProject extends PageAppTemplate {
+public class PageProject extends PageAppProjects {
 
     public static final String PROJECT_ID = "projectId";
 
