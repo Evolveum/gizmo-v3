@@ -131,32 +131,32 @@ public class PageWork extends PageAppTemplate {
         });
         form.add(isWorkLog);
 
-        FormGroup customer = new FormGroup(ID_CUSTOMER, new Model(),
+        HFormGroup customer = new HFormGroup(ID_CUSTOMER, new Model(),
                 createStringResource("Work.customer"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(customer);
 
-        FormGroup part = new FormGroup(ID_PART, new Model(),
+        HFormGroup part = new HFormGroup(ID_PART, new Model(),
                 createStringResource("Work.part"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(part);
 
-        FormGroup date = new DateFormGroup(ID_DATE, new PropertyModel<Date>(model, Work.F_DATE),
+        HFormGroup date = new DateFormGroup(ID_DATE, new PropertyModel<Date>(model, Work.F_DATE),
                 createStringResource("Work.date"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(date);
 
-        FormGroup invoice = new FormGroup(ID_INVOICE, new PropertyModel<String>(model, Work.F_INVOICE_LENGTH),
+        HFormGroup invoice = new HFormGroup(ID_INVOICE, new PropertyModel<String>(model, Work.F_INVOICE_LENGTH),
                 createStringResource("Work.invoiceLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(invoice);
 
-        FormGroup length = new FormGroup(ID_LENGTH, new PropertyModel<String>(model, Work.F_WORK_LENGTH),
+        HFormGroup length = new HFormGroup(ID_LENGTH, new PropertyModel<String>(model, Work.F_WORK_LENGTH),
                 createStringResource("Work.workLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(length);
 
-        AreaFormGroup description = new AreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Work.F_DESCRIPTION),
+        HAreaFormGroup description = new HAreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Work.F_DESCRIPTION),
                 createStringResource("Work.description"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         description.setRows(5);
         form.add(description);
 
-        FormGroup trackId = new FormGroup(ID_TRACK_ID, new PropertyModel<String>(model, Work.F_TRACK_ID),
+        HFormGroup trackId = new HFormGroup(ID_TRACK_ID, new PropertyModel<String>(model, Work.F_TRACK_ID),
                 createStringResource("Work.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(trackId);
 

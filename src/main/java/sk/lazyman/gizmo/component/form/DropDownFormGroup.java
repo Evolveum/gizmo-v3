@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author lazyman
  */
-public class DropDownFormGroup<T extends Serializable> extends FormGroup<DropDownInput<T>, T> {
+public class DropDownFormGroup<T extends Serializable> extends HFormGroup<DropDownInput<T>, T> {
 
     public DropDownFormGroup(String id, IModel<T> value, IModel<String> label, String labelSize, String inputSize,
                              String feedbackSize, boolean required) {

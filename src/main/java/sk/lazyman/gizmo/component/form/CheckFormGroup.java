@@ -5,7 +5,7 @@ import org.apache.wicket.model.IModel;
 /**
  * @author lazyman
  */
-public class CheckFormGroup extends FormGroup<CheckInput, Boolean> {
+public class CheckFormGroup extends HFormGroup<CheckInput, Boolean> {
 
     public CheckFormGroup(String id, IModel<Boolean> value, IModel<String> label, String labelSize, String inputSize,
                           String feedbackSize, boolean required) {

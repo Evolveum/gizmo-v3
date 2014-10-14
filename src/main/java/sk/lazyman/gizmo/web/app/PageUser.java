@@ -9,7 +9,7 @@ import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
-import sk.lazyman.gizmo.component.form.FormGroup;
+import sk.lazyman.gizmo.component.form.HFormGroup;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.util.LoadableModel;
@@ -64,19 +64,19 @@ public class PageUser extends PageAppUsers {
         Form form = new Form(ID_FORM);
         add(form);
 
-        FormGroup username = new FormGroup(ID_NAME, new PropertyModel<String>(model, User.F_NAME),
+        HFormGroup username = new HFormGroup(ID_NAME, new PropertyModel<String>(model, User.F_NAME),
                 createStringResource("User.name"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(username);
 
-        FormGroup firstName = new FormGroup(ID_GIVEN_NAME, new PropertyModel<String>(model, User.F_GIVEN_NAME),
+        HFormGroup firstName = new HFormGroup(ID_GIVEN_NAME, new PropertyModel<String>(model, User.F_GIVEN_NAME),
                 createStringResource("User.givenName"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(firstName);
 
-        FormGroup lastName = new FormGroup(ID_FAMILY_NAME, new PropertyModel<String>(model, User.F_FAMILY_NAME),
+        HFormGroup lastName = new HFormGroup(ID_FAMILY_NAME, new PropertyModel<String>(model, User.F_FAMILY_NAME),
                 createStringResource("User.familyName"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(lastName);
 
-        FormGroup email = new FormGroup(ID_LDAP_DN, new PropertyModel<String>(model, User.F_LDAP_DN),
+        HFormGroup email = new HFormGroup(ID_LDAP_DN, new PropertyModel<String>(model, User.F_LDAP_DN),
                 createStringResource("User.ldapDn"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(email);
 

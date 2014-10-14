@@ -10,11 +10,11 @@ import org.apache.wicket.model.IModel;
 /**
  * @author lazyman
  */
-public class TopMenuItemLink extends BookmarkablePageLink {
+public class BookmarkableLabeledLink extends BookmarkablePageLink {
 
     private IModel<String> model;
 
-    public TopMenuItemLink(String id, IModel<String> model, Class pageClass) {
+    public BookmarkableLabeledLink(String id, IModel<String> model, Class pageClass) {
         super(id, pageClass);
         this.model = model;
     }

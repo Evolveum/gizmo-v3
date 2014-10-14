@@ -9,10 +9,11 @@ import java.io.Serializable;
 /**
  * @author lazyman
  */
-public class AreaFormGroup<T extends Serializable> extends FormGroup<TextAreaInput, T> {
+public class HAreaFormGroup<T extends Serializable> extends HFormGroup<TextAreaInput, T> {
 
-    public AreaFormGroup(String id, IModel<T> value, IModel<String> label, boolean required) {
-        super(id, value, label, required);
+    public HAreaFormGroup(String id, IModel<T> value, IModel<String> label, String labelSize, String inputSize,
+                          String feedbackSize, boolean required) {
+        super(id, value, label, labelSize, inputSize, feedbackSize, required);
     }
 
     @Override

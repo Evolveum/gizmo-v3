@@ -6,15 +6,14 @@ import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import sk.lazyman.gizmo.component.BookmarkableLabeledLink;
 import sk.lazyman.gizmo.component.MainFeedback;
 import sk.lazyman.gizmo.component.TopMenuItem;
-import sk.lazyman.gizmo.component.TopMenuItemLink;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.web.PageTemplate;
@@ -56,9 +55,9 @@ public class PageAppTemplate extends PageTemplate {
             @Override
             protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
                 List<AbstractLink> list = new ArrayList<>();
-                list.add(new TopMenuItemLink(buttonMarkupId,
+                list.add(new BookmarkableLabeledLink(buttonMarkupId,
                         createStringResource("PageAppTemplate.menu.listCustomers"), PageCustomers.class));
-                list.add(new TopMenuItemLink(buttonMarkupId,
+                list.add(new BookmarkableLabeledLink(buttonMarkupId,
                         createStringResource("PageAppTemplate.menu.newCustomer"), PageCustomer.class));
 
                 return list;
@@ -71,9 +70,9 @@ public class PageAppTemplate extends PageTemplate {
             @Override
             protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
                 List<AbstractLink> list = new ArrayList<>();
-                list.add(new TopMenuItemLink(buttonMarkupId,
+                list.add(new BookmarkableLabeledLink(buttonMarkupId,
                         createStringResource("PageAppTemplate.menu.listProjects"), PageProjects.class));
-                list.add(new TopMenuItemLink(buttonMarkupId,
+                list.add(new BookmarkableLabeledLink(buttonMarkupId,
                         createStringResource("PageAppTemplate.menu.newProject"), PageProject.class));
 
                 return list;

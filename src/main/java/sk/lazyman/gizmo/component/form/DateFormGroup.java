@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * @author lazyman
  */
-public class DateFormGroup extends FormGroup<DateInput, Date> {
+public class DateFormGroup extends HFormGroup<DateInput, Date> {
 
     public DateFormGroup(String id, IModel<Date> value, IModel<String> label, String labelSize, String inputSize,
                          String feedbackSize, boolean required) {

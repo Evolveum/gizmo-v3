@@ -4,16 +4,15 @@ import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
-import sk.lazyman.gizmo.component.form.AreaFormGroup;
+import sk.lazyman.gizmo.component.form.HAreaFormGroup;
 import sk.lazyman.gizmo.component.form.CheckFormGroup;
-import sk.lazyman.gizmo.component.form.FormGroup;
+import sk.lazyman.gizmo.component.form.HFormGroup;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.util.LoadableModel;
@@ -76,23 +75,23 @@ public class PageProject extends PageAppProjects {
         Form form = new Form(ID_FORM);
         add(form);
 
-        FormGroup name = new FormGroup(ID_NAME, new PropertyModel<String>(model, Project.F_NAME),
+        HFormGroup name = new HFormGroup(ID_NAME, new PropertyModel<String>(model, Project.F_NAME),
                 createStringResource("Project.name"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(name);
 
-        FormGroup description = new AreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Project.F_DESCRIPTION),
+        HFormGroup description = new HAreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Project.F_DESCRIPTION),
                 createStringResource("Project.description"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(description);
 
-        FormGroup customer = new FormGroup(ID_CUSTOMER, new PropertyModel<String>(model, Project.F_CUSTOMER),
+        HFormGroup customer = new HFormGroup(ID_CUSTOMER, new PropertyModel<String>(model, Project.F_CUSTOMER),
                 createStringResource("Project.customer"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(customer);
 
-        FormGroup closed = new CheckFormGroup(ID_CLOSED, new PropertyModel<Boolean>(model, Project.F_CLOSED),
+        HFormGroup closed = new CheckFormGroup(ID_CLOSED, new PropertyModel<Boolean>(model, Project.F_CLOSED),
                 createStringResource("Project.closed"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(closed);
 
-        FormGroup commercial = new CheckFormGroup(ID_COMMERCIAL, new PropertyModel<Boolean>(model, Project.F_COMMERCIAL),
+        HFormGroup commercial = new CheckFormGroup(ID_COMMERCIAL, new PropertyModel<Boolean>(model, Project.F_COMMERCIAL),
                 createStringResource("Project.commercial"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(commercial);
 
