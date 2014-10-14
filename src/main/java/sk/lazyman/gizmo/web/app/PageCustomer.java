@@ -12,9 +12,9 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
-import sk.lazyman.gizmo.component.AjaxButton;
-import sk.lazyman.gizmo.component.AjaxSubmitButton;
+import sk.lazyman.gizmo.component.*;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
+import sk.lazyman.gizmo.component.form.DropDownFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.repository.CustomerRepository;
@@ -33,6 +33,8 @@ public class PageCustomer extends PageAppCustomers {
 
     private static final String ID_FORM = "form";
     private static final String ID_NAME = "name";
+    private static final String ID_TYPE = "type";
+    private static final String ID_PARTNER = "partner";
     private static final String ID_DESCRIPTION = "description";
     private static final String ID_TABS = "tabs";
     private static final String ID_CANCEL = "cancel";
@@ -83,23 +85,33 @@ public class PageCustomer extends PageAppCustomers {
 
         AreaFormGroup description = new AreaFormGroup(ID_DESCRIPTION,
                 new PropertyModel<String>(model, Customer.F_DESCRIPTION),
-                createStringResource("Customer.description"), true);
+                createStringResource("Customer.description"), false);
         description.setRows(3);
         form.add(description);
+
+        //todo finish
+        FormGroup type = new DropDownFormGroup(ID_TYPE, new PropertyModel<String>(model, Customer.F_TYPE),
+                createStringResource("Customer.type"), true);
+        form.add(type);
+
+        //todo finish
+        FormGroup partner = new DropDownFormGroup(ID_PARTNER, new PropertyModel<String>(model, Customer.F_PARTNER),
+                createStringResource("Customer.partner"), true);
+        form.add(partner);
 
         List<ITab> tabList = new ArrayList<>();
         tabList.add(new AbstractTab(createStringResource("PageCustomer.projects")) {
 
             @Override
             public WebMarkupContainer getPanel(String panelId) {
-                return new WebMarkupContainer(panelId);
+                return new ProjectsTab(panelId);
             }
         });
         tabList.add(new AbstractTab(createStringResource("PageCustomer.projectDetails")) {
 
             @Override
             public WebMarkupContainer getPanel(String panelId) {
-                return new WebMarkupContainer(panelId);
+                return new ProjectDetailsTab(panelId);
             }
         });
 
@@ -107,7 +119,7 @@ public class PageCustomer extends PageAppCustomers {
 
             @Override
             public WebMarkupContainer getPanel(String panelId) {
-                return new WebMarkupContainer(panelId);
+                return new CustomerLogsTab(panelId);
             }
         });
 
@@ -115,7 +127,7 @@ public class PageCustomer extends PageAppCustomers {
 
             @Override
             public WebMarkupContainer getPanel(String panelId) {
-                return new WebMarkupContainer(panelId);
+                return new CustomerNotificationsTab(panelId);
             }
         });
 
