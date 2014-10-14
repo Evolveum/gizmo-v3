@@ -11,7 +11,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.HAreaFormGroup;
-import sk.lazyman.gizmo.component.form.CheckFormGroup;
+import sk.lazyman.gizmo.component.form.HCheckFormGroup;
 import sk.lazyman.gizmo.component.form.HFormGroup;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.repository.ProjectRepository;
@@ -87,11 +87,11 @@ public class PageProject extends PageAppProjects {
                 createStringResource("Project.customer"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(customer);
 
-        HFormGroup closed = new CheckFormGroup(ID_CLOSED, new PropertyModel<Boolean>(model, Project.F_CLOSED),
+        HFormGroup closed = new HCheckFormGroup(ID_CLOSED, new PropertyModel<Boolean>(model, Project.F_CLOSED),
                 createStringResource("Project.closed"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(closed);
 
-        HFormGroup commercial = new CheckFormGroup(ID_COMMERCIAL, new PropertyModel<Boolean>(model, Project.F_COMMERCIAL),
+        HFormGroup commercial = new HCheckFormGroup(ID_COMMERCIAL, new PropertyModel<Boolean>(model, Project.F_COMMERCIAL),
                 createStringResource("Project.commercial"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(commercial);
 

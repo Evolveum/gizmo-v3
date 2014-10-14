@@ -100,7 +100,7 @@ public class PageWork extends PageAppTemplate {
         Form form = new Form(ID_FORM);
         add(form);
 
-        DropDownFormGroup<User> realizator = new DropDownFormGroup<>(ID_REALIZATOR,
+        HDropDownFormGroup<User> realizator = new HDropDownFormGroup<>(ID_REALIZATOR,
                 new PropertyModel<User>(model, Work.F_REALIZATOR),
                 createStringResource("Work.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         realizator.setRenderer(new IChoiceRenderer<User>() {
@@ -118,7 +118,7 @@ public class PageWork extends PageAppTemplate {
         realizator.setChoices(users);
         form.add(realizator);
 
-        CheckFormGroup isWorkLog = new CheckFormGroup(ID_IS_WORK_LOG, new Model<>(Boolean.TRUE),
+        HCheckFormGroup isWorkLog = new HCheckFormGroup(ID_IS_WORK_LOG, new Model<>(Boolean.TRUE),
                 createStringResource("PageWork.isWorkLog"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         FormComponent check = isWorkLog.getFormComponent();
         check.add(new AjaxFormComponentUpdatingBehavior("click") {
@@ -139,7 +139,7 @@ public class PageWork extends PageAppTemplate {
                 createStringResource("Work.part"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(part);
 
-        HFormGroup date = new DateFormGroup(ID_DATE, new PropertyModel<Date>(model, Work.F_DATE),
+        HFormGroup date = new HDateFormGroup(ID_DATE, new PropertyModel<Date>(model, Work.F_DATE),
                 createStringResource("Work.date"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(date);
 
