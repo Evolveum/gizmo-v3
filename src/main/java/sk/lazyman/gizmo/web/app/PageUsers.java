@@ -49,7 +49,7 @@ public class PageUsers extends PageAppUsers {
 
     private void userDetailsPerformed(AjaxRequestTarget target, User user) {
         PageParameters params = new PageParameters();
-        params.set(PageUser.USER_ID, user.getId());
+        params.set(PageUser.USER_ID, Integer.toString(user.getId()));
 
         setResponsePage(PageUser.class, params);
     }

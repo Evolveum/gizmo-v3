@@ -1,5 +1,6 @@
 package sk.lazyman.gizmo.component;
 
+import com.mysema.query.types.Predicate;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -10,8 +11,9 @@ import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Project;
+import sk.lazyman.gizmo.data.QProject;
 import sk.lazyman.gizmo.data.provider.BasicDataProvider;
-import sk.lazyman.gizmo.web.PageTemplate;
+import sk.lazyman.gizmo.web.app.PageCustomer;
 import sk.lazyman.gizmo.web.app.PageProject;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
 public class ProjectsTab extends SimplePanel {
 
     private static final String ID_TABLE = "table";
+    private static final String ID_NEW_PROJECT = "newProject";
 
     public ProjectsTab(String id) {
         super(id);
@@ -36,8 +39,19 @@ public class ProjectsTab extends SimplePanel {
     }
 
     private void initPanelLayout() {
-        PageTemplate page = (PageTemplate) getPage();
-        BasicDataProvider provider = new BasicDataProvider(page.getProjectRepository());
+        final PageCustomer page = (PageCustomer) getPage();
+        BasicDataProvider provider = new BasicDataProvider(page.getProjectRepository()) {
+
+            @Override
+            public Predicate getPredicate() {
+                Integer customerId = page.getIntegerParam(PageCustomer.CUSTOMER_ID);
+                if (customerId == null) {
+                    return null;
+                }
+
+                return QProject.project.customer.id.eq(customerId);
+            }
+        };
         provider.setSort(new Sort(new Sort.Order(Sort.Direction.ASC, Project.F_NAME),
                 new Sort.Order(Sort.Direction.DESC, Project.F_COMMERCIAL)));
 
@@ -57,9 +71,26 @@ public class ProjectsTab extends SimplePanel {
 
         TablePanel table = new TablePanel(ID_TABLE, provider, columns, 15);
         add(table);
+
+        AjaxButton newProject = new AjaxButton(ID_NEW_PROJECT, createStringResource("ProjectsTab.newProject")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                //todo set customer as default for this new project
+                newProjectPerformed(target);
+            }
+        };
+        add(newProject);
     }
 
-    private void projectDetailsPerformed(AjaxRequestTarget target, Project customer) {
+    private void newProjectPerformed(AjaxRequestTarget target) {
+        setResponsePage(PageProject.class);
+    }
 
+    private void projectDetailsPerformed(AjaxRequestTarget target, Project project) {
+        PageParameters params = new PageParameters();
+        params.set(PageProject.PROJECT_ID, project.getId());
+
+        setResponsePage(PageProject.class, params);
     }
 }

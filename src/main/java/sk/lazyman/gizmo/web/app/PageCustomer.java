@@ -10,8 +10,6 @@ import org.apache.wicket.markup.html.form.EnumChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.*;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
@@ -58,16 +56,13 @@ public class PageCustomer extends PageAppCustomers {
     }
 
     private Customer loadCustomer() {
-        PageParameters params = getPageParameters();
-        StringValue val = params.get(CUSTOMER_ID);
-        String customerId = val != null ? val.toString() : null;
-
-        if (customerId == null || !customerId.matches("[0-9]+")) {
+        Integer customerId = getIntegerParam(CUSTOMER_ID);
+        if (customerId == null) {
             return new Customer();
         }
 
         CustomerRepository repository = getCustomerRepository();
-        Customer customer = repository.findOne(Integer.parseInt(customerId));
+        Customer customer = repository.findOne(customerId);
         if (customer == null) {
             getSession().error(translateString("Message.couldntFindCustomer", customerId));
             throw new RestartResponseException(PageCustomers.class);
@@ -123,13 +118,6 @@ public class PageCustomer extends PageAppCustomers {
             @Override
             public WebMarkupContainer getPanel(String panelId) {
                 return new ProjectsTab(panelId);
-            }
-        });
-        tabList.add(new AbstractTab(createStringResource("PageCustomer.projectDetails")) {
-
-            @Override
-            public WebMarkupContainer getPanel(String panelId) {
-                return new ProjectDetailsTab(panelId);
             }
         });
 

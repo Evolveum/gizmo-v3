@@ -5,12 +5,9 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
@@ -62,7 +59,7 @@ public class PageWork extends PageAppTemplate {
             }
         };
 
-        users= new LoadableModel<List<User>>(false) {
+        users = new LoadableModel<List<User>>(false) {
 
             @Override
             protected List<User> load() {
@@ -79,16 +76,13 @@ public class PageWork extends PageAppTemplate {
     }
 
     private Work loadWork() {
-        PageParameters params = getPageParameters();
-        StringValue val = params.get(WORK_ID);
-        String workId = val != null ? val.toString() : null;
-
-        if (workId == null || !workId.matches("[0-9]+")) {
+        Integer workId = getIntegerParam(WORK_ID);
+        if (workId == null) {
             return new Work();
         }
 
         WorkRepository repository = getWorkRepository();
-        Work work = repository.findOne(Integer.parseInt(workId));
+        Work work = repository.findOne(workId);
         if (work == null) {
             getSession().error(translateString("Message.couldntFindWork", workId));
             throw new RestartResponseException(PageWork.class);

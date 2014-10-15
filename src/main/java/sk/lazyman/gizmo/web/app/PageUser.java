@@ -49,15 +49,14 @@ public class PageUser extends PageAppUsers {
     }
 
     private User loadUser() {
-        StringValue id = getPageParameters().get(USER_ID);
-        String userId = id != null ? id.toString() : null;
+        Integer userId = getIntegerParam(USER_ID);
 
-        if (StringUtils.isEmpty(userId)) {
+        if (userId == null) {
             return new User();
         }
 
         UserRepository repo = getUserRepository();
-        return repo.findOne(new Integer(userId));
+        return repo.findOne(userId);
     }
 
     private void initLayout() {

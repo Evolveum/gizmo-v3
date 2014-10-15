@@ -11,6 +11,7 @@ import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.util.string.StringValue;
 import sk.lazyman.gizmo.component.BookmarkableLabeledLink;
 import sk.lazyman.gizmo.component.MainFeedback;
 import sk.lazyman.gizmo.component.TopMenuItem;
@@ -114,6 +115,18 @@ public class PageAppTemplate extends PageTemplate {
         params.set(PageUser.USER_ID, principal.getUserId());
 
         return params;
+    }
+
+    public Integer getIntegerParam(String paramName) {
+        PageParameters params = getPageParameters();
+        StringValue val = params.get(paramName);
+        String id = val != null ? val.toString() : null;
+
+        if (id == null || !id.matches("[0-9]+")) {
+            return null;
+        }
+
+        return Integer.parseInt(id);
     }
 
     private IModel<String> createUsernameModel() {
