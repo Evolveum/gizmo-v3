@@ -1,7 +1,11 @@
 package sk.lazyman.gizmo.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.StringResourceModel;
 import org.springframework.data.domain.Sort;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Part;
@@ -9,9 +13,7 @@ import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.repository.UserRepository;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lazyman
@@ -86,6 +88,54 @@ public class GizmoUtils {
             @Override
             protected List<User> load() {
                 return repo.findAll(new Sort(Sort.Direction.ASC, User.F_GIVEN_NAME, User.F_FAMILY_NAME));
+            }
+        };
+    }
+
+    public static <T extends Enum> IModel<String> createLocalizedModelForEnum(T value, Component comp) {
+        String key = value != null ? value.getClass().getSimpleName() + "." + value.name() : "";
+        return new StringResourceModel(key, comp, null);
+    }
+
+    public static <T extends Enum> IModel<List<T>> createReadonlyModelFromEnum(final Class<T> type) {
+        return new AbstractReadOnlyModel<List<T>>() {
+
+            @Override
+            public List<T> getObject() {
+                List<T> list = new ArrayList<T>();
+                Collections.addAll(list, type.getEnumConstants());
+
+                return list;
+            }
+        };
+    }
+
+    public static IChoiceRenderer<User> createUserChoiceRenderer() {
+        return new IChoiceRenderer<User>() {
+
+            @Override
+            public Object getDisplayValue(User object) {
+                return object != null ? object.getFullName() : null;
+            }
+
+            @Override
+            public String getIdValue(User object, int index) {
+                return Integer.toString(index);
+            }
+        };
+    }
+
+    public static IChoiceRenderer<Customer> createCustomerChoiceRenderer() {
+        return new IChoiceRenderer<Customer>() {
+
+            @Override
+            public Object getDisplayValue(Customer object) {
+                return object != null ? object.getName() : null;
+            }
+
+            @Override
+            public String getIdValue(Customer object, int index) {
+                return Integer.toString(index);
             }
         };
     }

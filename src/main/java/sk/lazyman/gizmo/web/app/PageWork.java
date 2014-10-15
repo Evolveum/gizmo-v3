@@ -19,6 +19,7 @@ import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.repository.WorkRepository;
+import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.util.Date;
@@ -103,18 +104,7 @@ public class PageWork extends PageAppTemplate {
         HDropDownFormGroup<User> realizator = new HDropDownFormGroup<>(ID_REALIZATOR,
                 new PropertyModel<User>(model, Work.F_REALIZATOR),
                 createStringResource("Work.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-        realizator.setRenderer(new IChoiceRenderer<User>() {
-
-            @Override
-            public Object getDisplayValue(User object) {
-                return object != null ? object.getFullName() : null;
-            }
-
-            @Override
-            public String getIdValue(User object, int index) {
-                return Integer.toString(index);
-            }
-        });
+        realizator.setRenderer(GizmoUtils.createUserChoiceRenderer());
         realizator.setChoices(users);
         form.add(realizator);
 

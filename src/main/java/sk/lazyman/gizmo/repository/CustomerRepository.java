@@ -13,4 +13,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
     @Query("from Customer c order by c.name")
     public List<Customer> listCustomers();
+
+    @Query("from Customer c where c.type = 2 order by c.name")
+    public List<Customer> listPartners();
 }

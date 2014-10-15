@@ -6,6 +6,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.form.EnumChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -17,7 +18,9 @@ import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.DropDownFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.Customer;
+import sk.lazyman.gizmo.data.CustomerType;
 import sk.lazyman.gizmo.repository.CustomerRepository;
+import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.util.ArrayList;
@@ -89,14 +92,29 @@ public class PageCustomer extends PageAppCustomers {
         description.setRows(3);
         form.add(description);
 
-        //todo finish
-        FormGroup type = new DropDownFormGroup(ID_TYPE, new PropertyModel<String>(model, Customer.F_TYPE),
+        DropDownFormGroup type = new DropDownFormGroup(ID_TYPE,
+                new PropertyModel<CustomerType>(model, Customer.F_TYPE),
                 createStringResource("Customer.type"), true);
+        type.setChoices(GizmoUtils.createReadonlyModelFromEnum(CustomerType.class));
+        type.setRenderer(new EnumChoiceRenderer(this));
         form.add(type);
 
-        //todo finish
-        FormGroup partner = new DropDownFormGroup(ID_PARTNER, new PropertyModel<String>(model, Customer.F_PARTNER),
+        DropDownFormGroup partner = new DropDownFormGroup(ID_PARTNER,
+                new PropertyModel<Customer>(model, Customer.F_PARTNER),
                 createStringResource("Customer.partner"), true);
+        partner.setChoices(new LoadableModel<List<Customer>>(false) {
+
+            @Override
+            protected List<Customer> load() {
+                CustomerRepository repository = getCustomerRepository();
+                List<Customer> list = repository.listPartners();
+                if (list == null) {
+                    list = new ArrayList<>();
+                }
+                return list;
+            }
+        });
+        partner.setRenderer(GizmoUtils.createCustomerChoiceRenderer());
         form.add(partner);
 
         List<ITab> tabList = new ArrayList<>();
@@ -134,6 +152,7 @@ public class PageCustomer extends PageAppCustomers {
         AjaxBootstrapTabbedPanel tabs = new AjaxBootstrapTabbedPanel(ID_TABS, tabList);
         add(tabs);
     }
+
     private void initButtons(Form form) {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
