@@ -39,7 +39,7 @@ public class PageProjects extends PageAppProjects {
 
             @Override
             public void onClick(AjaxRequestTarget target, IModel<Project> rowModel) {
-                customerDetailsPerformed(target, rowModel.getObject());
+                projectDetailsPerformed(target, rowModel.getObject());
             }
         });
         columns.add(new PropertyColumn(createStringResource("Project.customer"), Project.F_CUSTOMER + "." + Customer.F_NAME));
@@ -51,7 +51,7 @@ public class PageProjects extends PageAppProjects {
         add(table);
     }
 
-    private void customerDetailsPerformed(AjaxRequestTarget target, Project customer) {
+    private void projectDetailsPerformed(AjaxRequestTarget target, Project customer) {
         PageParameters params = new PageParameters();
         params.set(PageProject.PROJECT_ID, customer.getId());
 

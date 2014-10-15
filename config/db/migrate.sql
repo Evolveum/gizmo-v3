@@ -21,5 +21,8 @@ insert into g_emaillog_project (emaillog_id,projectlist_id)
 
 alter table tasks alter column description type character varying(2500);
 
-insert into g_work (id,date,description,invoicelength,worklength,part_id,realizator_id)
-  select id,date,description,invoice,length,part_id,realizator_id from tasks;
+insert into g_abstract_task (id,date,description,worklength,realizator_id)
+  select id,date,description,length,realizator_id from tasks;
+
+insert into g_work (id,invoicelength,part_id)
+  select id,invoice,part_id from tasks;

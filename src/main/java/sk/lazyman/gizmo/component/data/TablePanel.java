@@ -7,9 +7,11 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
+import sk.lazyman.gizmo.data.provider.BasicDataProvider;
 
 import java.util.List;
 
@@ -52,6 +54,8 @@ public class TablePanel<T> extends Panel {
         NavigatorPanel nb2 = new NavigatorPanel(ID_PAGING, table, true);
         addVisibleBehaviour(nb2, showPaging);
         add(nb2);
+
+        setItemsPerPage(rowsPerPage);
     }
 
     private void addVisibleBehaviour(Component comp, final IModel<Boolean> model) {
@@ -73,6 +77,11 @@ public class TablePanel<T> extends Panel {
     }
 
     public void setItemsPerPage(int size) {
+        IDataProvider provider = getDataTable().getDataProvider();
+        if (provider instanceof BasicDataProvider) {
+            ((BasicDataProvider) provider).setItemsPerPage(size);
+        }
+
         getDataTable().setItemsPerPage(size);
     }
 

@@ -25,6 +25,10 @@ public class BasicDataProvider<T extends Serializable> extends SortableDataProvi
     private Predicate predicate;
     private Sort sort;
 
+    public BasicDataProvider(JpaRepository<T, Integer> repository) {
+        this(repository, 10);
+    }
+
     public BasicDataProvider(JpaRepository<T, Integer> repository, int itemsPerPage) {
         this.repository = repository;
         this.itemsPerPage = itemsPerPage;
@@ -50,6 +54,10 @@ public class BasicDataProvider<T extends Serializable> extends SortableDataProvi
         }
 
         return new ArrayList<T>().iterator();
+    }
+
+    public void setItemsPerPage(int itemsPerPage) {
+        this.itemsPerPage = itemsPerPage;
     }
 
     @Override
