@@ -1,6 +1,7 @@
 package sk.lazyman.gizmo.component.form;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.feedback.ComponentFeedbackMessageFilter;
 import org.apache.wicket.markup.html.basic.Label;
@@ -33,15 +34,19 @@ public class FormGroup<F extends FormInput, T extends Serializable> extends Simp
                     hasError = " has-error";
                 }
 
-                return "form-group" + hasError;
+                return getFormGroupClass() + hasError;
             }
         }));
 
         initLayout(label, required);
     }
 
+    protected String getFormGroupClass() {
+        return "form-group";
+    }
+
     private void initLayout(IModel<String> labelModel, boolean required) {
-        Label label = new Label(ID_LABEL, labelModel);
+        Component label = createLabel(ID_LABEL, labelModel);
         add(label);
 
         FormInput inputWrapper = createInput(ID_INPUT_WRAPPER, getModel(), labelModel);
@@ -54,6 +59,10 @@ public class FormGroup<F extends FormInput, T extends Serializable> extends Simp
         FormGroupFeedback feedback = new FormGroupFeedback(ID_FEEDBACK, new ComponentFeedbackMessageFilter(input));
         feedback.setOutputMarkupId(true);
         add(feedback);
+    }
+
+    protected Component createLabel(String labelId, IModel<String> labelModel) {
+        return new Label(labelId, labelModel);
     }
 
     protected FormInput createInput(String componentId, IModel<T> model, IModel<String> placeholder) {

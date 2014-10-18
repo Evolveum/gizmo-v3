@@ -1,7 +1,11 @@
 package sk.lazyman.gizmo.web.app;
 
+import de.agilecoders.wicket.core.markup.html.bootstrap.tabs.AjaxBootstrapTabbedPanel;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
+import org.apache.wicket.extensions.markup.html.tabs.ITab;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -10,12 +14,15 @@ import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
-import sk.lazyman.gizmo.component.form.HAreaFormGroup;
-import sk.lazyman.gizmo.component.form.HCheckFormGroup;
-import sk.lazyman.gizmo.component.form.HFormGroup;
+import sk.lazyman.gizmo.component.form.AreaFormGroup;
+import sk.lazyman.gizmo.component.form.CheckFormGroup;
+import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.util.LoadableModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author lazyman
@@ -33,10 +40,7 @@ public class PageProject extends PageAppProjects {
     private static final String ID_COMMERCIAL = "commercial";
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
-
-    private static final String LABEL_SIZE = "col-sm-3 col-md-2 control-label";
-    private static final String TEXT_SIZE = "col-sm-5 col-md-4";
-    private static final String FEEDBACK_SIZE = "col-sm-4 col-md-4";
+    private static final String ID_TABS = "tabs";
 
     private IModel<Project> model;
 
@@ -75,27 +79,39 @@ public class PageProject extends PageAppProjects {
         Form form = new Form(ID_FORM);
         add(form);
 
-        HFormGroup name = new HFormGroup(ID_NAME, new PropertyModel<String>(model, Project.F_NAME),
-                createStringResource("Project.name"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        FormGroup name = new FormGroup(ID_NAME, new PropertyModel<String>(model, Project.F_NAME),
+                createStringResource("Project.name"), true);
         form.add(name);
 
-        HFormGroup description = new HAreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Project.F_DESCRIPTION),
-                createStringResource("Project.description"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        FormGroup description = new AreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Project.F_DESCRIPTION),
+                createStringResource("Project.description"), true);
         form.add(description);
 
-        HFormGroup customer = new HFormGroup(ID_CUSTOMER, new PropertyModel<String>(model, Project.F_CUSTOMER),
-                createStringResource("Project.customer"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        FormGroup customer = new FormGroup(ID_CUSTOMER, new PropertyModel<String>(model, Project.F_CUSTOMER),
+                createStringResource("Project.customer"), true);
         form.add(customer);
 
-        HFormGroup closed = new HCheckFormGroup(ID_CLOSED, new PropertyModel<Boolean>(model, Project.F_CLOSED),
-                createStringResource("Project.closed"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        FormGroup closed = new CheckFormGroup(ID_CLOSED, new PropertyModel<Boolean>(model, Project.F_CLOSED),
+                createStringResource("Project.closed"), true);
         form.add(closed);
 
-        HFormGroup commercial = new HCheckFormGroup(ID_COMMERCIAL, new PropertyModel<Boolean>(model, Project.F_COMMERCIAL),
-                createStringResource("Project.commercial"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        FormGroup commercial = new CheckFormGroup(ID_COMMERCIAL, new PropertyModel<Boolean>(model, Project.F_COMMERCIAL),
+                createStringResource("Project.commercial"), true);
         form.add(commercial);
 
         initButtons(form);
+
+        List<ITab> tabList = new ArrayList<>();
+        tabList.add(new AbstractTab(createStringResource("PageProject.parts")) {
+
+            @Override
+            public WebMarkupContainer getPanel(String panelId) {
+                return new WebMarkupContainer(panelId);
+            }
+        });
+
+        AjaxBootstrapTabbedPanel tabs = new AjaxBootstrapTabbedPanel(ID_TABS, tabList);
+        add(tabs);
     }
 
     private void initButtons(Form form) {
