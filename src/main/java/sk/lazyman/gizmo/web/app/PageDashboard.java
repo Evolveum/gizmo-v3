@@ -1,20 +1,30 @@
 package sk.lazyman.gizmo.web.app;
 
 
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxLink;
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons;
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.dropdown.*;
+import de.agilecoders.wicket.core.markup.html.bootstrap.image.IconType;
+import de.agilecoders.wicket.extensions.markup.html.bootstrap.contextmenu.ButtonListContextMenu;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
+import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
@@ -33,6 +43,7 @@ import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -78,7 +89,40 @@ public class PageDashboard extends PageAppTemplate {
         initLayout();
     }
 
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+        response.render(CssHeaderItem.forReference(new LessResourceReference(PageDashboard.class, "PageDashboard.less")));
+    }
+
     private void initLayout() {
+        DropDownButton menu = new DropDownButton("menu", new Model("Selected project")) {
+
+            @Override
+            protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
+                List<AbstractLink> list = new ArrayList<>();
+                list.add(new MenuHeader(new Model("Companies")));
+
+                list.add(new LabeledLink(buttonMarkupId, new Model<>("Company 1")) {
+                    @Override
+                    public void onClick(AjaxRequestTarget target) {
+                        System.out.println("asdf 1");
+                    }
+                });
+                list.add(new LabeledLink(buttonMarkupId, new Model<>("Company 2")) {
+                    @Override
+                    public void onClick(AjaxRequestTarget target) {
+                        System.out.println("asdf 2");
+                    }
+                });
+
+
+
+                return list;
+            }
+        };
+        add(menu);
+
         Form form = new Form(ID_FORM);
         add(form);
 
@@ -86,18 +130,7 @@ public class PageDashboard extends PageAppTemplate {
         form.add(new DateTextField(ID_TO, new PropertyModel<Date>(filter, WorkFilterDto.F_TO)));
 
         form.add(new DropDownChoice<User>(ID_REALIZATOR, new PropertyModel<User>(filter, WorkFilterDto.F_REALIZATOR),
-                GizmoUtils.createUserModel(getUserRepository()), new IChoiceRenderer<User>() {
-
-            @Override
-            public Object getDisplayValue(User object) {
-                return object.getFullName();
-            }
-
-            @Override
-            public String getIdValue(User object, int index) {
-                return Integer.toString(index);
-            }
-        }) {
+                GizmoUtils.createUserModel(getUserRepository()), GizmoUtils.createUserChoiceRenderer()) {
 
             @Override
             protected String getNullValidKey() {
