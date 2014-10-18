@@ -96,7 +96,7 @@ public class PageCustomer extends PageAppCustomers {
 
         DropDownFormGroup partner = new DropDownFormGroup(ID_PARTNER,
                 new PropertyModel<Customer>(model, Customer.F_PARTNER),
-                createStringResource("Customer.partner"), true);
+                createStringResource("Customer.partner"), false);
         partner.setChoices(new LoadableModel<List<Customer>>(false) {
 
             @Override

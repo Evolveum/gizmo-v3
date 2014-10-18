@@ -15,4 +15,7 @@ public interface ProjectRepository extends JpaRepository<Project, Integer>, Quer
 
     @Query("from Project p where p.customer.id = :customerId order by p.name")
     public List<Project> findProjects(@Param("customerId") Integer companyId);
+
+    @Query("from Project p where p.closed = false order by p.name")
+    public List<Project> findOpenedProjects();
 }

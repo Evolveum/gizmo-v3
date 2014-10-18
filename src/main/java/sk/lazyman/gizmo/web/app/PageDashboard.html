@@ -2,38 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
-    <div wicket:id="menu"/>
-
-    <div class="dropdown">
-        <a class="dropdown-toggle btn btn-sm btn-default" data-toggle="dropdown" href="#">
-            Select item&nbsp;<span class="caret"></span>
-        </a>
-        <!--style="display: block; position: static; margin-bottom: 5px; *width: 180px;"-->
-        <ul aria-labelledby="dropdownMenu" role="menu" class="dropdown-menu">
-            <li class="dropdown-header">Company</li>
-            <li>
-                <a href="#" tabindex="-1">Company 1</a>
-            </li>
-            <li class="dropdown-submenu">
-                <a href="#" tabindex="-1">Company 2</a>
-                <ul class="dropdown-menu">
-                    <li class="dropdown-header">Project</li>
-                    <li><a href="#" tabindex="-1">Project 1</a></li>
-                    <li class="dropdown-submenu">
-                        <a href="#" tabindex="-1">Project 2</a>
-                        <ul class="dropdown-menu">
-                            <li class="dropdown-header">Part</li>
-                            <li><a href="#" tabindex="-1">Part 1</a></li>
-                            <li class="dropdown-submenu">
-                                <a href="#" tabindex="-1">Part 2</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-
     <form class="form-inline pull-right search" role="form" wicket:id="form">
         <div class="form-group">
             <label class="sr-only"><wicket:message key="PageDashboard.dateFrom"/></label>
@@ -46,8 +14,9 @@
                    wicket:message="placeholder:PageDashboard.dateTo">
         </div>
         <div class="form-group">
-            <label class="sr-only">Project</label>
-            <input type="email" class="form-control input-sm" placeholder="Project">
+            <label class="sr-only"><wicket:message key="PageDashboard.project"/></label>
+            <input class="form-control input-sm" wicket:id="project" size="40"
+                   wicket:message="placeholder:PageDashboard.project">
         </div>
         <div class="form-group">
             <label class="sr-only"><wicket:message key="PageDashboard.realizator"/></label>

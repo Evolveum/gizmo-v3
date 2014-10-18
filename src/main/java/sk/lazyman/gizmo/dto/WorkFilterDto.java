@@ -18,7 +18,7 @@ public class WorkFilterDto implements Serializable {
 
     private Date from;
     private Date to;
-    private Project project;
+    private DashboardProjectDto project;
     private User realizator;
 
     public Date getFrom() {
@@ -37,11 +37,11 @@ public class WorkFilterDto implements Serializable {
         this.to = to;
     }
 
-    public Project getProject() {
+    public DashboardProjectDto getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(DashboardProjectDto project) {
         this.project = project;
     }
 

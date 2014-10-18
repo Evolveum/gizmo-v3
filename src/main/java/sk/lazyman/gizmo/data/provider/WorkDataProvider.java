@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import sk.lazyman.gizmo.data.QWork;
 import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.dto.DashboardProjectDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.repository.WorkRepository;
 
@@ -72,6 +73,15 @@ public class WorkDataProvider extends SortableDataProvider<Work, String> {
 
         if (filter.getRealizator() != null) {
             list.add(QWork.work.realizator.eq(filter.getRealizator()));
+        }
+
+        if (filter.getProject() != null) {
+            DashboardProjectDto dto = filter.getProject();
+            if (dto.getCustomerId() != null) {
+                list.add(QWork.work.part.project.customer.id.eq(dto.getCustomerId()));
+            } else if (dto.getProjectId() != null) {
+                list.add(QWork.work.part.project.id.eq(dto.getProjectId()));
+            }
         }
 
         if (list.isEmpty()) {

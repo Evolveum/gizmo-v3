@@ -1,15 +1,15 @@
 package sk.lazyman.gizmo.web.app;
 
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxLink;
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons;
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.dropdown.*;
-import de.agilecoders.wicket.core.markup.html.bootstrap.image.IconType;
-import de.agilecoders.wicket.extensions.markup.html.bootstrap.contextmenu.ButtonListContextMenu;
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.dropdown.DropDownButton;
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.dropdown.MenuHeader;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AbstractAutoCompleteRenderer;
+import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AbstractAutoCompleteTextRenderer;
+import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -19,36 +19,36 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.Response;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.*;
-import sk.lazyman.gizmo.component.data.DateColumn;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
-import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.data.Customer;
+import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.data.provider.WorkDataProvider;
+import sk.lazyman.gizmo.dto.DashboardProjectDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
+import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lazyman
@@ -70,8 +70,38 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_SUMMARY_PARTS = "summaryParts";
 
     private IModel<WorkFilterDto> filter;
+    private IModel<List<DashboardProjectDto>> projects;
 
     public PageDashboard() {
+        projects = new LoadableModel<List<DashboardProjectDto>>(false) {
+
+            @Override
+            protected List<DashboardProjectDto> load() {
+                List<DashboardProjectDto> list = new ArrayList<>();
+
+                ProjectRepository repository = getProjectRepository();
+                List<Project> projects = repository.findOpenedProjects();
+                Set<Customer> customers = new HashSet<>();
+
+                for (Project project : projects) {
+                    Customer customer = project.getCustomer();
+                    String customerName = null;
+                    if (customer != null) {
+                        customers.add(customer);
+                        customerName = customer.getName();
+                    }
+
+                    list.add(new DashboardProjectDto(customerName, project.getName(), project.getId()));
+                }
+
+                for (Customer customer : customers) {
+                    list.add(new DashboardProjectDto(customer.getName(), customer.getId()));
+                }
+
+                return list;
+            }
+        };
+
         filter = new LoadableModel<WorkFilterDto>(false) {
 
             @Override
@@ -96,33 +126,6 @@ public class PageDashboard extends PageAppTemplate {
     }
 
     private void initLayout() {
-        DropDownButton menu = new DropDownButton("menu", new Model("Selected project")) {
-
-            @Override
-            protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
-                List<AbstractLink> list = new ArrayList<>();
-                list.add(new MenuHeader(new Model("Companies")));
-
-                list.add(new LabeledLink(buttonMarkupId, new Model<>("Company 1")) {
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
-                        System.out.println("asdf 1");
-                    }
-                });
-                list.add(new LabeledLink(buttonMarkupId, new Model<>("Company 2")) {
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
-                        System.out.println("asdf 2");
-                    }
-                });
-
-
-
-                return list;
-            }
-        };
-        add(menu);
-
         Form form = new Form(ID_FORM);
         add(form);
 
@@ -137,6 +140,51 @@ public class PageDashboard extends PageAppTemplate {
                 return "PageDashboard.realizator";
             }
         });
+
+        AutoCompleteTextField project = new AutoCompleteTextField<DashboardProjectDto>(ID_PROJECT,
+                new PropertyModel<DashboardProjectDto>(filter, WorkFilterDto.F_PROJECT),
+                new AbstractAutoCompleteTextRenderer<DashboardProjectDto>() {
+
+                    @Override
+                    protected String getTextValue(DashboardProjectDto object) {
+                        if (object == null) {
+                            return null;
+                        }
+
+                        StringBuilder sb = new StringBuilder();
+                        if (StringUtils.isNotEmpty(object.getCustomerName())) {
+                            sb.append(object.getCustomerName());
+                        }
+
+                        if (StringUtils.isNotEmpty(object.getCustomerName())
+                                && StringUtils.isNotEmpty(object.getProjectName())) {
+                            sb.append(" / ");
+                        }
+
+                        if (StringUtils.isNotEmpty(object.getProjectName())) {
+                            sb.append(object.getProjectName());
+                        }
+
+                        return sb.toString();
+                    }
+                }) {
+
+            @Override
+            protected Iterator<DashboardProjectDto> getChoices(String input) {
+                List<DashboardProjectDto> list = projects.getObject();
+                List<DashboardProjectDto> result = new ArrayList<>();
+                for (DashboardProjectDto dto : list) {
+                    if (dto.match(input)) {
+                        result.add(dto);
+                    }
+                }
+
+                return result.iterator();
+            }
+        };
+
+        project.setLabel(createStringResource("PageDashboard.project"));
+        form.add(project);
 
         initButtons(form);
 

@@ -76,7 +76,6 @@ public class ProjectsTab extends SimplePanel {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                //todo set customer as default for this new project
                 newProjectPerformed(target);
             }
         };
@@ -84,6 +83,8 @@ public class ProjectsTab extends SimplePanel {
     }
 
     private void newProjectPerformed(AjaxRequestTarget target) {
+        //todo set customer as default for this new project
+
         setResponsePage(PageProject.class);
     }
 
