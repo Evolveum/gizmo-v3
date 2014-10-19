@@ -101,6 +101,8 @@ public class PageDashboard extends PageAppTemplate {
                     list.add(new DashboardProjectDto(customer.getName(), customer.getId()));
                 }
 
+                Collections.sort(list);
+
                 return list;
             }
         };
@@ -293,23 +295,23 @@ public class PageDashboard extends PageAppTemplate {
         };
         form.add(display);
 
-        AjaxButton email = new AjaxButton(ID_BTN_EMAIL, createStringResource("PageDashboard.email")) {
-
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                emailPerformed(target);
-            }
-        };
-        form.add(email);
-
-        AjaxButton print = new AjaxButton(ID_BTN_PRINT, createStringResource("PageDashboard.print")) {
-
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                printPerformed(target);
-            }
-        };
-        form.add(print);
+//        AjaxButton email = new AjaxButton(ID_BTN_EMAIL, createStringResource("PageDashboard.email")) {
+//
+//            @Override
+//            public void onClick(AjaxRequestTarget target) {
+//                emailPerformed(target);
+//            }
+//        };
+//        form.add(email);
+//
+//        AjaxButton print = new AjaxButton(ID_BTN_PRINT, createStringResource("PageDashboard.print")) {
+//
+//            @Override
+//            public void onClick(AjaxRequestTarget target) {
+//                printPerformed(target);
+//            }
+//        };
+//        form.add(print);
 
         AjaxButton task = new AjaxButton(ID_BTN_NEW_TASK, createStringResource("PageDashboard.task")) {
 

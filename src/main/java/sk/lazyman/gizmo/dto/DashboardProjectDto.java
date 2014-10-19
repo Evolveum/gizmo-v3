@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * @author lazyman
  */
-public class DashboardProjectDto implements Serializable {
+public class DashboardProjectDto implements Serializable, Comparable<DashboardProjectDto> {
 
     private String customerName;
     private String projectName;
@@ -95,5 +95,29 @@ public class DashboardProjectDto implements Serializable {
         }
 
         return false;
+    }
+
+    @Override
+    public int compareTo(DashboardProjectDto o) {
+        if (o == null) {
+            return 0;
+        }
+
+        int val = customerName.compareTo(o.customerName);
+        if (val != 0) {
+            return val;
+        }
+
+        if (projectName == o.projectName) {
+            return 0;
+        }
+        if (projectName == null && o.projectName != null) {
+            return -1;
+        }
+        if (projectName != null && o.projectName == null) {
+            return 1;
+        }
+
+        return projectName.compareTo(projectName);
     }
 }

@@ -2,6 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
+    <form class="form-inline pull-right search" role="form" wicket:id="form">
+        <div class="form-group">
+            <label class="sr-only"><wicket:message key="PageCustomers.searchText"/></label>
+            <input class="form-control input-sm" wicket:id="searchText"
+                   wicket:message="placeholder:PageCustomers.searchText">
+        </div>
+
+        <a class="btn btn-primary btn-sm" wicket:id="search"/>
+        <a class="btn btn-success btn-sm" wicket:id="newCustomer"/>
+    </form>
     <div wicket:id="table"/>
 </wicket:extend>
 </body>
