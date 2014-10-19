@@ -1,14 +1,13 @@
 package sk.lazyman.gizmo.web.app;
 
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.dropdown.DropDownButton;
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.dropdown.MenuHeader;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AbstractAutoCompleteRenderer;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AbstractAutoCompleteTextRenderer;
+import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteSettings;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -19,16 +18,18 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.Response;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.util.convert.ConversionException;
+import org.apache.wicket.util.convert.IConverter;
 import org.wicketstuff.annotation.mount.MountPath;
-import sk.lazyman.gizmo.component.*;
+import sk.lazyman.gizmo.component.AjaxButton;
+import sk.lazyman.gizmo.component.AjaxSubmitButton;
+import sk.lazyman.gizmo.component.SummaryPanel;
+import sk.lazyman.gizmo.component.SummaryPartsPanel;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.Customer;
@@ -43,6 +44,8 @@ import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
+import sk.lazyman.gizmo.util.DashboardProjectConverter;
+import sk.lazyman.gizmo.util.DashboardProjectRenderer;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
@@ -141,33 +144,10 @@ public class PageDashboard extends PageAppTemplate {
             }
         });
 
+        final DashboardProjectConverter converter = new DashboardProjectConverter(projects);
         AutoCompleteTextField project = new AutoCompleteTextField<DashboardProjectDto>(ID_PROJECT,
-                new PropertyModel<DashboardProjectDto>(filter, WorkFilterDto.F_PROJECT),
-                new AbstractAutoCompleteTextRenderer<DashboardProjectDto>() {
-
-                    @Override
-                    protected String getTextValue(DashboardProjectDto object) {
-                        if (object == null) {
-                            return null;
-                        }
-
-                        StringBuilder sb = new StringBuilder();
-                        if (StringUtils.isNotEmpty(object.getCustomerName())) {
-                            sb.append(object.getCustomerName());
-                        }
-
-                        if (StringUtils.isNotEmpty(object.getCustomerName())
-                                && StringUtils.isNotEmpty(object.getProjectName())) {
-                            sb.append(" / ");
-                        }
-
-                        if (StringUtils.isNotEmpty(object.getProjectName())) {
-                            sb.append(object.getProjectName());
-                        }
-
-                        return sb.toString();
-                    }
-                }) {
+                new PropertyModel<DashboardProjectDto>(filter, WorkFilterDto.F_PROJECT), DashboardProjectDto.class,
+                converter, new AutoCompleteSettings()) {
 
             @Override
             protected Iterator<DashboardProjectDto> getChoices(String input) {
@@ -180,6 +160,11 @@ public class PageDashboard extends PageAppTemplate {
                 }
 
                 return result.iterator();
+            }
+
+            @Override
+            public <C> IConverter<C> getConverter(Class<C> type) {
+                return (IConverter<C>) converter;
             }
         };
 

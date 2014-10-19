@@ -1,6 +1,10 @@
 package sk.lazyman.gizmo.dto;
 
+import sk.lazyman.gizmo.util.GizmoUtils;
+
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,6 +14,8 @@ import java.util.Map;
  * @author lazyman
  */
 public class SummaryPanelDto implements Serializable {
+
+    public static final String F_MONTH_COUNT = "monthCount";
 
     private WorkFilterDto filter;
     private Map<Date, TaskLength> dates = new HashMap<>();
@@ -26,41 +32,57 @@ public class SummaryPanelDto implements Serializable {
         return dates;
     }
 
-    //todo not working correctly
-    public Date getFromRoundedToMonday() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(filter.getFrom());
-
-        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        return cal.getTime();
-    }
-
-    //todo not working correctly
-    private Date getToRoundedToSunday() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(filter.getTo());
-
-        cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        return cal.getTime();
-    }
-
-    public int getWeekCount() {
-        Date from = getFromRoundedToMonday();
-        Date to = getToRoundedToSunday();
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(from);
+    public int getMonthCount() {
+        Calendar fromCal = getFromRoundedToFirstMonthDay();
+        Calendar toCal = getToRoundedToLastMonthDay();
 
         int c = 0;
         do {
             c++;
-            cal.add(Calendar.WEEK_OF_YEAR, 1);
-        } while (cal.getTime().before(to));
+            fromCal.add(Calendar.MONTH, 1);
+        } while (fromCal.getTime().before(toCal.getTime()));
         return c;
     }
 
-    public boolean isWithinFilter(int dayIndex) {
-        Date date = getDayForIndex(dayIndex);
+    private Calendar getToRoundedToLastMonthDay() {
+        Date to = GizmoUtils.clearTime(filter.getTo());
+        Calendar toCal = Calendar.getInstance();
+        toCal.setTime(to);
+        toCal.set(Calendar.DAY_OF_MONTH, 1);
+        toCal.add(Calendar.MONTH, 1);
+        toCal.add(Calendar.DAY_OF_MONTH, -1);
+
+        return toCal;
+    }
+
+    private Calendar getFromRoundedToFirstMonthDay() {
+        Date from = GizmoUtils.clearTime(filter.getFrom());
+        Calendar fromCal = Calendar.getInstance();
+        fromCal.setTime(from);
+        fromCal.set(Calendar.DAY_OF_MONTH, 1);
+
+        return fromCal;
+    }
+
+    public Date getDayForIndex(int monthIndex, int dayIndex) {
+        Calendar cal = getFromRoundedToFirstMonthDay();
+        cal.add(Calendar.MONTH, monthIndex);
+
+        int month = cal.get(Calendar.MONTH);
+        cal.add(Calendar.DAY_OF_YEAR, dayIndex);
+
+        if (month != cal.get(Calendar.MONTH)) {
+            //in case of looking for 31. day of month which only have 30 days (or 28/29 days)
+            return null;
+        }
+        return cal.getTime();
+    }
+
+    public boolean isWithinFilter(int monthIndex, int dayIndex) {
+        Date date = getDayForIndex(monthIndex, dayIndex);
+        if (date == null) {
+            return false;
+        }
 
         if (filter.getFrom().equals(date) || filter.getTo().equals(date)) {
             return true;
@@ -69,8 +91,12 @@ public class SummaryPanelDto implements Serializable {
         return filter.getFrom().before(date) && filter.getTo().after(date);
     }
 
-    public boolean isWeekend(int dayIndex) {
-        Date date = getDayForIndex(dayIndex);
+    public boolean isWeekend(int monthIndex, int dayIndex) {
+        Date date = getDayForIndex(monthIndex, dayIndex);
+        if (date == null) {
+            return false;
+        }
+
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
 
@@ -78,27 +104,62 @@ public class SummaryPanelDto implements Serializable {
         return Calendar.SATURDAY == day || Calendar.SUNDAY == day;
     }
 
-    private Date getDayForIndex(int i) {
+    public TaskLength getTaskLength(int monthIndex, int dayIndex) {
+        Date date = getDayForIndex(monthIndex, dayIndex);
+        if (date == null) {
+            return null;
+        }
+
+        return dates.get(date);
+    }
+
+    public boolean isFuture(int monthIndex, int dayIndex) {
+        Date date = getDayForIndex(monthIndex, dayIndex);
+        if (date == null) {
+            return false;
+        }
         Calendar cal = Calendar.getInstance();
-        cal.setTime(filter.getFrom());
+        cal.setTime(date);
+        Calendar now = Calendar.getInstance();
+        now.setTime(GizmoUtils.clearTime(new Date()));
 
-        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        cal.add(Calendar.DAY_OF_YEAR, i);
-        return cal.getTime();
+        return cal.getTime().after(now.getTime());
     }
 
-    public TaskLength getTaskLength(int index) {
-        //todo not working correctly
-        return dates.get(getDayForIndex(index));
+    public boolean isFullDayDone(int monthIndex, int dayIndex) {
+        if (isWeekend(monthIndex, dayIndex) || isFuture(monthIndex, dayIndex)) {
+            return true;
+        }
+
+        TaskLength task = getTaskLength(monthIndex, dayIndex);
+        if (task == null) {
+            return false;
+        }
+
+        return task.getLength() >= 8.0;
     }
 
-    public boolean isFullDayDone(int index) {
-        //todo implement if it's workday and >=8 hours logged then it's true
-        return true;
+    public boolean isToday(int monthIndex, int dayIndex) {
+        Date date = getDayForIndex(monthIndex, dayIndex);
+        if (date == null) {
+            return false;
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        Calendar now = Calendar.getInstance();
+        now.setTime(GizmoUtils.clearTime(new Date()));
+
+        return cal.getTime().equals(now.getTime());
     }
 
-    public boolean isToday(int index) {
-        //todo implement
-        return false;
+    public String getMonthYear(int monthIndex) {
+        DateFormat df = new SimpleDateFormat("MMMM yyyy");
+
+        Calendar from = getFromRoundedToFirstMonthDay();
+        from.add(Calendar.MONTH, monthIndex);
+
+        return df.format(from.getTime());
     }
 }

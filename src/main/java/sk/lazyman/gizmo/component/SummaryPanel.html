@@ -1,10 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
-    <table class="table table-condensed table-bordered">
-        <tr wicket:id="weekRepeater">
-            <td wicket:id="dayRepeater"><span wicket:id="label"/></td>
+    <table class="table table-condensed table-bordered table-summary">
+        <thead>
+        <tr>
+            <th><wicket:message key="SummaryPanel.monthYear"/></th>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+            <th>8</th>
+            <th>9</th>
+            <th>10</th>
+            <th>11</th>
+            <th>12</th>
+            <th>13</th>
+            <th>14</th>
+            <th>15</th>
+            <th>16</th>
+            <th>17</th>
+            <th>18</th>
+            <th>19</th>
+            <th>20</th>
+            <th>21</th>
+            <th>22</th>
+            <th>23</th>
+            <th>24</th>
+            <th>25</th>
+            <th>26</th>
+            <th>27</th>
+            <th>28</th>
+            <th>29</th>
+            <th>30</th>
+            <th>31</th>
         </tr>
+        </thead>
+        <tbody>
+            <tr wicket:id="monthRepeater">
+                <td wicket:id="dayRepeater"><span wicket:id="label"/></td>
+            </tr>
+        </tbody>
     </table>
 </wicket:panel>
 </html>
