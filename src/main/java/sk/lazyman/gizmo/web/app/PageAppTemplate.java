@@ -51,35 +51,11 @@ public class PageAppTemplate extends PageTemplate {
         TopMenuItem item = new TopMenuItem(createStringResource("PageAppTemplate.menu.dashboard"), PageDashboard.class);
         navbar.addComponents(new ImmutableNavbarComponent(item));
 
-        NavbarDropDownButton drop = new NavbarDropDownButton(createStringResource("PageAppTemplate.menu.customers")) {
+        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.customers"), PageCustomers.class);
+        navbar.addComponents(new ImmutableNavbarComponent(item));
 
-            @Override
-            protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
-                List<AbstractLink> list = new ArrayList<>();
-                list.add(new BookmarkableLabeledLink(buttonMarkupId,
-                        createStringResource("PageAppTemplate.menu.listCustomers"), PageCustomers.class));
-                list.add(new BookmarkableLabeledLink(buttonMarkupId,
-                        createStringResource("PageAppTemplate.menu.newCustomer"), PageCustomer.class));
-
-                return list;
-            }
-        };
-        navbar.addComponents(new ImmutableNavbarComponent(drop));
-
-        drop = new NavbarDropDownButton(createStringResource("PageAppTemplate.menu.projects")) {
-
-            @Override
-            protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
-                List<AbstractLink> list = new ArrayList<>();
-                list.add(new BookmarkableLabeledLink(buttonMarkupId,
-                        createStringResource("PageAppTemplate.menu.listProjects"), PageProjects.class));
-                list.add(new BookmarkableLabeledLink(buttonMarkupId,
-                        createStringResource("PageAppTemplate.menu.newProject"), PageProject.class));
-
-                return list;
-            }
-        };
-        navbar.addComponents(new ImmutableNavbarComponent(drop));
+        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.projects"), PageProjects.class);
+        navbar.addComponents(new ImmutableNavbarComponent(item));
 
         item = new TopMenuItem(createStringResource("PageAppTemplate.menu.users"), PageUsers.class);
         navbar.addComponents(new ImmutableNavbarComponent(item));

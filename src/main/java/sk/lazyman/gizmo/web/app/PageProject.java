@@ -1,5 +1,6 @@
 package sk.lazyman.gizmo.web.app;
 
+import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
 import de.agilecoders.wicket.core.markup.html.bootstrap.tabs.AjaxBootstrapTabbedPanel;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -8,15 +9,19 @@ import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
+import sk.lazyman.gizmo.component.ProjectPartsTab;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.CheckFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
+import sk.lazyman.gizmo.component.modal.ProjectPartModal;
+import sk.lazyman.gizmo.data.Part;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.util.LoadableModel;
@@ -41,6 +46,7 @@ public class PageProject extends PageAppProjects {
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
     private static final String ID_TABS = "tabs";
+    private static final String ID_PROJECT_PART = "projectPart";
 
     private IModel<Project> model;
 
@@ -53,7 +59,13 @@ public class PageProject extends PageAppProjects {
             }
         };
 
+        initDialogs();
         initLayout();
+    }
+
+    private void initDialogs() {
+        ProjectPartModal modal = new ProjectPartModal(ID_PROJECT_PART);
+        add(modal);
     }
 
     private Project loadProject() {
@@ -106,7 +118,13 @@ public class PageProject extends PageAppProjects {
 
             @Override
             public WebMarkupContainer getPanel(String panelId) {
-                return new WebMarkupContainer(panelId);
+                return new ProjectPartsTab(panelId) {
+
+                    @Override
+                    protected void newPartPerformed(AjaxRequestTarget target) {
+                        PageProject.this.newPartPerformed(target);
+                    }
+                };
             }
         });
 
@@ -145,5 +163,12 @@ public class PageProject extends PageAppProjects {
 
     private void savePerformed(AjaxRequestTarget target) {
         //todo implement
+    }
+
+    private void newPartPerformed(AjaxRequestTarget target) {
+        Modal modal = (Modal) get(ID_PROJECT_PART);
+        target.add(modal);
+        modal.show(target);
+        modal.setModel(new Model(new Part()));
     }
 }
