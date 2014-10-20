@@ -19,11 +19,15 @@ import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.ProjectPartsTab;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.CheckFormGroup;
+import sk.lazyman.gizmo.component.form.DropDownFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.component.modal.ProjectPartModal;
+import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Part;
 import sk.lazyman.gizmo.data.Project;
+import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.ProjectRepository;
+import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.util.ArrayList;
@@ -99,8 +103,22 @@ public class PageProject extends PageAppProjects {
                 createStringResource("Project.description"), true);
         form.add(description);
 
-        FormGroup customer = new FormGroup(ID_CUSTOMER, new PropertyModel<String>(model, Project.F_CUSTOMER),
-                createStringResource("Project.customer"), true);
+        DropDownFormGroup customer = new DropDownFormGroup(ID_CUSTOMER,
+                new PropertyModel<Customer>(model, Project.F_CUSTOMER),
+                createStringResource("Project.customer"), false);
+        customer.setChoices(new LoadableModel<List<Customer>>(false) {
+
+            @Override
+            protected List<Customer> load() {
+                CustomerRepository repository = getCustomerRepository();
+                List<Customer> list = repository.listCustomers();
+                if (list == null) {
+                    list = new ArrayList<>();
+                }
+                return list;
+            }
+        });
+        customer.setRenderer(GizmoUtils.createCustomerChoiceRenderer());
         form.add(customer);
 
         FormGroup closed = new CheckFormGroup(ID_CLOSED, new PropertyModel<Boolean>(model, Project.F_CLOSED),
