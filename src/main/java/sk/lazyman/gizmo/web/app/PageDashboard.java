@@ -1,12 +1,14 @@
 package sk.lazyman.gizmo.web.app;
 
 
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxLink;
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons;
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.dropdown.SplitButton;
+import de.agilecoders.wicket.core.markup.html.bootstrap.image.IconType;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AbstractAutoCompleteRenderer;
-import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AbstractAutoCompleteTextRenderer;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteSettings;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -18,16 +20,16 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
 import org.wicketstuff.annotation.mount.MountPath;
-import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
+import sk.lazyman.gizmo.component.LabeledLink;
 import sk.lazyman.gizmo.component.SummaryPanel;
 import sk.lazyman.gizmo.component.SummaryPartsPanel;
 import sk.lazyman.gizmo.component.data.LinkColumn;
@@ -45,7 +47,6 @@ import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.DashboardProjectConverter;
-import sk.lazyman.gizmo.util.DashboardProjectRenderer;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
@@ -313,14 +314,42 @@ public class PageDashboard extends PageAppTemplate {
 //        };
 //        form.add(print);
 
-        AjaxButton task = new AjaxButton(ID_BTN_NEW_TASK, createStringResource("PageDashboard.newWork")) {
+        SplitButton task = new SplitButton(ID_BTN_NEW_TASK, createStringResource("PageDashboard.newWork")) {
+
+            @Override
+            protected AbstractLink newBaseButton(String markupId, IModel<String> labelModel,
+                                                 IModel<IconType> iconTypeModel) {
+                return new BootstrapAjaxLink(markupId, labelModel, Buttons.Type.Success) {
+
+                    @Override
+                    public void onClick(AjaxRequestTarget target) {
+                        newWorkPerformed(target);
+                    }
+                }.setIconType(iconTypeModel.getObject());
+            }
+
+            @Override
+            protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
+                return createDropDownLinks(buttonMarkupId);
+            }
+        };
+        task.setSize(Buttons.Size.Small).setType(Buttons.Type.Success);
+
+        form.add(task);
+    }
+
+    private List<AbstractLink> createDropDownLinks(String id) {
+        List<AbstractLink> list = new ArrayList<>();
+        list.add(new LabeledLink(id, createStringResource("PageDashboard.newLog")) {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                newWorkPerformed(target);
+                newLogPerformed(target);
             }
-        };
-        form.add(task);
+        });
+
+
+        return list;
     }
 
     private void displayPerformed(AjaxRequestTarget target) {
@@ -341,6 +370,11 @@ public class PageDashboard extends PageAppTemplate {
     }
 
     private void newWorkPerformed(AjaxRequestTarget target) {
+        setResponsePage(PageWork.class);
+    }
+
+    private void newLogPerformed(AjaxRequestTarget target) {
+        //todo implement PageLog
         setResponsePage(PageWork.class);
     }
 

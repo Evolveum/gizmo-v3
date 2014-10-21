@@ -1,11 +1,16 @@
 package sk.lazyman.gizmo.dto;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 
 /**
  * @author lazyman
  */
 public class DashboardProjectDto implements Serializable, Comparable<DashboardProjectDto> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DashboardProjectDto.class);
 
     private String customerName;
     private String projectName;
@@ -80,17 +85,51 @@ public class DashboardProjectDto implements Serializable, Comparable<DashboardPr
     }
 
     public boolean match(String input) {
+        LOG.trace("Matching '{}'", input);
+
         if (input == null || input.isEmpty()) {
             return true;
         }
 
-        input = input.toLowerCase().replace('/', ' ').trim();
+        input = input.toLowerCase().trim();
+        if (!input.contains("/")) {
+            LOG.trace("Input doesn't contain '/'.");
+            return match(input, input, false);
+        } else {
+            String[] array = input.split("/");
+            if (array.length == 2) {
+                LOG.trace("Input contain '/' and two parts.");
+                return match(array[0].trim(), array[1].trim(), true);
+            } else {
+                LOG.trace("Input contain '/'.");
+                boolean retVal;
+                for (int i = 0; i < array.length; i++) {
+                    String item = array[i].trim();
+                    if (item.length() == 0) {
+                        continue;
+                    }
 
-        if (customerName != null && customerName.toLowerCase().contains(input)) {
-            return true;
+                    retVal = match(item, item, false);
+                    if (retVal) {
+                        return true;
+                    }
+                }
+            }
         }
 
-        if (projectName != null && projectName.toLowerCase().contains(input)) {
+        return false;
+    }
+
+    private boolean match(String customer, String project, boolean and) {
+        if (and) {
+            return customerName != null && customerName.toLowerCase().contains(customer)
+                    && projectName != null && projectName.toLowerCase().contains(project);
+        }
+
+        if (customerName != null && customerName.toLowerCase().contains(customer)) {
+            return true;
+        }
+        if (projectName != null && projectName.toLowerCase().contains(project)) {
             return true;
         }
 
