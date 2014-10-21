@@ -59,7 +59,7 @@ public class PageCustomers extends PageAppCustomers {
 
         initButtons(form);
 
-        BasicDataProvider provider = new BasicDataProvider(getCustomerRepository(), 25) {
+        BasicDataProvider provider = new BasicDataProvider(getCustomerRepository()) {
 
             @Override
             public Predicate getPredicate() {

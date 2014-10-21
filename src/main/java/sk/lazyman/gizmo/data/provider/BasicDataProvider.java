@@ -4,6 +4,8 @@ import com.mysema.query.types.Predicate;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -18,6 +20,8 @@ import java.util.Iterator;
  * @author lazyman
  */
 public class BasicDataProvider<T extends Serializable> extends SortableDataProvider<T, String> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BasicDataProvider.class);
 
     private JpaRepository<T, Integer> repository;
     private int itemsPerPage;
@@ -37,9 +41,10 @@ public class BasicDataProvider<T extends Serializable> extends SortableDataProvi
     @Override
     public Iterator<? extends T> iterator(long first, long count) {
         int pageIndex = (int) Math.ceil((double) first / (double) itemsPerPage);
+        LOG.debug("Setting page request: page {}, size {}", pageIndex, itemsPerPage);
 
         Predicate predicate = getPredicate();
-        PageRequest page = new PageRequest(pageIndex, (int) count, sort);
+        PageRequest page = new PageRequest(pageIndex, itemsPerPage, sort);
 
         Page<T> found;
         if (predicate == null) {

@@ -4,12 +4,17 @@
 <wicket:extend>
     <form class="form-inline pull-right search" role="form" wicket:id="form">
         <div class="form-group">
-            <label class="sr-only"><wicket:message key="PageCustomers.searchText"/></label>
-            <input class="form-control input-sm" wicket:id="searchText"
-                   wicket:message="placeholder:PageCustomers.searchText">
+            <label class="sr-only"><wicket:message key="PageProjects.searchText"/></label>
+            <div class="input-group">
+                <input type="text" class="form-control input-sm" wicket:id="searchText"
+                       wicket:message="placeholder:PageProjects.searchText">
+                <span class="input-group-btn">
+                    <button type="button" wicket:id="clear"></button>
+                    <button type="button" wicket:id="search"></button>
+                </span>
+            </div>
         </div>
 
-        <a class="btn btn-primary btn-sm" wicket:id="search"/>
         <a class="btn btn-success btn-sm" wicket:id="newProject"/>
     </form>
     <div wicket:id="table"/>
