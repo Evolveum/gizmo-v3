@@ -313,7 +313,7 @@ public class PageDashboard extends PageAppTemplate {
 //        };
 //        form.add(print);
 
-        AjaxButton task = new AjaxButton(ID_BTN_NEW_TASK, createStringResource("PageDashboard.task")) {
+        AjaxButton task = new AjaxButton(ID_BTN_NEW_TASK, createStringResource("PageDashboard.newWork")) {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
@@ -333,11 +333,11 @@ public class PageDashboard extends PageAppTemplate {
     }
 
     private void emailPerformed(AjaxRequestTarget target) {
-
+        //todo implement
     }
 
     private void printPerformed(AjaxRequestTarget target) {
-
+        //todo implement
     }
 
     private void newWorkPerformed(AjaxRequestTarget target) {

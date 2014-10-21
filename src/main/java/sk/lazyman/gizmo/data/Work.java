@@ -1,5 +1,7 @@
 package sk.lazyman.gizmo.data;
 
+import com.mysema.query.annotations.QueryInit;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
@@ -17,6 +19,7 @@ public class Work extends AbstractTask {
     private double invoiceLength;
 
     @ManyToOne
+    @QueryInit("project.*")
     public Part getPart() {
         return part;
     }
