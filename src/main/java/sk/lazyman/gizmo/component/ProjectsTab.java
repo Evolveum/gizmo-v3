@@ -13,6 +13,7 @@ import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.QProject;
 import sk.lazyman.gizmo.data.provider.BasicDataProvider;
+import sk.lazyman.gizmo.data.provider.CustomTabDataProvider;
 import sk.lazyman.gizmo.web.app.PageCustomer;
 import sk.lazyman.gizmo.web.app.PageProject;
 
@@ -40,7 +41,7 @@ public class ProjectsTab extends SimplePanel {
 
     private void initPanelLayout() {
         final PageCustomer page = (PageCustomer) getPage();
-        BasicDataProvider provider = new BasicDataProvider(page.getProjectRepository()) {
+        BasicDataProvider provider = new CustomTabDataProvider(page.getProjectRepository()) {
 
             @Override
             public Predicate getPredicate() {
@@ -79,6 +80,14 @@ public class ProjectsTab extends SimplePanel {
                 newProjectPerformed(target);
             }
         };
+        newProject.add(new VisibleEnableBehaviour() {
+
+            @Override
+            public boolean isVisible() {
+                Integer customerId = page.getIntegerParam(PageCustomer.CUSTOMER_ID);
+                return customerId != null;
+            }
+        });
         add(newProject);
     }
 

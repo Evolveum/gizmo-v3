@@ -10,6 +10,7 @@ import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.data.provider.BasicDataProvider;
+import sk.lazyman.gizmo.data.provider.CustomTabDataProvider;
 import sk.lazyman.gizmo.web.app.PageCustomer;
 import sk.lazyman.gizmo.web.app.PageProject;
 
@@ -46,7 +47,7 @@ public class ProjectPartsTab extends SimplePanel {
         add(newProject);
 
         final PageProject page = (PageProject) getPage();
-        BasicDataProvider provider = new BasicDataProvider(page.getProjectPartRepository()) {
+        BasicDataProvider provider = new CustomTabDataProvider(page.getProjectPartRepository()) {
 
             @Override
             public Predicate getPredicate() {

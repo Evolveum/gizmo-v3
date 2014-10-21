@@ -105,6 +105,12 @@ public class PageAppTemplate extends PageTemplate {
         return Integer.parseInt(id);
     }
 
+    public PageParameters createPageParams(String paramName, Integer value) {
+        PageParameters params = new PageParameters();
+        params.add(paramName, value);
+        return params;
+    }
+
     private IModel<String> createUsernameModel() {
         return new LoadableDetachableModel<String>() {
 

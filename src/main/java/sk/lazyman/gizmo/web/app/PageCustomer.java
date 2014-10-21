@@ -10,6 +10,7 @@ import org.apache.wicket.markup.html.form.EnumChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.*;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
@@ -167,10 +168,22 @@ public class PageCustomer extends PageAppCustomers {
     }
 
     private void cancelPerformed(AjaxRequestTarget target) {
-        setResponsePage(PageProjects.class);
+        setResponsePage(PageCustomers.class);
     }
 
     private void savePerformed(AjaxRequestTarget target) {
-        //todo implement
+        CustomerRepository repository = getCustomerRepository();
+
+        try {
+            Customer customer = model.getObject();
+            customer = repository.saveAndFlush(customer);
+
+            PageParameters params = createPageParams(CUSTOMER_ID, customer.getId());
+            setResponsePage(PageCustomer.class, params);
+            return;
+        } catch (Exception ex) {
+            //todo error handling
+            ex.printStackTrace();
+        }
     }
 }
