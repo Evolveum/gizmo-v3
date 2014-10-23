@@ -8,10 +8,12 @@ import org.apache.wicket.model.IModel;
 import org.springframework.data.domain.Sort;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
-import sk.lazyman.gizmo.data.*;
+import sk.lazyman.gizmo.data.Part;
+import sk.lazyman.gizmo.data.Project;
+import sk.lazyman.gizmo.data.QPart;
 import sk.lazyman.gizmo.data.provider.BasicDataProvider;
 import sk.lazyman.gizmo.data.provider.CustomTabDataProvider;
-import sk.lazyman.gizmo.web.app.PageCustomer;
+import sk.lazyman.gizmo.web.app.PageAppTemplate;
 import sk.lazyman.gizmo.web.app.PageProject;
 
 import java.util.ArrayList;
@@ -37,14 +39,23 @@ public class ProjectPartsTab extends SimplePanel {
     }
 
     private void initPanelLayout() {
-        AjaxButton newProject = new AjaxButton(ID_NEW_PART, createStringResource("ProjectPartsTab.newPart")) {
+        AjaxButton newPart = new AjaxButton(ID_NEW_PART, createStringResource("ProjectPartsTab.newPart")) {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
                 newPartPerformed(target);
             }
         };
-        add(newProject);
+        newPart.add(new VisibleEnableBehaviour() {
+
+            @Override
+            public boolean isVisible() {
+                PageAppTemplate page = (PageAppTemplate) getPage();
+                Integer customerId = page.getIntegerParam(PageProject.PROJECT_ID);
+                return customerId != null;
+            }
+        });
+        add(newPart);
 
         final PageProject page = (PageProject) getPage();
         BasicDataProvider provider = new CustomTabDataProvider(page.getProjectPartRepository()) {

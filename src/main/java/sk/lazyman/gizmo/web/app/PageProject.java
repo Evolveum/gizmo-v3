@@ -2,6 +2,7 @@ package sk.lazyman.gizmo.web.app;
 
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
 import de.agilecoders.wicket.core.markup.html.bootstrap.tabs.AjaxBootstrapTabbedPanel;
+import org.apache.commons.lang.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
@@ -63,7 +64,13 @@ public class PageProject extends PageAppProjects {
             }
         };
 
-        initDialogs();
+        initLayout();
+    }
+
+    public PageProject(IModel<Project> model) {
+        Validate.notNull(model, "Model must not be null.");
+        this.model = model;
+
         initLayout();
     }
 
@@ -92,6 +99,8 @@ public class PageProject extends PageAppProjects {
     }
 
     private void initLayout() {
+        initDialogs();
+
         Form form = new Form(ID_FORM);
         add(form);
 

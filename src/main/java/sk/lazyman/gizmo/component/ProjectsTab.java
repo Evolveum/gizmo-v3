@@ -5,6 +5,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.springframework.data.domain.Sort;
 import sk.lazyman.gizmo.component.data.LinkColumn;
@@ -14,6 +15,8 @@ import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.QProject;
 import sk.lazyman.gizmo.data.provider.BasicDataProvider;
 import sk.lazyman.gizmo.data.provider.CustomTabDataProvider;
+import sk.lazyman.gizmo.repository.CustomerRepository;
+import sk.lazyman.gizmo.web.app.PageAppTemplate;
 import sk.lazyman.gizmo.web.app.PageCustomer;
 import sk.lazyman.gizmo.web.app.PageProject;
 
@@ -92,9 +95,21 @@ public class ProjectsTab extends SimplePanel {
     }
 
     private void newProjectPerformed(AjaxRequestTarget target) {
-        //todo set customer as default for this new project
+        try {
+            PageAppTemplate page = (PageAppTemplate) getPage();
+            Integer customerId = page.getIntegerParam(PageCustomer.CUSTOMER_ID);
 
-        setResponsePage(PageProject.class);
+            CustomerRepository repository = page.getCustomerRepository();
+            Customer customer = repository.findOne(customerId);
+
+            Project project = new Project();
+            project.setCustomer(customer);
+
+            setResponsePage(new PageProject(new Model<>(project)));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            //todo handle exception
+        }
     }
 
     private void projectDetailsPerformed(AjaxRequestTarget target, Project project) {

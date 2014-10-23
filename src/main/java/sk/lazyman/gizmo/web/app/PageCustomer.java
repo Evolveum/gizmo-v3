@@ -1,6 +1,7 @@
 package sk.lazyman.gizmo.web.app;
 
 import de.agilecoders.wicket.core.markup.html.bootstrap.tabs.AjaxBootstrapTabbedPanel;
+import org.apache.commons.lang.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
@@ -52,6 +53,13 @@ public class PageCustomer extends PageAppCustomers {
                 return loadCustomer();
             }
         };
+
+        initLayout();
+    }
+
+    public PageCustomer(IModel<Customer> model) {
+        Validate.notNull(model, "Model must not be null");
+        this.model = model;
 
         initLayout();
     }
