@@ -38,6 +38,8 @@ public class PageTemplate extends WebPage {
     private WorkRepository workRepository;
     @SpringBean
     private EmailLogRepository emailLogRepository;
+    @SpringBean
+    private LogRepository logRepository;
 
     public PageTemplate() {
         Injector.get().inject(this);
@@ -113,6 +115,10 @@ public class PageTemplate extends WebPage {
 
     public EmailLogRepository getEmailLogRepository() {
         return emailLogRepository;
+    }
+
+    public LogRepository getLogRepository() {
+        return logRepository;
     }
 
     public EntityManager getEntityManager() {

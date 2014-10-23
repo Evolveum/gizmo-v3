@@ -24,6 +24,7 @@ import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.convert.IConverter;
@@ -34,10 +35,7 @@ import sk.lazyman.gizmo.component.SummaryPanel;
 import sk.lazyman.gizmo.component.SummaryPartsPanel;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
-import sk.lazyman.gizmo.data.Customer;
-import sk.lazyman.gizmo.data.Project;
-import sk.lazyman.gizmo.data.User;
-import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.data.provider.WorkDataProvider;
@@ -374,8 +372,7 @@ public class PageDashboard extends PageAppTemplate {
     }
 
     private void newLogPerformed(AjaxRequestTarget target) {
-        //todo implement PageLog
-        setResponsePage(PageWork.class);
+        setResponsePage(PageLog.class);
     }
 
     private void workDetailsPerformed(AjaxRequestTarget target, Work work) {

@@ -13,9 +13,10 @@ import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.*;
-import sk.lazyman.gizmo.data.Part;
+import sk.lazyman.gizmo.data.Log;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.repository.LogRepository;
 import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.repository.WorkRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
@@ -29,10 +30,10 @@ import java.util.List;
 /**
  * @author lazyman
  */
-@MountPath("/app/work")
-public class PageWork extends PageAppTemplate {
+@MountPath("/app/log")
+public class PageLog extends PageAppTemplate {
 
-    public static final String WORK_ID = "workId";
+    public static final String LOG_ID = "logId";
 
     private static final String ID_FORM = "form";
     private static final String ID_REALIZATOR = "realizator";
@@ -43,35 +44,38 @@ public class PageWork extends PageAppTemplate {
     private static final String ID_TRACK_ID = "trackId";
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
+    private static final String ID_IS_WORK_LOG = "isWorkLog";
     private static final String ID_PART = "part";
+    private static final String ID_CUSTOMER = "customer";
 
     private static final String LABEL_SIZE = "col-sm-3 col-md-2 control-label";
     private static final String TEXT_SIZE = "col-sm-5 col-md-4";
     private static final String FEEDBACK_SIZE = "col-sm-4 col-md-4";
 
-    private IModel<List<User>> users = new LoadableModel<List<User>>(false) {
+    private IModel<List<User>> users;
+    private IModel<Log> model;
 
-        @Override
-        protected List<User> load() {
-            return loadUsers();
-        }
-    };
-
-    private IModel<Work> model;
-
-    public PageWork() {
-        model = new LoadableModel<Work>(false) {
+    public PageLog() {
+        model = new LoadableModel<Log>(false) {
 
             @Override
-            protected Work load() {
-                return loadWork();
+            protected Log load() {
+                return loadLog();
+            }
+        };
+
+        users = new LoadableModel<List<User>>(false) {
+
+            @Override
+            protected List<User> load() {
+                return loadUsers();
             }
         };
 
         initLayout();
     }
 
-    public PageWork(IModel<Work> model) {
+    public PageLog(IModel<Log> model) {
         Validate.notNull(model, "Model must not be null.");
         this.model = model;
 
@@ -83,27 +87,27 @@ public class PageWork extends PageAppTemplate {
         return repository.listUsersOrderByGivenFamilyName();
     }
 
-    private Work loadWork() {
-        Integer workId = getIntegerParam(WORK_ID);
-        if (workId == null) {
+    private Log loadLog() {
+        Integer logId = getIntegerParam(LOG_ID);
+        if (logId == null) {
             GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
             User user = principal.getUser();
 
-            Work work = new Work();
-            work.setRealizator(user);
-            work.setDate(new Date());
+            Log log = new Log();
+            log.setRealizator(user);
+            log.setDate(new Date());
 
-            return work;
+            return log;
         }
 
-        WorkRepository repository = getWorkRepository();
-        Work work = repository.findOne(workId);
-        if (work == null) {
-            getSession().error(translateString("Message.couldntFindWork", workId));
-            throw new RestartResponseException(PageWork.class);
+        LogRepository repository = getLogRepository();
+        Log log = repository.findOne(logId);
+        if (log == null) {
+            getSession().error(translateString("Message.couldntFindLog", logId));
+            throw new RestartResponseException(PageLog.class);
         }
 
-        return work;
+        return log;
     }
 
     private void initLayout() {
@@ -117,7 +121,11 @@ public class PageWork extends PageAppTemplate {
         realizator.setChoices(users);
         form.add(realizator);
 
-        HFormGroup part = new HFormGroup(ID_PART, new PropertyModel<Part>(model, Work.F_PART),
+        HFormGroup customer = new HFormGroup(ID_CUSTOMER, new Model(),
+                createStringResource("Work.customer"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        form.add(customer);
+
+        HFormGroup part = new HFormGroup(ID_PART, new Model(),
                 createStringResource("Work.part"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(part);
 
