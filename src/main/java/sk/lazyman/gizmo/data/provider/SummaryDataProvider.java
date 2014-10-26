@@ -7,7 +7,7 @@ import com.mysema.query.types.Predicate;
 import com.mysema.query.types.expr.DateTimeExpression;
 import com.mysema.query.types.template.DateTimeTemplate;
 import sk.lazyman.gizmo.data.QWork;
-import sk.lazyman.gizmo.dto.DashboardProjectDto;
+import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
 import sk.lazyman.gizmo.dto.TaskLength;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
@@ -51,7 +51,7 @@ public class SummaryDataProvider implements Serializable {
             list.add(QWork.work.date.loe(filter.getTo()));
         }
         if (filter.getProject() != null) {
-            DashboardProjectDto projectDto = filter.getProject();
+            CustomerProjectPartDto projectDto = filter.getProject();
             if (projectDto.getCustomerId() != null) {
                 list.add(QWork.work.part.project.customer.id.eq(projectDto.getCustomerId()));
             } else if (projectDto.getProjectId() != null) {

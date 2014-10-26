@@ -15,4 +15,7 @@ public interface PartRepository extends JpaRepository<Part, Integer>, QueryDslPr
 
     @Query("from Part p where p.project.id = :projectId order by p.name")
     public List<Part> findParts(@Param("projectId") Integer projectId);
+
+    @Query("from Part p where p.project.closed = false")
+    List<Part> findOpenedProjectParts();
 }

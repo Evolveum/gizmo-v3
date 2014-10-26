@@ -3,19 +3,18 @@ package sk.lazyman.gizmo.web.app;
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.*;
-import sk.lazyman.gizmo.data.Part;
-import sk.lazyman.gizmo.data.User;
-import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.data.*;
+import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
+import sk.lazyman.gizmo.repository.PartRepository;
 import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.repository.WorkRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
@@ -23,6 +22,8 @@ import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -54,6 +55,28 @@ public class PageWork extends PageAppTemplate {
         @Override
         protected List<User> load() {
             return loadUsers();
+        }
+    };
+
+    private IModel<List<CustomerProjectPartDto>> projects = new LoadableModel<List<CustomerProjectPartDto>>(false) {
+
+        @Override
+        protected List<CustomerProjectPartDto> load() {
+            List<CustomerProjectPartDto> list = new ArrayList<>();
+
+            PartRepository repository = getProjectPartRepository();
+            List<Part> parts = repository.findOpenedProjectParts();
+            for (Part part : parts) {
+                Project project = part.getProject();
+                Customer customer = project.getCustomer();
+
+                list.add(new CustomerProjectPartDto(customer.getName(), project.getName(),
+                        part.getName(), part.getId()));
+            }
+
+            Collections.sort(list);
+
+            return list;
         }
     };
 
@@ -106,7 +129,7 @@ public class PageWork extends PageAppTemplate {
         return work;
     }
 
-    private void initLayout() {
+    private <T extends FormInput> void initLayout() {
         Form form = new Form(ID_FORM);
         add(form);
 
@@ -117,8 +140,18 @@ public class PageWork extends PageAppTemplate {
         realizator.setChoices(users);
         form.add(realizator);
 
-        HFormGroup part = new HFormGroup(ID_PART, new PropertyModel<Part>(model, Work.F_PART),
-                createStringResource("Work.part"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        HFormGroup part = new HFormGroup<T, Part>(ID_PART, new PropertyModel<Part>(model, Work.F_PART),
+                createStringResource("Work.part"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true) {
+
+            @Override
+            protected FormInput createInput(String componentId, IModel<Part> model, IModel<String> placeholder) {
+                AutoCompleteInput formInput = new AutoCompleteInput(componentId, createPartModel(model), projects);
+                FormComponent input = formInput.getFormComponent();
+                input.add(AttributeAppender.replace("placeholder", placeholder));
+
+                return formInput;
+            }
+        };
         form.add(part);
 
         HFormGroup date = new HDateFormGroup(ID_DATE, new PropertyModel<Date>(model, Work.F_DATE),
@@ -139,10 +172,53 @@ public class PageWork extends PageAppTemplate {
         form.add(description);
 
         HFormGroup trackId = new HFormGroup(ID_TRACK_ID, new PropertyModel<String>(model, Work.F_TRACK_ID),
-                createStringResource("Work.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+                createStringResource("Work.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, false);
         form.add(trackId);
 
         initButtons(form);
+    }
+
+    private IModel<CustomerProjectPartDto> createPartModel(final IModel<Part> model) {
+        return new IModel<CustomerProjectPartDto>() {
+
+            private Part part;
+
+            @Override
+            public CustomerProjectPartDto getObject() {
+                Part p = model.getObject();
+                part = p;
+
+                if (part != null) {
+                    for (CustomerProjectPartDto dto : projects.getObject()) {
+                        if (part.getId().equals(dto.getPartId())) {
+                            return dto;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            @Override
+            public void setObject(CustomerProjectPartDto object) {
+                if (object == null) {
+                    model.setObject(null);
+                }
+
+                Integer id = object.getPartId();
+                if (part != null && id.equals(part.getId())) {
+                    model.setObject(part);
+                }
+
+                PartRepository repository = getProjectPartRepository();
+                part = repository.findOne(id);
+                model.setObject(part);
+            }
+
+            @Override
+            public void detach() {
+            }
+        };
     }
 
     private void initButtons(Form form) {
@@ -150,7 +226,7 @@ public class PageWork extends PageAppTemplate {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                userSavePerformed(target);
+                saveWorkPerformed(target);
             }
 
             @Override
@@ -174,7 +250,19 @@ public class PageWork extends PageAppTemplate {
         setResponsePage(PageDashboard.class);
     }
 
-    private void userSavePerformed(AjaxRequestTarget target) {
-        //todo implement
+    private void saveWorkPerformed(AjaxRequestTarget target) {
+        WorkRepository repository = getWorkRepository();
+        try {
+            Work work = model.getObject();
+            work = repository.save(work);
+
+            model.setObject(work);
+
+            PageDashboard response = new PageDashboard();
+            response.success(createStringResource("Message.workSavedSuccessfully").getString());
+            setResponsePage(response);
+        } catch (Exception ex) {
+            handleGuiException(PageWork.class, "couldn't save work", ex, target);
+        }
     }
 }

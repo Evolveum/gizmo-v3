@@ -1,26 +1,26 @@
 package sk.lazyman.gizmo.web.app;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.*;
+import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.ImmutableNavbarComponent;
+import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.Navbar;
+import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarExternalLink;
 import de.agilecoders.wicket.less.LessResourceReference;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
-import sk.lazyman.gizmo.component.BookmarkableLabeledLink;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sk.lazyman.gizmo.component.MainFeedback;
 import sk.lazyman.gizmo.component.TopMenuItem;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.web.PageTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author lazyman
@@ -120,5 +120,17 @@ public class PageAppTemplate extends PageTemplate {
                 return principal.getFullName();
             }
         };
+    }
+
+    protected void handleGuiException(Class type, String message, Exception ex, AjaxRequestTarget target) {
+        Logger LOG = LoggerFactory.getLogger(type);
+        LOG.error("Exception occurred, {}, reason: {}", message, ex.getMessage());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Exception occurred, {}", ex);
+        }
+
+        if (target != null) {
+            target.add(getFeedbackPanel());
+        }
     }
 }

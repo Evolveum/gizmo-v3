@@ -9,7 +9,6 @@ import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteSettings;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -24,27 +23,24 @@ import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.util.convert.IConverter;
 import org.wicketstuff.annotation.mount.MountPath;
-import sk.lazyman.gizmo.component.AjaxSubmitButton;
-import sk.lazyman.gizmo.component.LabeledLink;
-import sk.lazyman.gizmo.component.SummaryPanel;
-import sk.lazyman.gizmo.component.SummaryPartsPanel;
+import sk.lazyman.gizmo.component.*;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
-import sk.lazyman.gizmo.data.*;
+import sk.lazyman.gizmo.data.Customer;
+import sk.lazyman.gizmo.data.Project;
+import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.data.provider.WorkDataProvider;
-import sk.lazyman.gizmo.dto.DashboardProjectDto;
+import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
-import sk.lazyman.gizmo.util.DashboardProjectConverter;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
@@ -72,14 +68,14 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_SUMMARY_PARTS = "summaryParts";
 
     private IModel<WorkFilterDto> filter;
-    private IModel<List<DashboardProjectDto>> projects;
+    private IModel<List<CustomerProjectPartDto>> projects;
 
     public PageDashboard() {
-        projects = new LoadableModel<List<DashboardProjectDto>>(false) {
+        projects = new LoadableModel<List<CustomerProjectPartDto>>(false) {
 
             @Override
-            protected List<DashboardProjectDto> load() {
-                List<DashboardProjectDto> list = new ArrayList<>();
+            protected List<CustomerProjectPartDto> load() {
+                List<CustomerProjectPartDto> list = new ArrayList<>();
 
                 ProjectRepository repository = getProjectRepository();
                 List<Project> projects = repository.findOpenedProjects();
@@ -93,11 +89,11 @@ public class PageDashboard extends PageAppTemplate {
                         customerName = customer.getName();
                     }
 
-                    list.add(new DashboardProjectDto(customerName, project.getName(), project.getId()));
+                    list.add(new CustomerProjectPartDto(customerName, project.getName(), project.getId()));
                 }
 
                 for (Customer customer : customers) {
-                    list.add(new DashboardProjectDto(customer.getName(), customer.getId()));
+                    list.add(new CustomerProjectPartDto(customer.getName(), customer.getId()));
                 }
 
                 Collections.sort(list);
@@ -145,30 +141,8 @@ public class PageDashboard extends PageAppTemplate {
             }
         });
 
-        final DashboardProjectConverter converter = new DashboardProjectConverter(projects);
-        AutoCompleteTextField project = new AutoCompleteTextField<DashboardProjectDto>(ID_PROJECT,
-                new PropertyModel<DashboardProjectDto>(filter, WorkFilterDto.F_PROJECT), DashboardProjectDto.class,
-                converter, new AutoCompleteSettings()) {
-
-            @Override
-            protected Iterator<DashboardProjectDto> getChoices(String input) {
-                List<DashboardProjectDto> list = projects.getObject();
-                List<DashboardProjectDto> result = new ArrayList<>();
-                for (DashboardProjectDto dto : list) {
-                    if (dto.match(input)) {
-                        result.add(dto);
-                    }
-                }
-
-                return result.iterator();
-            }
-
-            @Override
-            public <C> IConverter<C> getConverter(Class<C> type) {
-                return (IConverter<C>) converter;
-            }
-        };
-
+        AutoCompleteTextField project = new PartAutoCompleteText(ID_PROJECT,
+                new PropertyModel<CustomerProjectPartDto>(filter, WorkFilterDto.F_PROJECT), projects);
         project.setLabel(createStringResource("PageDashboard.project"));
         form.add(project);
 

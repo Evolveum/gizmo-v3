@@ -1,6 +1,5 @@
 package sk.lazyman.gizmo.dto;
 
-import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
 
 import java.io.Serializable;
@@ -18,7 +17,7 @@ public class WorkFilterDto implements Serializable {
 
     private Date from;
     private Date to;
-    private DashboardProjectDto project;
+    private CustomerProjectPartDto project;
     private User realizator;
 
     public Date getFrom() {
@@ -37,11 +36,11 @@ public class WorkFilterDto implements Serializable {
         this.to = to;
     }
 
-    public DashboardProjectDto getProject() {
+    public CustomerProjectPartDto getProject() {
         return project;
     }
 
-    public void setProject(DashboardProjectDto project) {
+    public void setProject(CustomerProjectPartDto project) {
         this.project = project;
     }
 

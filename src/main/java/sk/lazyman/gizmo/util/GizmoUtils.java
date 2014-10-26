@@ -83,8 +83,6 @@ public class GizmoUtils {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
-        cal.add(Calendar.MONTH, -2);
-
         return cal.getTime();
     }
 
