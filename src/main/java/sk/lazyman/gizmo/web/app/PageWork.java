@@ -103,7 +103,7 @@ public class PageWork extends PageAppTemplate {
 
         HDropDownFormGroup<User> realizator = new HDropDownFormGroup<>(ID_REALIZATOR,
                 new PropertyModel<User>(model, Work.F_REALIZATOR),
-                createStringResource("Work.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+                createStringResource("AbstractTask.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         realizator.setRenderer(GizmoUtils.createUserChoiceRenderer());
         realizator.setChoices(users);
         form.add(realizator);
@@ -123,7 +123,7 @@ public class PageWork extends PageAppTemplate {
         form.add(part);
 
         HFormGroup date = new HDateFormGroup(ID_DATE, new PropertyModel<Date>(model, Work.F_DATE),
-                createStringResource("Work.date"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+                createStringResource("AbstractTask.date"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(date);
 
         HFormGroup invoice = new HFormGroup(ID_INVOICE, new PropertyModel<String>(model, Work.F_INVOICE_LENGTH),
@@ -131,16 +131,16 @@ public class PageWork extends PageAppTemplate {
         form.add(invoice);
 
         HFormGroup length = new HFormGroup(ID_LENGTH, new PropertyModel<String>(model, Work.F_WORK_LENGTH),
-                createStringResource("Work.workLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+                createStringResource("AbstractTask.workLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(length);
 
         HAreaFormGroup description = new HAreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Work.F_DESCRIPTION),
-                createStringResource("Work.description"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+                createStringResource("AbstractTask.description"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         description.setRows(5);
         form.add(description);
 
         HFormGroup trackId = new HFormGroup(ID_TRACK_ID, new PropertyModel<String>(model, Work.F_TRACK_ID),
-                createStringResource("Work.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, false);
+                createStringResource("AbstractTask.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, false);
         form.add(trackId);
 
         initButtons(form);
@@ -153,8 +153,7 @@ public class PageWork extends PageAppTemplate {
 
             @Override
             public CustomerProjectPartDto getObject() {
-                Part p = model.getObject();
-                part = p;
+                part = model.getObject();
 
                 if (part != null) {
                     for (CustomerProjectPartDto dto : projects.getObject()) {

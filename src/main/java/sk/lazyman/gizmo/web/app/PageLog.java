@@ -3,21 +3,20 @@ package sk.lazyman.gizmo.web.app;
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
-import sk.lazyman.gizmo.component.form.HAreaFormGroup;
-import sk.lazyman.gizmo.component.form.HDateFormGroup;
-import sk.lazyman.gizmo.component.form.HDropDownFormGroup;
-import sk.lazyman.gizmo.component.form.HFormGroup;
+import sk.lazyman.gizmo.component.form.*;
+import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Log;
 import sk.lazyman.gizmo.data.User;
-import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
+import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.LogRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
@@ -39,12 +38,10 @@ public class PageLog extends PageAppTemplate {
     private static final String ID_REALIZATOR = "realizator";
     private static final String ID_DATE = "date";
     private static final String ID_LENGTH = "length";
-    private static final String ID_INVOICE = "invoice";
     private static final String ID_DESCRIPTION = "description";
     private static final String ID_TRACK_ID = "trackId";
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
-    private static final String ID_PART = "part";
     private static final String ID_CUSTOMER = "customer";
 
     private static final String LABEL_SIZE = "col-sm-3 col-md-2 control-label";
@@ -99,47 +96,91 @@ public class PageLog extends PageAppTemplate {
         return log;
     }
 
-    private void initLayout() {
+    private <T extends FormInput> void initLayout() {
         Form form = new Form(ID_FORM);
         add(form);
 
         HDropDownFormGroup<User> realizator = new HDropDownFormGroup<>(ID_REALIZATOR,
-                new PropertyModel<User>(model, Work.F_REALIZATOR),
-                createStringResource("Work.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+                new PropertyModel<User>(model, Log.F_REALIZATOR),
+                createStringResource("AbstractTask.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         realizator.setRenderer(GizmoUtils.createUserChoiceRenderer());
         realizator.setChoices(users);
         form.add(realizator);
 
-        HFormGroup customer = new HFormGroup(ID_CUSTOMER, new Model(),
-                createStringResource("Work.customer"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        HFormGroup customer = new HFormGroup<T, Customer>(ID_CUSTOMER, new PropertyModel<Customer>(model, Log.F_CUSTOMER),
+                createStringResource("Log.customer"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true) {
+
+            @Override
+            protected FormInput createInput(String componentId, IModel<Customer> model, IModel<String> placeholder) {
+                AutoCompleteInput formInput = new AutoCompleteInput(componentId, createCustomerModel(model), projects);
+                FormComponent input = formInput.getFormComponent();
+                input.add(AttributeAppender.replace("placeholder", placeholder));
+
+                return formInput;
+            }
+        };
         form.add(customer);
 
-        HFormGroup part = new HFormGroup(ID_PART, new Model(),
-                createStringResource("Work.part"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-        form.add(part);
-
-        HFormGroup date = new HDateFormGroup(ID_DATE, new PropertyModel<Date>(model, Work.F_DATE),
-                createStringResource("Work.date"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        HFormGroup date = new HDateFormGroup(ID_DATE, new PropertyModel<Date>(model, Log.F_DATE),
+                createStringResource("AbstractTask.date"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(date);
 
-        HFormGroup invoice = new HFormGroup(ID_INVOICE, new PropertyModel<String>(model, Work.F_INVOICE_LENGTH),
-                createStringResource("Work.invoiceLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-        form.add(invoice);
-
-        HFormGroup length = new HFormGroup(ID_LENGTH, new PropertyModel<String>(model, Work.F_WORK_LENGTH),
-                createStringResource("Work.workLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        HFormGroup length = new HFormGroup(ID_LENGTH, new PropertyModel<String>(model, Log.F_WORK_LENGTH),
+                createStringResource("AbstractTask.workLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(length);
 
-        HAreaFormGroup description = new HAreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Work.F_DESCRIPTION),
-                createStringResource("Work.description"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        HAreaFormGroup description = new HAreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Log.F_DESCRIPTION),
+                createStringResource("AbstractTask.description"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         description.setRows(5);
         form.add(description);
 
-        HFormGroup trackId = new HFormGroup(ID_TRACK_ID, new PropertyModel<String>(model, Work.F_TRACK_ID),
-                createStringResource("Work.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        HFormGroup trackId = new HFormGroup(ID_TRACK_ID, new PropertyModel<String>(model, Log.F_TRACK_ID),
+                createStringResource("AbstractTask.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(trackId);
 
         initButtons(form);
+    }
+
+    private IModel<CustomerProjectPartDto> createCustomerModel(final IModel<Customer> model) {
+        return new IModel<CustomerProjectPartDto>() {
+
+            private Customer customer;
+
+            @Override
+            public CustomerProjectPartDto getObject() {
+                customer = model.getObject();
+
+                if (customer != null) {
+                    for (CustomerProjectPartDto dto : projects.getObject()) {
+                        if (customer.getId().equals(dto.getCustomerId())) {
+                            return dto;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            @Override
+            public void setObject(CustomerProjectPartDto object) {
+                if (object == null) {
+                    model.setObject(null);
+                }
+
+                Integer id = object.getCustomerId();
+                if (customer != null && id.equals(customer.getId())) {
+                    model.setObject(customer);
+                }
+
+                CustomerRepository repository = getCustomerRepository();
+                customer = repository.findOne(id);
+                model.setObject(customer);
+            }
+
+            @Override
+            public void detach() {
+            }
+        };
     }
 
     private void initButtons(Form form) {
@@ -147,7 +188,7 @@ public class PageLog extends PageAppTemplate {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                userSavePerformed(target);
+                saveLogPerformed(target);
             }
 
             @Override
@@ -171,7 +212,7 @@ public class PageLog extends PageAppTemplate {
         setResponsePage(PageDashboard.class);
     }
 
-    private void userSavePerformed(AjaxRequestTarget target) {
+    private void saveLogPerformed(AjaxRequestTarget target) {
         //todo implement
     }
 }
