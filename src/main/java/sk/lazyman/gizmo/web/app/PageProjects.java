@@ -87,7 +87,7 @@ public class PageProjects extends PageAppProjects {
         columns.add(new PropertyColumn(createStringResource("Project.commercial"), Project.F_COMMERCIAL));
         columns.add(new PropertyColumn(createStringResource("Project.closed"), Project.F_CLOSED));
 
-        TablePanel table = new TablePanel(ID_TABLE, provider, columns, 25);
+        TablePanel table = new TablePanel(ID_TABLE, provider, columns, 20);
         table.setOutputMarkupId(true);
         add(table);
     }

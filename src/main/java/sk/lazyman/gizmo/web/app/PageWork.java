@@ -229,7 +229,7 @@ public class PageWork extends PageAppTemplate {
             response.success(createStringResource("Message.workSavedSuccessfully").getString());
             setResponsePage(response);
         } catch (Exception ex) {
-            handleGuiException(PageWork.class, "couldn't save work", ex, target);
+            handleGuiException(this, "Message.couldntSaveWork", ex, target);
         }
     }
 }

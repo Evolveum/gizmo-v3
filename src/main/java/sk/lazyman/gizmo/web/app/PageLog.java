@@ -15,9 +15,11 @@ import sk.lazyman.gizmo.component.form.*;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Log;
 import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.LogRepository;
+import sk.lazyman.gizmo.repository.WorkRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
@@ -135,7 +137,7 @@ public class PageLog extends PageAppTemplate {
         form.add(description);
 
         HFormGroup trackId = new HFormGroup(ID_TRACK_ID, new PropertyModel<String>(model, Log.F_TRACK_ID),
-                createStringResource("AbstractTask.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+                createStringResource("AbstractTask.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, false);
         form.add(trackId);
 
         initButtons(form);
@@ -213,6 +215,18 @@ public class PageLog extends PageAppTemplate {
     }
 
     private void saveLogPerformed(AjaxRequestTarget target) {
-        //todo implement
+        LogRepository repository = getLogRepository();
+        try {
+            Log log = model.getObject();
+            log = repository.save(log);
+
+            model.setObject(log);
+
+            PageDashboard response = new PageDashboard();
+            response.success(createStringResource("Message.logSavedSuccessfully").getString());
+            setResponsePage(response);
+        } catch (Exception ex) {
+            handleGuiException(this, "Message.couldntSaveLog", ex, target);
+        }
     }
 }

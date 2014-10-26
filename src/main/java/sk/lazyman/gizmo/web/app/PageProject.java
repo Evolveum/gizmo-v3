@@ -114,7 +114,7 @@ public class PageProject extends PageAppProjects {
 
         DropDownFormGroup customer = new DropDownFormGroup(ID_CUSTOMER,
                 new PropertyModel<Customer>(model, Project.F_CUSTOMER),
-                createStringResource("Project.customer"), false);
+                createStringResource("Project.customer"), true);
         customer.setChoices(new LoadableModel<List<Customer>>(false) {
 
             @Override

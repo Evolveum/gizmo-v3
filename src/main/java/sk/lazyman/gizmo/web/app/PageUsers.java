@@ -28,7 +28,7 @@ public class PageUsers extends PageAppUsers {
     }
 
     private void initLayout() {
-        BasicDataProvider provider = new BasicDataProvider(getUserRepository(), 15);
+        BasicDataProvider provider = new BasicDataProvider(getUserRepository());
         provider.setSort(new Sort(Sort.Direction.ASC, User.F_NAME));
 
         List<IColumn> columns = new ArrayList<>();
@@ -43,7 +43,7 @@ public class PageUsers extends PageAppUsers {
         columns.add(new PropertyColumn(createStringResource("User.familyName"), User.F_FAMILY_NAME));
         columns.add(new PropertyColumn(createStringResource("User.ldapDn"), User.F_LDAP_DN));
 
-        TablePanel table = new TablePanel(ID_TABLE, provider, columns, 15);
+        TablePanel table = new TablePanel(ID_TABLE, provider, columns, 20);
         add(table);
     }
 

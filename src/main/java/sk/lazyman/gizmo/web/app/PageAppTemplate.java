@@ -122,12 +122,14 @@ public class PageAppTemplate extends PageTemplate {
         };
     }
 
-    protected void handleGuiException(Class type, String message, Exception ex, AjaxRequestTarget target) {
-        Logger LOG = LoggerFactory.getLogger(type);
+    protected void handleGuiException(PageTemplate page, String message, Exception ex, AjaxRequestTarget target) {
+        Logger LOG = LoggerFactory.getLogger(page.getClass());
         LOG.error("Exception occurred, {}, reason: {}", message, ex.getMessage());
         if (LOG.isDebugEnabled()) {
             LOG.debug("Exception occurred, {}", ex);
         }
+
+        page.error(createStringResource(message, ex.getMessage()).getString());
 
         if (target != null) {
             target.add(getFeedbackPanel());

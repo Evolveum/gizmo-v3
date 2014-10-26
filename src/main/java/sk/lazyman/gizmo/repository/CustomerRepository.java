@@ -17,4 +17,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer>, Qu
 
     @Query("from Customer c where c.type = 2 order by c.name")
     public List<Customer> listPartners();
+
+    @Query("select distinct c from Customer c left join c.projects p where p.closed != false")
+    public List<Customer> listCustomersWithOpenProjects();
 }

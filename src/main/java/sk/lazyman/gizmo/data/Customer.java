@@ -17,6 +17,7 @@ public class Customer implements Serializable {
     public static final String F_DESCRIPTION = "description";
     public static final String F_TYPE = "type";
     public static final String F_PARTNER = "partner";
+    public static final String F_PROJECTS = "projects";
 
     private Integer id;
     private String name;
@@ -24,6 +25,7 @@ public class Customer implements Serializable {
     private CustomerType type;
     private Customer partner;
     private Set<Notification> notifications;
+    private Set<Project> projects;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_id")
@@ -54,6 +56,15 @@ public class Customer implements Serializable {
     @OneToMany(mappedBy = Notification.F_CUSTOMER)
     public Set<Notification> getNotifications() {
         return notifications;
+    }
+
+    @OneToMany(mappedBy = Project.F_CUSTOMER)
+    public Set<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Set<Project> projects) {
+        this.projects = projects;
     }
 
     public void setNotifications(Set<Notification> notifications) {

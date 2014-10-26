@@ -15,6 +15,7 @@ import sk.lazyman.gizmo.data.Part;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
+import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.PartRepository;
 import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.repository.UserRepository;
@@ -29,6 +30,8 @@ import java.util.*;
 public class GizmoUtils {
 
     public static final int DESCRIPTION_SIZE = 3000;
+
+    private static final Logger LOG = LoggerFactory.getLogger(GizmoUtils.class);
 
     public static Date clearTime(Date date) {
         if (date == null) {
@@ -178,23 +181,22 @@ public class GizmoUtils {
 
             @Override
             protected List<CustomerProjectPartDto> load() {
+                List<CustomerProjectPartDto> list = new ArrayList<>();
                 try {
                     if (showCustomers && showProjects && !showParts) {
-                        return listCustomersProjects(page);
-                    }
-
-                    if (showCustomers && showProjects && showParts) {
-                        return listCustomersProjectsParts(page);
-                    }
-
-                    if (showCustomers && !showProjects && !showParts) {
-                        return listCustomers(page);
+                        list = listCustomersProjects(page);
+                    } else if (showCustomers && showProjects && showParts) {
+                        list = listCustomersProjectsParts(page);
+                    } else if (showCustomers && !showProjects && !showParts) {
+                        list = listCustomers(page);
                     }
                 } catch (Exception ex) {
                     handleModelException(page, "Message.couldntLoadProjectData", ex);
                 }
 
-                return new ArrayList<>();
+                LOG.debug("Found {} items.", list.size());
+
+                return list;
             }
         };
     }
@@ -230,8 +232,17 @@ public class GizmoUtils {
     }
 
     private static List<CustomerProjectPartDto> listCustomers(PageTemplate page) {
-        //todo implement
-        return new ArrayList<>();
+        List<CustomerProjectPartDto> list = new ArrayList<>();
+
+        CustomerRepository repository = page.getCustomerRepository();
+        List<Customer> customers = repository.listCustomersWithOpenProjects();
+        for (Customer customer : customers) {
+            list.add(new CustomerProjectPartDto(customer.getName(), customer.getId()));
+        }
+
+        Collections.sort(list);
+
+        return list;
     }
 
     private static List<CustomerProjectPartDto> listCustomersProjects(PageTemplate page) {

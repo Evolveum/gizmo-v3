@@ -87,7 +87,7 @@ public class PageCustomers extends PageAppCustomers {
         columns.add(new PropertyColumn(createStringResource("Customer.description"), Customer.F_DESCRIPTION));
         columns.add(new PropertyColumn(createStringResource("Customer.partner"), Customer.F_PARTNER));
 
-        TablePanel table = new TablePanel(ID_TABLE, provider, columns, 25);
+        TablePanel table = new TablePanel(ID_TABLE, provider, columns, 20);
         table.setOutputMarkupId(true);
         add(table);
     }
