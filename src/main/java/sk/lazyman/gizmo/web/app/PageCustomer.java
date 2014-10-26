@@ -9,6 +9,7 @@ import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.EnumChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -62,6 +63,19 @@ public class PageCustomer extends PageAppCustomers {
         this.model = model;
 
         initLayout();
+    }
+
+    @Override
+    protected IModel<String> createPageTitleModel() {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                Integer id = getIntegerParam(CUSTOMER_ID);
+                String key = id != null ? "page.title.edit" : "page.title";
+                return createStringResource(key).getString();
+            }
+        };
     }
 
     private Customer loadCustomer() {

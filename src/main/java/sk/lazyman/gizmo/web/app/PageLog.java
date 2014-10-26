@@ -6,6 +6,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
@@ -15,11 +16,9 @@ import sk.lazyman.gizmo.component.form.*;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Log;
 import sk.lazyman.gizmo.data.User;
-import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.LogRepository;
-import sk.lazyman.gizmo.repository.WorkRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
@@ -73,6 +72,19 @@ public class PageLog extends PageAppTemplate {
         this.model = model;
 
         initLayout();
+    }
+
+    @Override
+    protected IModel<String> createPageTitleModel() {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                Integer logId = getIntegerParam(LOG_ID);
+                String key = logId != null ? "page.title.edit" : "page.title";
+                return createStringResource(key).getString();
+            }
+        };
     }
 
     private Log loadLog() {

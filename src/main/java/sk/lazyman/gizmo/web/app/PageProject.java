@@ -9,6 +9,7 @@ import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -96,6 +97,19 @@ public class PageProject extends PageAppProjects {
         }
 
         return project;
+    }
+
+    @Override
+    protected IModel<String> createPageTitleModel() {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                Integer id = getIntegerParam(PROJECT_ID);
+                String key = id != null ? "page.title.edit" : "page.title";
+                return createStringResource(key).getString();
+            }
+        };
     }
 
     private void initLayout() {
@@ -189,7 +203,19 @@ public class PageProject extends PageAppProjects {
     }
 
     private void savePerformed(AjaxRequestTarget target) {
-        //todo implement
+        ProjectRepository repository = getProjectRepository();
+        try {
+            Project project = model.getObject();
+            project = repository.save(project);
+
+            model.setObject(project);
+
+            PageProjects response = new PageProjects();
+            response.success(createStringResource("Message.projectSavedSuccessfully").getString());
+            setResponsePage(response);
+        } catch (Exception ex) {
+            handleGuiException(this, "Message.couldntSaveProject", ex, target);
+        }
     }
 
     private void newPartPerformed(AjaxRequestTarget target) {

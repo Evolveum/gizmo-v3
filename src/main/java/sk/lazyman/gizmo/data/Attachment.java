@@ -1,5 +1,7 @@
 package sk.lazyman.gizmo.data;
 
+import sk.lazyman.gizmo.util.GizmoUtils;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -13,9 +15,11 @@ public class Attachment implements Serializable {
     public static final String F_NAME = "name";
     public static final String F_VALUE = "value";
     public static final String F_WORK = "work";
+    public static final String F_DESCRIPTION = "description";
 
     private Integer id;
     private String name;
+    private String description;
     private byte[] value;
     private Work work;
 
@@ -33,6 +37,15 @@ public class Attachment implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    @Column(length = GizmoUtils.DESCRIPTION_SIZE)
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public byte[] getValue() {
@@ -77,6 +90,7 @@ public class Attachment implements Serializable {
         final StringBuilder sb = new StringBuilder("Attachment{");
         sb.append("id=").append(id);
         sb.append(", name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
         sb.append(", work='").append(work).append('\'');
         sb.append('}');
         return sb.toString();

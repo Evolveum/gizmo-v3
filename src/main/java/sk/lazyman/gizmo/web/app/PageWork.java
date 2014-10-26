@@ -6,6 +6,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
@@ -72,6 +73,19 @@ public class PageWork extends PageAppTemplate {
         this.model = model;
 
         initLayout();
+    }
+
+    @Override
+    protected IModel<String> createPageTitleModel() {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                Integer workId = getIntegerParam(WORK_ID);
+                String key = workId != null ? "page.title.edit" : "page.title";
+                return createStringResource(key).getString();
+            }
+        };
     }
 
     private Work loadWork() {
