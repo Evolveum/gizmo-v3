@@ -108,7 +108,6 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
         return sb.toString();
     }
 
-    //todo improve
     public boolean match(String input) {
         LOG.trace("Matching '{}'", input);
 
@@ -119,15 +118,17 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
         input = input.toLowerCase().trim();
         if (!input.contains("/")) {
             LOG.trace("Input doesn't contain '/'.");
-            return match(input, input, false);
+            return matchCustomerProject(input, input, false);
         } else {
             String[] array = input.split("/");
             switch (array.length) {
                 case 3:
-
+                    return matchCustomerProject(array[0].trim(), array[1].trim(), true)
+                            && matchProjectPart(array[1].trim(), array[2].trim(), true);
                 case 2:
                     LOG.trace("Input contain '/' and two parts.");
-                    return match(array[0].trim(), array[1].trim(), true);
+                    return matchCustomerProject(array[0].trim(), array[1].trim(), true)
+                            || matchProjectPart(array[0].trim(), array[1].trim(), true);
                 default:
                     LOG.trace("Input contain '/'.");
                     boolean retVal;
@@ -137,7 +138,7 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
                             continue;
                         }
 
-                        retVal = match(item, item, false);
+                        retVal = matchCustomerProject(item, item, false);
                         if (retVal) {
                             return true;
                         }
@@ -148,8 +149,23 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
         return false;
     }
 
-    //todo improve
-    private boolean match(String customer, String project, boolean and) {
+    private boolean matchProjectPart(String project, String part, boolean and) {
+        if (and) {
+            return projectName != null && projectName.toLowerCase().contains(project)
+                    && partName != null && partName.toLowerCase().contains(part);
+        }
+
+        if (projectName != null && projectName.toLowerCase().contains(project)) {
+            return true;
+        }
+        if (partName != null && partName.toLowerCase().contains(part)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean matchCustomerProject(String customer, String project, boolean and) {
         if (and) {
             return customerName != null && customerName.toLowerCase().contains(customer)
                     && projectName != null && projectName.toLowerCase().contains(project);
@@ -165,7 +181,6 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
         return false;
     }
 
-    //todo improve
     @Override
     public int compareTo(CustomerProjectPartDto o) {
         if (o == null) {
@@ -177,9 +192,6 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
             return val;
         }
 
-        if (projectName == o.projectName) {
-            return 0;
-        }
         if (projectName == null && o.projectName != null) {
             return -1;
         }
@@ -187,6 +199,22 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
             return 1;
         }
 
-        return projectName.compareTo(projectName);
+        val = projectName != null ? projectName.compareTo(o.projectName) : 0;
+        if (val != 0) {
+            return val;
+        }
+
+        if (partName == o.partName) {
+            return 0;
+        }
+
+        if (partName == null && o.partName != null) {
+            return -1;
+        }
+        if (partName != null && o.partName == null) {
+            return 1;
+        }
+
+        return partName.compareTo(o.partName);
     }
 }

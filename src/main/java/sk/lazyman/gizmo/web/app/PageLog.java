@@ -3,22 +3,22 @@ package sk.lazyman.gizmo.web.app;
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
-import sk.lazyman.gizmo.component.form.*;
+import sk.lazyman.gizmo.component.form.HAreaFormGroup;
+import sk.lazyman.gizmo.component.form.HDateFormGroup;
+import sk.lazyman.gizmo.component.form.HDropDownFormGroup;
+import sk.lazyman.gizmo.component.form.HFormGroup;
 import sk.lazyman.gizmo.data.Log;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.repository.LogRepository;
-import sk.lazyman.gizmo.repository.UserRepository;
-import sk.lazyman.gizmo.repository.WorkRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
@@ -44,7 +44,6 @@ public class PageLog extends PageAppTemplate {
     private static final String ID_TRACK_ID = "trackId";
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
-    private static final String ID_IS_WORK_LOG = "isWorkLog";
     private static final String ID_PART = "part";
     private static final String ID_CUSTOMER = "customer";
 
@@ -52,7 +51,10 @@ public class PageLog extends PageAppTemplate {
     private static final String TEXT_SIZE = "col-sm-5 col-md-4";
     private static final String FEEDBACK_SIZE = "col-sm-4 col-md-4";
 
-    private IModel<List<User>> users;
+    private IModel<List<User>> users = GizmoUtils.createUsersModel(this);
+    private IModel<List<CustomerProjectPartDto>> projects =
+            GizmoUtils.createCustomerProjectPartList(this, true, false, false);
+
     private IModel<Log> model;
 
     public PageLog() {
@@ -64,14 +66,6 @@ public class PageLog extends PageAppTemplate {
             }
         };
 
-        users = new LoadableModel<List<User>>(false) {
-
-            @Override
-            protected List<User> load() {
-                return loadUsers();
-            }
-        };
-
         initLayout();
     }
 
@@ -80,11 +74,6 @@ public class PageLog extends PageAppTemplate {
         this.model = model;
 
         initLayout();
-    }
-
-    private List<User> loadUsers() {
-        UserRepository repository = getUserRepository();
-        return repository.listUsersOrderByGivenFamilyName();
     }
 
     private Log loadLog() {

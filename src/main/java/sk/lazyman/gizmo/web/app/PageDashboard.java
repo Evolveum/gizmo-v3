@@ -29,8 +29,6 @@ import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.*;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
-import sk.lazyman.gizmo.data.Customer;
-import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
@@ -38,7 +36,6 @@ import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.data.provider.WorkDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
-import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
@@ -46,7 +43,9 @@ import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author lazyman
@@ -68,40 +67,10 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_SUMMARY_PARTS = "summaryParts";
 
     private IModel<WorkFilterDto> filter;
-    private IModel<List<CustomerProjectPartDto>> projects;
+    private IModel<List<CustomerProjectPartDto>> projects =
+            GizmoUtils.createCustomerProjectPartList(this, true, true, false);
 
     public PageDashboard() {
-        projects = new LoadableModel<List<CustomerProjectPartDto>>(false) {
-
-            @Override
-            protected List<CustomerProjectPartDto> load() {
-                List<CustomerProjectPartDto> list = new ArrayList<>();
-
-                ProjectRepository repository = getProjectRepository();
-                List<Project> projects = repository.findOpenedProjects();
-                Set<Customer> customers = new HashSet<>();
-
-                for (Project project : projects) {
-                    Customer customer = project.getCustomer();
-                    String customerName = null;
-                    if (customer != null) {
-                        customers.add(customer);
-                        customerName = customer.getName();
-                    }
-
-                    list.add(new CustomerProjectPartDto(customerName, project.getName(), project.getId()));
-                }
-
-                for (Customer customer : customers) {
-                    list.add(new CustomerProjectPartDto(customer.getName(), customer.getId()));
-                }
-
-                Collections.sort(list);
-
-                return list;
-            }
-        };
-
         filter = new LoadableModel<WorkFilterDto>(false) {
 
             @Override
@@ -133,7 +102,7 @@ public class PageDashboard extends PageAppTemplate {
         form.add(new DateTextField(ID_TO, new PropertyModel<Date>(filter, WorkFilterDto.F_TO)));
 
         form.add(new DropDownChoice<User>(ID_REALIZATOR, new PropertyModel<User>(filter, WorkFilterDto.F_REALIZATOR),
-                GizmoUtils.createUserModel(getUserRepository()), GizmoUtils.createUserChoiceRenderer()) {
+                GizmoUtils.createUsersModel(this), GizmoUtils.createUserChoiceRenderer()) {
 
             @Override
             protected String getNullValidKey() {

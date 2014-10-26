@@ -12,18 +12,17 @@ import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.*;
-import sk.lazyman.gizmo.data.*;
+import sk.lazyman.gizmo.data.Part;
+import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.repository.PartRepository;
-import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.repository.WorkRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -50,35 +49,9 @@ public class PageWork extends PageAppTemplate {
     private static final String TEXT_SIZE = "col-sm-5 col-md-4";
     private static final String FEEDBACK_SIZE = "col-sm-4 col-md-4";
 
-    private IModel<List<User>> users = new LoadableModel<List<User>>(false) {
-
-        @Override
-        protected List<User> load() {
-            return loadUsers();
-        }
-    };
-
-    private IModel<List<CustomerProjectPartDto>> projects = new LoadableModel<List<CustomerProjectPartDto>>(false) {
-
-        @Override
-        protected List<CustomerProjectPartDto> load() {
-            List<CustomerProjectPartDto> list = new ArrayList<>();
-
-            PartRepository repository = getProjectPartRepository();
-            List<Part> parts = repository.findOpenedProjectParts();
-            for (Part part : parts) {
-                Project project = part.getProject();
-                Customer customer = project.getCustomer();
-
-                list.add(new CustomerProjectPartDto(customer.getName(), project.getName(),
-                        part.getName(), part.getId()));
-            }
-
-            Collections.sort(list);
-
-            return list;
-        }
-    };
+    private IModel<List<User>> users = GizmoUtils.createUsersModel(this);
+    private IModel<List<CustomerProjectPartDto>> projects =
+            GizmoUtils.createCustomerProjectPartList(this, true, true, true);
 
     private IModel<Work> model;
 
@@ -99,11 +72,6 @@ public class PageWork extends PageAppTemplate {
         this.model = model;
 
         initLayout();
-    }
-
-    private List<User> loadUsers() {
-        UserRepository repository = getUserRepository();
-        return repository.listUsersOrderByGivenFamilyName();
     }
 
     private Work loadWork() {

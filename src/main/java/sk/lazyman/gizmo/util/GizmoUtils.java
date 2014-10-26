@@ -2,16 +2,24 @@ package sk.lazyman.gizmo.util;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.StringResourceModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Part;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
+import sk.lazyman.gizmo.repository.PartRepository;
+import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.repository.UserRepository;
+import sk.lazyman.gizmo.web.PageTemplate;
+import sk.lazyman.gizmo.web.error.PageError;
 
 import java.util.*;
 
@@ -96,16 +104,6 @@ public class GizmoUtils {
         return cal.getTime();
     }
 
-    public static IModel<List<User>> createUserModel(final UserRepository repo) {
-        return new LoadableModel<List<User>>(false) {
-
-            @Override
-            protected List<User> load() {
-                return repo.findAll(new Sort(Sort.Direction.ASC, User.F_GIVEN_NAME, User.F_FAMILY_NAME));
-            }
-        };
-    }
-
     public static <T extends Enum> IModel<String> createLocalizedModelForEnum(T value, Component comp) {
         String key = value != null ? value.getClass().getSimpleName() + "." + value.name() : "";
         return new StringResourceModel(key, comp, null);
@@ -152,5 +150,114 @@ public class GizmoUtils {
                 return Integer.toString(index);
             }
         };
+    }
+
+    public static IModel<List<User>> createUsersModel(final PageTemplate page) {
+        return new LoadableModel<List<User>>(false) {
+
+            @Override
+            protected List<User> load() {
+                try {
+                    UserRepository repository = page.getUserRepository();
+
+                    return repository.findAll(new Sort(Sort.Direction.ASC, User.F_GIVEN_NAME, User.F_FAMILY_NAME));
+                } catch (Exception ex) {
+                    handleModelException(page, "Message.couldntLoadUsers", ex);
+                }
+
+                return new ArrayList<>();
+            }
+        };
+    }
+
+    public static IModel<List<CustomerProjectPartDto>> createCustomerProjectPartList(final PageTemplate page,
+                                                                                     final boolean showCustomers,
+                                                                                     final boolean showProjects,
+                                                                                     final boolean showParts) {
+        return new LoadableModel<List<CustomerProjectPartDto>>(false) {
+
+            @Override
+            protected List<CustomerProjectPartDto> load() {
+                try {
+                    if (showCustomers && showProjects && !showParts) {
+                        return listCustomersProjects(page);
+                    }
+
+                    if (showCustomers && showProjects && showParts) {
+                        return listCustomersProjectsParts(page);
+                    }
+
+                    if (showCustomers && !showProjects && !showParts) {
+                        return listCustomers(page);
+                    }
+                } catch (Exception ex) {
+                    handleModelException(page, "Message.couldntLoadProjectData", ex);
+                }
+
+                return new ArrayList<>();
+            }
+        };
+    }
+
+    private static void handleModelException(PageTemplate page, String message, Exception ex) {
+        Logger LOG = LoggerFactory.getLogger(page.getClass());
+        LOG.error("Exception occurred, {}, reason: {}", message, ex.getMessage());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Exception occurred, {}", ex);
+        }
+
+        PageError errorPage = new PageError();
+        errorPage.error(page.createStringResource(message, ex.getMessage()).getString());
+        throw new RestartResponseException(errorPage);
+    }
+
+    private static List<CustomerProjectPartDto> listCustomersProjectsParts(PageTemplate page) {
+        List<CustomerProjectPartDto> list = new ArrayList<>();
+
+        PartRepository repository = page.getProjectPartRepository();
+        List<Part> parts = repository.findOpenedProjectParts();
+        for (Part part : parts) {
+            Project project = part.getProject();
+            Customer customer = project.getCustomer();
+
+            list.add(new CustomerProjectPartDto(customer.getName(), project.getName(),
+                    part.getName(), part.getId()));
+        }
+
+        Collections.sort(list);
+
+        return list;
+    }
+
+    private static List<CustomerProjectPartDto> listCustomers(PageTemplate page) {
+        //todo implement
+        return new ArrayList<>();
+    }
+
+    private static List<CustomerProjectPartDto> listCustomersProjects(PageTemplate page) {
+        List<CustomerProjectPartDto> list = new ArrayList<>();
+
+        ProjectRepository repository = page.getProjectRepository();
+        List<Project> projects = repository.findOpenedProjects();
+        Set<Customer> customers = new HashSet<>();
+
+        for (Project project : projects) {
+            Customer customer = project.getCustomer();
+            String customerName = null;
+            if (customer != null) {
+                customers.add(customer);
+                customerName = customer.getName();
+            }
+
+            list.add(new CustomerProjectPartDto(customerName, project.getName(), project.getId()));
+        }
+
+        for (Customer customer : customers) {
+            list.add(new CustomerProjectPartDto(customer.getName(), customer.getId()));
+        }
+
+        Collections.sort(list);
+
+        return list;
     }
 }

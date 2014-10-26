@@ -73,7 +73,7 @@ public class PageEmails extends PageAppTemplate {
         form.add(new DateTextField(ID_TO, new PropertyModel<Date>(filter, EmailFilterDto.F_TO)));
 
         form.add(new DropDownChoice<User>(ID_SENDER, new PropertyModel<User>(filter, EmailFilterDto.F_SENDER),
-                GizmoUtils.createUserModel(getUserRepository()), new IChoiceRenderer<User>() {
+                GizmoUtils.createUsersModel(this), new IChoiceRenderer<User>() {
 
             @Override
             public Object getDisplayValue(User object) {
