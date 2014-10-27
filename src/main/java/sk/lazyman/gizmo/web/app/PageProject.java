@@ -53,6 +53,7 @@ public class PageProject extends PageAppProjects {
     private static final String ID_SAVE = "save";
     private static final String ID_TABS = "tabs";
     private static final String ID_PROJECT_PART = "projectPart";
+    private static final String ID_DIALOG_FORM = "dialogForm";
 
     private IModel<Project> model;
 
@@ -76,8 +77,11 @@ public class PageProject extends PageAppProjects {
     }
 
     private void initDialogs() {
+        Form dialogForm = new Form(ID_DIALOG_FORM);
+        add(dialogForm);
+
         ProjectPartModal modal = new ProjectPartModal(ID_PROJECT_PART);
-        add(modal);
+        dialogForm.add(modal);
     }
 
     private Project loadProject() {
@@ -123,12 +127,13 @@ public class PageProject extends PageAppProjects {
         form.add(name);
 
         FormGroup description = new AreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Project.F_DESCRIPTION),
-                createStringResource("Project.description"), true);
+                createStringResource("Project.description"), false);
         form.add(description);
 
         DropDownFormGroup customer = new DropDownFormGroup(ID_CUSTOMER,
                 new PropertyModel<Customer>(model, Project.F_CUSTOMER),
                 createStringResource("Project.customer"), true);
+        customer.setNullValid(false);
         customer.setChoices(new LoadableModel<List<Customer>>(false) {
 
             @Override
@@ -219,9 +224,13 @@ public class PageProject extends PageAppProjects {
     }
 
     private void newPartPerformed(AjaxRequestTarget target) {
-        Modal modal = (Modal) get(ID_PROJECT_PART);
+        Modal modal = (Modal) get(ID_DIALOG_FORM + ":" + ID_PROJECT_PART);
         target.add(modal);
         modal.show(target);
-        modal.setModel(new Model(new Part()));
+
+        Part part = new Part();
+        part.setProject(model.getObject());
+
+        modal.setModel(new Model(part));
     }
 }

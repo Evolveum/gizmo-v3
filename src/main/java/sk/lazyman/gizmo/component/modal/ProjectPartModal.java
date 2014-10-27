@@ -1,11 +1,11 @@
 package sk.lazyman.gizmo.component.modal;
 
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxButton;
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons;
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.*;
-import sk.lazyman.gizmo.component.AjaxButton;
-import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.Part;
@@ -15,13 +15,10 @@ import sk.lazyman.gizmo.data.Part;
  */
 public class ProjectPartModal extends Modal<Part> {
 
-    private static final String ID_FORM = "form";
     private static final String ID_LABEL = "label";
     private static final String ID_NAME = "name";
     private static final String ID_DESCRIPTION = "description";
     private static final String ID_PROJECT = "project";
-    private static final String ID_SAVE = "save";
-    private static final String ID_CANCEL = "cancel";
 
     public ProjectPartModal(String id) {
         super(id, new Model<>(new Part()));
@@ -44,28 +41,33 @@ public class ProjectPartModal extends Modal<Part> {
     }
 
     private void initLayout() {
-        Form form = new Form(ID_FORM);
-        add(form);
-
         FormGroup name = new FormGroup(ID_NAME,
                 new PropertyModel<String>(getModel(), Part.F_NAME),
                 createStringResource("Part.name"), true);
-        form.add(name);
+        add(name);
 
         FormGroup description = new AreaFormGroup(ID_DESCRIPTION,
                 new PropertyModel<String>(getModel(), Part.F_DESCRIPTION),
                 createStringResource("Part.description"), true);
-        form.add(description);
+        add(description);
 
-        initButtons(form);
-    }
+        BootstrapAjaxButton cancel = new BootstrapAjaxButton(BUTTON_MARKUP_ID,
+                createStringResource("GizmoApplication.button.cancel"), Buttons.Type.Default) {
 
-    private IModel<String> createStringResource(String key) {
-        return new StringResourceModel(key, this, null);
-    }
+            @Override
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                cancelPerformed(target);
+            }
 
-    private void initButtons(Form form) {
-        AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
+            @Override
+            protected void onError(AjaxRequestTarget target, Form<?> form) {
+                target.add(form);
+            }
+        };
+        addButton(cancel);
+
+        BootstrapAjaxButton save = new BootstrapAjaxButton(BUTTON_MARKUP_ID,
+                createStringResource("GizmoApplication.button.save"), Buttons.Type.Primary) {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
@@ -77,16 +79,11 @@ public class ProjectPartModal extends Modal<Part> {
                 target.add(form);
             }
         };
-        form.add(save);
+        addButton(save);
+    }
 
-        AjaxButton cancel = new AjaxButton(ID_CANCEL, createStringResource("GizmoApplication.button.cancel")) {
-
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                cancelPerformed(target);
-            }
-        };
-        form.add(cancel);
+    private IModel<String> createStringResource(String key) {
+        return new StringResourceModel(key, this, null);
     }
 
     protected void cancelPerformed(AjaxRequestTarget target) {
@@ -94,6 +91,6 @@ public class ProjectPartModal extends Modal<Part> {
     }
 
     protected void savePerformed(AjaxRequestTarget target) {
-        //todo implement
+        close(target);
     }
 }

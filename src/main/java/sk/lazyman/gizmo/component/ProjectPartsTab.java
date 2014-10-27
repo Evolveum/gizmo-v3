@@ -27,6 +27,8 @@ public class ProjectPartsTab extends SimplePanel {
     private static final String ID_TABLE = "table";
     private static final String ID_NEW_PART = "newPart";
 
+    private boolean initialized;
+
     public ProjectPartsTab(String id) {
         super(id);
     }
@@ -35,7 +37,10 @@ public class ProjectPartsTab extends SimplePanel {
     protected void onConfigure() {
         super.onConfigure();
 
-        initPanelLayout();
+        if (!initialized) {
+            initPanelLayout();
+            initialized = true;
+        }
     }
 
     private void initPanelLayout() {
