@@ -2,12 +2,12 @@
 <configuration>
     <appender name="GIZMO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <Append>true</Append>
-        <File>${catalina.base}/logs/gizmo.log</File>
+        <File>target/gizmo.log</File>
         <encoder>
             <pattern>%date [%thread] %-5level \(%logger{46}\): %message%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${catalina.base}/logs/gizmo.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <fileNamePattern>target/gizmo.log.%d{yyyy-MM-dd}</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
