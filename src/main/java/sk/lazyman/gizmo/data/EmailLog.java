@@ -74,8 +74,13 @@ public class EmailLog implements Serializable {
     }
 
     @ManyToMany(fetch = FetchType.EAGER)
-//    @JoinTable(joinColumns = {@JoinColumn(name = "log_id", nullable = false, updatable = false)},
-//            inverseJoinColumns = {@JoinColumn(name = "user_id", nullable = false, updatable = false)})
+    @JoinTable(
+            joinColumns = {
+                    @JoinColumn(name = "log_id",// nullable = false, updatable = false,
+                            foreignKey = @ForeignKey(name = "fk_emailLogUser_log"))},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "user_id",// nullable = false, updatable = false,
+                            foreignKey = @ForeignKey(name = "fk_emailLogUser_realizator"))})
     public Set<User> getRealizatorList() {
         return realizatorList;
     }

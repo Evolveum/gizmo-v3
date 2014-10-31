@@ -13,7 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.SystemPropertyUtils;
 import org.testng.annotations.Test;
-import sk.lazyman.gizmo.util.GizmoPostgreSQLDialect;
+import sk.lazyman.gizmo.util.GizmoNamingStrategy;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,15 +35,15 @@ public class SpringApplicationContextTest extends BaseTest {
     public void initApplicationContext() throws Exception {
         assertNotNull(sessionFactoryBean);
 
-        createSQLSchema("./target/postgresql-schema.sql", GizmoPostgreSQLDialect.class.getName());
+        createSQLSchema("./target/postgresql-schema.sql");
     }
 
-    private void createSQLSchema(String fileName, String dialect) throws Exception {
+    private void createSQLSchema(String fileName) throws Exception {
         org.hibernate.cfg.Configuration configuration = new Configuration();
         Properties properties = new Properties();
         properties.putAll(sessionFactoryBean.getJpaPropertyMap());
         configuration.setProperties(properties);
-        properties.setProperty("hibernate.dialect", dialect);
+        configuration.setNamingStrategy(new GizmoNamingStrategy());
 
         System.out.println("Dialect: " + properties.getProperty("hibernate.dialect"));
 

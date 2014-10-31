@@ -2,16 +2,13 @@ package sk.lazyman.gizmo.data;
 
 import com.mysema.query.annotations.QueryInit;
 
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * @author lazyman
  */
 @Entity
-//@PrimaryKeyJoinColumn(name = "id", foreignKey = @ForeignKey(name = "fk_work_abstractTask"))
+//@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(name = "asdfasdf"))
 public class Work extends AbstractTask {
 
     public static final String F_PART = "part";

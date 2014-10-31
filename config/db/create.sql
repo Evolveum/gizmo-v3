@@ -1,4 +1,21 @@
-CREATE TABLE AbstractTask (
+CREATE TABLE g_EmailLog_Project (
+  EmailLog_id    INT4 NOT NULL,
+  projectList_id INT4 NOT NULL,
+  PRIMARY KEY (EmailLog_id, projectList_id)
+);
+
+CREATE TABLE g_EmailLog_User (
+  log_id  INT4 NOT NULL,
+  user_id INT4 NOT NULL,
+  PRIMARY KEY (log_id, user_id)
+);
+
+CREATE TABLE g_Notification_emails (
+  Notification_id INT4 NOT NULL,
+  emails          VARCHAR(255)
+);
+
+CREATE TABLE g_abstract_task (
   id            INT4   NOT NULL,
   date          TIMESTAMP,
   description   VARCHAR(3000),
@@ -8,7 +25,7 @@ CREATE TABLE AbstractTask (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE Attachment (
+CREATE TABLE g_attachment (
   id          INT4 NOT NULL,
   description VARCHAR(3000),
   name        VARCHAR(255),
@@ -17,7 +34,7 @@ CREATE TABLE Attachment (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE Contact (
+CREATE TABLE g_contact (
   id          INT4 NOT NULL,
   city        VARCHAR(255),
   country     VARCHAR(255),
@@ -28,7 +45,7 @@ CREATE TABLE Contact (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE ContactValue (
+CREATE TABLE g_contact_value (
   id         INT4 NOT NULL,
   type       INT4,
   value      VARCHAR(255),
@@ -36,7 +53,7 @@ CREATE TABLE ContactValue (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE Customer (
+CREATE TABLE g_customer (
   id          INT4 NOT NULL,
   description VARCHAR(3000),
   name        VARCHAR(255),
@@ -45,7 +62,7 @@ CREATE TABLE Customer (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE EmailLog (
+CREATE TABLE g_email_log (
   id             INT4    NOT NULL,
   description    VARCHAR(3000),
   fromDate       TIMESTAMP,
@@ -61,25 +78,13 @@ CREATE TABLE EmailLog (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE EmailLog_Project (
-  EmailLog_id    INT4 NOT NULL,
-  projectList_id INT4 NOT NULL,
-  PRIMARY KEY (EmailLog_id, projectList_id)
-);
-
-CREATE TABLE EmailLog_User (
-  EmailLog_id       INT4 NOT NULL,
-  realizatorList_id INT4 NOT NULL,
-  PRIMARY KEY (EmailLog_id, realizatorList_id)
-);
-
-CREATE TABLE Log (
+CREATE TABLE g_log (
   id          INT4 NOT NULL,
   customer_id INT4,
   PRIMARY KEY (id)
 );
 
-CREATE TABLE Notification (
+CREATE TABLE g_notification (
   id          INT4      NOT NULL,
   alarm       TIMESTAMP NOT NULL,
   created     TIMESTAMP NOT NULL,
@@ -89,12 +94,7 @@ CREATE TABLE Notification (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE Notification_emails (
-  Notification_id INT4 NOT NULL,
-  emails          VARCHAR(255)
-);
-
-CREATE TABLE Part (
+CREATE TABLE g_part (
   id          INT4 NOT NULL,
   description VARCHAR(3000),
   name        VARCHAR(255),
@@ -102,7 +102,7 @@ CREATE TABLE Part (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE Project (
+CREATE TABLE g_project (
   id          INT4    NOT NULL,
   closed      BOOLEAN NOT NULL,
   commercial  BOOLEAN NOT NULL,
@@ -112,7 +112,7 @@ CREATE TABLE Project (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE User (
+CREATE TABLE g_user (
   id         INT4    NOT NULL,
   enabled    BOOLEAN NOT NULL,
   familyName VARCHAR(255),
@@ -123,120 +123,120 @@ CREATE TABLE User (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE Work (
+CREATE TABLE g_work (
   invoiceLength FLOAT4 NOT NULL,
   id            INT4   NOT NULL,
   part_id       INT4,
   PRIMARY KEY (id)
 );
 
-ALTER TABLE User
+ALTER TABLE g_user
 ADD CONSTRAINT u_ldapdn UNIQUE (ldapDn);
 
-ALTER TABLE User
+ALTER TABLE g_user
 ADD CONSTRAINT u_name UNIQUE (name);
 
-ALTER TABLE AbstractTask
+ALTER TABLE g_EmailLog_Project
+ADD CONSTRAINT FK_cekxbqvdbixd13gxa3qslkafj
+FOREIGN KEY (projectList_id)
+REFERENCES g_project;
+
+ALTER TABLE g_EmailLog_Project
+ADD CONSTRAINT FK_oi1upgvklwxnasqb43y4wuq4l
+FOREIGN KEY (EmailLog_id)
+REFERENCES g_email_log;
+
+ALTER TABLE g_EmailLog_User
+ADD CONSTRAINT FK_dubkv2pfantss2ch9msogdjr9
+FOREIGN KEY (user_id)
+REFERENCES g_user;
+
+ALTER TABLE g_EmailLog_User
+ADD CONSTRAINT FK_joe1pwy6xoxewqp2pgxcx3l76
+FOREIGN KEY (log_id)
+REFERENCES g_email_log;
+
+ALTER TABLE g_Notification_emails
+ADD CONSTRAINT FK_jr84n71h4x166rtr0nwkaqug8
+FOREIGN KEY (Notification_id)
+REFERENCES g_notification;
+
+ALTER TABLE g_abstract_task
 ADD CONSTRAINT fk_abstractTask_user
 FOREIGN KEY (realizator_id)
-REFERENCES User;
+REFERENCES g_user;
 
-ALTER TABLE Attachment
+ALTER TABLE g_attachment
 ADD CONSTRAINT fk_attachment_log
 FOREIGN KEY (log_id)
-REFERENCES Log;
+REFERENCES g_log;
 
-ALTER TABLE ContactValue
+ALTER TABLE g_contact_value
 ADD CONSTRAINT fk_contactValue_contact
 FOREIGN KEY (contact_id)
-REFERENCES Contact;
+REFERENCES g_contact;
 
-ALTER TABLE Customer
+ALTER TABLE g_customer
 ADD CONSTRAINT fk_customer_customer
 FOREIGN KEY (partner_id)
-REFERENCES Customer;
+REFERENCES g_customer;
 
-ALTER TABLE EmailLog
+ALTER TABLE g_email_log
 ADD CONSTRAINT fk_emaillog_user
 FOREIGN KEY (sender_id)
-REFERENCES User;
+REFERENCES g_user;
 
-ALTER TABLE EmailLog_Project
-ADD CONSTRAINT FK_5h11y4q3hi94tmxry29rj9yt3
-FOREIGN KEY (projectList_id)
-REFERENCES Project;
-
-ALTER TABLE EmailLog_Project
-ADD CONSTRAINT FK_bl6g2d1uxcjoy6an283bj8b15
-FOREIGN KEY (EmailLog_id)
-REFERENCES EmailLog;
-
-ALTER TABLE EmailLog_User
-ADD CONSTRAINT FK_3m3u8yasqwvowwumuaripd57c
-FOREIGN KEY (realizatorList_id)
-REFERENCES User;
-
-ALTER TABLE EmailLog_User
-ADD CONSTRAINT FK_adwogr4sj4o6ktojlse2yko5p
-FOREIGN KEY (EmailLog_id)
-REFERENCES EmailLog;
-
-ALTER TABLE Log
+ALTER TABLE g_log
 ADD CONSTRAINT fk_log_customer
 FOREIGN KEY (customer_id)
-REFERENCES Customer;
+REFERENCES g_customer;
 
-ALTER TABLE Log
-ADD CONSTRAINT FK_4hrj1flwhdimpvxwmvtf6534g
+ALTER TABLE g_log
+ADD CONSTRAINT FK_6m8l0gkoe4hubqjwmj9vw9x5x
 FOREIGN KEY (id)
-REFERENCES AbstractTask;
+REFERENCES g_abstract_task;
 
-ALTER TABLE Notification
+ALTER TABLE g_notification
 ADD CONSTRAINT fk_notification_customer
 FOREIGN KEY (customer_id)
-REFERENCES Customer;
+REFERENCES g_customer;
 
-ALTER TABLE Notification_emails
-ADD CONSTRAINT FK_d6o6s37g3nro1602635phkaev
-FOREIGN KEY (Notification_id)
-REFERENCES Notification;
-
-ALTER TABLE Part
-ADD CONSTRAINT FK_h8fjfbo2kl07u8snpis7poimx
+ALTER TABLE g_part
+ADD CONSTRAINT FK_hbetssupir7kry5d3ik0209np
 FOREIGN KEY (project_id)
-REFERENCES Project;
+REFERENCES g_project;
 
-ALTER TABLE Project
+ALTER TABLE g_project
 ADD CONSTRAINT fk_project_customer
 FOREIGN KEY (customer_id)
-REFERENCES Customer;
+REFERENCES g_customer;
 
-ALTER TABLE Work
+ALTER TABLE g_work
 ADD CONSTRAINT fk_work_part
 FOREIGN KEY (part_id)
-REFERENCES Part;
+REFERENCES g_part;
 
-ALTER TABLE Work
-ADD CONSTRAINT FK_9felfxkau9dqjbvpux357btt0
+ALTER TABLE g_work
+ADD CONSTRAINT FK_isskwp31rcqe9lppoo5l1earh
 FOREIGN KEY (id)
-REFERENCES AbstractTask;
+REFERENCES g_abstract_task;
 
-CREATE SEQUENCE g_attachment_id_seq START 1 INCREMENT 50;
+CREATE SEQUENCE g_attachment_id_seq START 30000 INCREMENT 50;
 
-CREATE SEQUENCE g_contact_id_seq START 1 INCREMENT 50;
+CREATE SEQUENCE g_contact_id_seq START 30000 INCREMENT 50;
 
-CREATE SEQUENCE g_contact_value_id_seq START 1 INCREMENT 50;
+CREATE SEQUENCE g_contact_value_id_seq START 30000 INCREMENT 50;
 
-CREATE SEQUENCE g_customer_id_seq START 1 INCREMENT 50;
+CREATE SEQUENCE g_customer_id_seq START 30000 INCREMENT 50;
 
-CREATE SEQUENCE g_email_log_id_seq START 1 INCREMENT 50;
+CREATE SEQUENCE g_email_log_id_seq START 30000 INCREMENT 50;
 
-CREATE SEQUENCE g_notification_id_seq START 1 INCREMENT 50;
+CREATE SEQUENCE g_notification_id_seq START 30000 INCREMENT 50;
 
-CREATE SEQUENCE g_part_id_seq START 1 INCREMENT 50;
+CREATE SEQUENCE g_part_id_seq START 30000 INCREMENT 50;
 
-CREATE SEQUENCE g_project_id_seq START 1 INCREMENT 50;
+CREATE SEQUENCE g_project_id_seq START 30000 INCREMENT 50;
 
-CREATE SEQUENCE g_task_id_seq START 1 INCREMENT 50;
+CREATE SEQUENCE g_task_id_seq START 30000 INCREMENT 50;
 
-CREATE SEQUENCE g_user_id_seq START 1 INCREMENT 50;
+CREATE SEQUENCE g_user_id_seq START 30000 INCREMENT 50;
