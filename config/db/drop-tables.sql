@@ -11,3 +11,5 @@ drop table g_user cascade;
 drop table g_work cascade;
 drop table g_notification cascade;
 drop table g_notification_emails cascade;
+drop table g_abstract_task cascade;
+drop table g_log cascade;

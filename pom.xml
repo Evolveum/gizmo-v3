@@ -25,6 +25,7 @@
         <logback.version>0.9.29</logback.version>
         <querydsl.version>3.4.3</querydsl.version>
         <boostrap.switch.version>3.0.2</boostrap.switch.version>
+        <h2.version>1.4.182</h2.version>
     </properties>
 
     <dependencies>
@@ -207,9 +208,16 @@
 
         <!-- TEST -->
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -228,6 +236,12 @@
             <artifactId>log4j-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

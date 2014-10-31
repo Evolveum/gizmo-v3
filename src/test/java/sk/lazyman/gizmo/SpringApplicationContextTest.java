@@ -18,6 +18,7 @@ import sk.lazyman.gizmo.util.GizmoPostgreSQLDialect;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import static org.testng.AssertJUnit.assertNotNull;
 
@@ -39,10 +40,12 @@ public class SpringApplicationContextTest extends BaseTest {
 
     private void createSQLSchema(String fileName, String dialect) throws Exception {
         org.hibernate.cfg.Configuration configuration = new Configuration();
-        configuration.setProperties(sessionFactoryBean.getHibernateProperties());
-        sessionFactoryBean.getHibernateProperties().setProperty("hibernate.dialect", dialect);
+        Properties properties = new Properties();
+        properties.putAll(sessionFactoryBean.getJpaPropertyMap());
+        configuration.setProperties(properties);
+        properties.setProperty("hibernate.dialect", dialect);
 
-        System.out.println("Dialect: " + sessionFactoryBean.getHibernateProperties().getProperty("hibernate.dialect"));
+        System.out.println("Dialect: " + properties.getProperty("hibernate.dialect"));
 
         addAnnotatedClasses("sk.lazyman.gizmo.data", configuration);
 
