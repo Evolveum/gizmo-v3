@@ -9,6 +9,10 @@ import java.io.Serializable;
  * @author lazyman
  */
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = "ldapDn", name = "u_ldapdn"),
+        @UniqueConstraint(columnNames = "name", name = "u_name")
+})
 public class User implements Serializable {
 
     public static final String F_ID = "id";
@@ -34,7 +38,6 @@ public class User implements Serializable {
         return id;
     }
 
-    @Column(unique = true)
     public String getName() {
         return name;
     }
@@ -47,7 +50,6 @@ public class User implements Serializable {
         return familyName;
     }
 
-    @Column(unique = true)
     public String getLdapDn() {
         return ldapDn;
     }

@@ -48,6 +48,7 @@ public class Notification implements Serializable {
     }
 
     @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_notification_customer"))
     public Customer getCustomer() {
         return customer;
     }

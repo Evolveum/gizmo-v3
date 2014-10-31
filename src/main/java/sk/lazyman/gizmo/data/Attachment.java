@@ -14,14 +14,14 @@ public class Attachment implements Serializable {
     public static final String F_ID = "id";
     public static final String F_NAME = "name";
     public static final String F_VALUE = "value";
-    public static final String F_WORK = "work";
+    public static final String F_LOG = "log";
     public static final String F_DESCRIPTION = "description";
 
     private Integer id;
     private String name;
     private String description;
     private byte[] value;
-    private Work work;
+    private Log log;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "attachment_id")
@@ -31,8 +31,9 @@ public class Attachment implements Serializable {
     }
 
     @ManyToOne
-    public Work getWork() {
-        return work;
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_attachment_log"))
+    public Log getLog() {
+        return log;
     }
 
     public String getName() {
@@ -64,8 +65,8 @@ public class Attachment implements Serializable {
         this.value = value;
     }
 
-    public void setWork(Work work) {
-        this.work = work;
+    public void setLog(Log log) {
+        this.log = log;
     }
 
     @Override
@@ -91,7 +92,7 @@ public class Attachment implements Serializable {
         sb.append("id=").append(id);
         sb.append(", name='").append(name).append('\'');
         sb.append(", description='").append(description).append('\'');
-        sb.append(", work='").append(work).append('\'');
+        sb.append(", log='").append(log).append('\'');
         sb.append('}');
         return sb.toString();
     }

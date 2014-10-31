@@ -49,6 +49,7 @@ public class Customer implements Serializable {
     }
 
     @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_customer_customer"))
     public Customer getPartner() {
         return partner;
     }

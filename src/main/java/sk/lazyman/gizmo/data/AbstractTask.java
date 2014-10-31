@@ -37,6 +37,7 @@ public class AbstractTask implements Serializable {
     }
 
     @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_abstractTask_user"))
     public User getRealizator() {
         return realizator;
     }

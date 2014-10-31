@@ -1,9 +1,6 @@
 package sk.lazyman.gizmo.data;
 
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -11,7 +8,7 @@ import java.util.Set;
  * @author lazyman
  */
 @Entity
-//@ForeignKey(name = "g_fk_log")
+@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(name = "fk_log_abstractTask"))
 public class Log extends AbstractTask {
 
     public static final String F_CUSTOMER = "customer";
@@ -20,11 +17,12 @@ public class Log extends AbstractTask {
     private Set<Attachment> attachments;
 
     @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_log_customer"))
     public Customer getCustomer() {
         return customer;
     }
 
-    @OneToMany(mappedBy = Attachment.F_WORK)
+    @OneToMany(mappedBy = Attachment.F_LOG)
     public Set<Attachment> getAttachments() {
         return attachments;
     }

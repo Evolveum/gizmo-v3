@@ -3,13 +3,15 @@ package sk.lazyman.gizmo.data;
 import com.mysema.query.annotations.QueryInit;
 
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
  * @author lazyman
  */
 @Entity
-//javax.persistence.ForeignKey(name = "g_fk_work")
+//@PrimaryKeyJoinColumn(name = "id", foreignKey = @ForeignKey(name = "fk_work_abstractTask"))
 public class Work extends AbstractTask {
 
     public static final String F_PART = "part";
@@ -19,6 +21,7 @@ public class Work extends AbstractTask {
     private double invoiceLength;
 
     @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_work_part"))
     @QueryInit("project.*")
     public Part getPart() {
         return part;

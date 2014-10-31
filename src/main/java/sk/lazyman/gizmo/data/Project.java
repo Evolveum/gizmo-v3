@@ -45,6 +45,7 @@ public class Project implements Serializable {
     }
 
     @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_project_customer"))
     public Customer getCustomer() {
         return customer;
     }

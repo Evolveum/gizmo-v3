@@ -59,6 +59,7 @@ public class EmailLog implements Serializable {
     }
 
     @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_emaillog_user"))
     public User getSender() {
         return sender;
     }

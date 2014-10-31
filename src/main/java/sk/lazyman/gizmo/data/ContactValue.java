@@ -36,6 +36,7 @@ public class ContactValue implements Serializable {
     }
 
     @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_contactValue_contact"))
     public Contact getContact() {
         return contact;
     }
