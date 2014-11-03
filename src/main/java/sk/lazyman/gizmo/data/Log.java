@@ -1,7 +1,6 @@
 package sk.lazyman.gizmo.data;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Set;
 
 /**

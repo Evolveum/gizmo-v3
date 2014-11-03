@@ -8,7 +8,7 @@ import javax.persistence.*;
  * @author lazyman
  */
 @Entity
-//@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(name = "asdfasdf"))
+@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(name = "fk_work_abstractTask"))
 public class Work extends AbstractTask {
 
     public static final String F_PART = "part";

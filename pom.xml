@@ -14,16 +14,16 @@
         <source.version>1.7</source.version>
 
         <commons.lang.version>2.6</commons.lang.version>
-        <spring.version>4.0.6.RELEASE</spring.version>
+        <spring.version>4.1.1.RELEASE</spring.version>
         <spring.security.version>3.2.5.RELEASE</spring.security.version>
-        <hibernate.version>4.3.6.Final</hibernate.version>
+        <hibernate.version>4.3.7.Final</hibernate.version>
         <testng.version>6.8.8</testng.version>
         <slf4j.version>1.6.4</slf4j.version>
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <wicket.version>6.17.0</wicket.version>
         <wicket.bootstrap.version>0.9.5</wicket.bootstrap.version>
         <logback.version>0.9.29</logback.version>
-        <querydsl.version>3.4.3</querydsl.version>
+        <querydsl.version>3.5.0</querydsl.version>
         <boostrap.switch.version>3.0.2</boostrap.switch.version>
         <h2.version>1.4.182</h2.version>
     </properties>
