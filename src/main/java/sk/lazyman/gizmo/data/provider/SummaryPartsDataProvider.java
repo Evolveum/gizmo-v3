@@ -49,7 +49,7 @@ public class SummaryPartsDataProvider implements Serializable {
         if (tuples != null) {
             LOG.debug("Found {} parts for summary.", tuples.size());
 
-            processSummaryResults(tuples);
+            processSummaryResults(tuples, result);
         }
 
         Collections.sort(result);
@@ -61,7 +61,7 @@ public class SummaryPartsDataProvider implements Serializable {
      * @param tuples contains columns (partId, customerId, sum(workLength), sum(invoiceLength)
      * @return
      */
-    private List<PartSummary> processSummaryResults(List<Tuple> tuples) {
+    private List<PartSummary> processSummaryResults(List<Tuple> tuples, List<PartSummary> result) {
         List<Integer> partIds = new ArrayList<>();
         List<Integer> customerIds = new ArrayList<>();
         for (Tuple tuple : tuples) {
@@ -77,7 +77,6 @@ public class SummaryPartsDataProvider implements Serializable {
         Map<Integer, Part> map = getProjectParts(partIds);
         Map<Integer, Customer> customerMap = getCustomers(customerIds);
 
-        List<PartSummary> result = new ArrayList<>();
         for (Tuple tuple : tuples) {
             Integer id = tuple.get(0, Integer.class);
             if (id != null) {
