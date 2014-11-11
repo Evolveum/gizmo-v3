@@ -16,12 +16,10 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.springframework.data.domain.Sort;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
-import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Project;
-import sk.lazyman.gizmo.data.QCustomer;
 import sk.lazyman.gizmo.data.QProject;
 import sk.lazyman.gizmo.data.provider.BasicDataProvider;
 

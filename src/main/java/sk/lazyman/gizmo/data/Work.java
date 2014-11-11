@@ -17,6 +17,10 @@ public class Work extends AbstractTask {
     private Part part;
     private double invoiceLength;
 
+    public Work() {
+        setType(TaskType.WORK);
+    }
+
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_work_part"))
     @QueryInit("project.*")

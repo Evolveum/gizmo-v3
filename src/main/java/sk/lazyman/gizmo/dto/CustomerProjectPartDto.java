@@ -24,12 +24,8 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
         this(customerName, null, null, customerId, null, null);
     }
 
-    public CustomerProjectPartDto(String customerName, String projectName, Integer projectId) {
-        this(customerName, projectName, null, null, projectId, null);
-    }
-
-    public CustomerProjectPartDto(String customerName, String projectName, String partName, Integer partId) {
-        this(customerName, projectName, partName, null, null, partId);
+    public CustomerProjectPartDto(String customerName, String projectName, Integer customerId, Integer projectId) {
+        this(customerName, projectName, null, customerId, projectId, null);
     }
 
     public CustomerProjectPartDto(String customerName, String projectName, String partName,

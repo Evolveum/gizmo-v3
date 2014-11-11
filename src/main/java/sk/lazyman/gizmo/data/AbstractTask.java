@@ -19,8 +19,11 @@ public class AbstractTask implements Serializable {
     public static final String F_DATE = "date";
     public static final String F_DESCRIPTION = "description";
     public static final String F_TRACK_ID = "trackId";
+    public static final String F_TYPE = "type";
 
     private Integer id;
+
+    private TaskType type;
 
     private User realizator;
     private double workLength;
@@ -57,6 +60,15 @@ public class AbstractTask implements Serializable {
 
     public String getTrackId() {
         return trackId;
+    }
+
+    @Enumerated
+    public TaskType getType() {
+        return type;
+    }
+
+    public void setType(TaskType type) {
+        this.type = type;
     }
 
     public void setTrackId(String trackId) {

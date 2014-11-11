@@ -107,6 +107,20 @@ public class GizmoUtils {
         return cal.getTime();
     }
 
+    public static <T extends Enum> IChoiceRenderer<T> createEnumRenderer(final Component component) {
+        return new IChoiceRenderer<T>() {
+            @Override
+            public Object getDisplayValue(T object) {
+                return createLocalizedModelForEnum(object, component).getObject();
+            }
+
+            @Override
+            public String getIdValue(T object, int index) {
+                return Integer.toString(index);
+            }
+        };
+    }
+
     public static <T extends Enum> IModel<String> createLocalizedModelForEnum(T value, Component comp) {
         String key = value != null ? value.getClass().getSimpleName() + "." + value.name() : "";
         return new StringResourceModel(key, comp, null);
@@ -222,8 +236,8 @@ public class GizmoUtils {
             Project project = part.getProject();
             Customer customer = project.getCustomer();
 
-            list.add(new CustomerProjectPartDto(customer.getName(), project.getName(),
-                    part.getName(), part.getId()));
+            list.add(new CustomerProjectPartDto(customer.getName(), project.getName(), part.getName(),
+                    customer.getId(), project.getId(), part.getId()));
         }
 
         Collections.sort(list);
@@ -260,7 +274,8 @@ public class GizmoUtils {
                 customerName = customer.getName();
             }
 
-            list.add(new CustomerProjectPartDto(customerName, project.getName(), project.getId()));
+            list.add(new CustomerProjectPartDto(customerName, project.getName(),
+                    customer.getId(), project.getId()));
         }
 
         for (Customer customer : customers) {

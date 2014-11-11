@@ -40,6 +40,8 @@ public class PageTemplate extends WebPage {
     private EmailLogRepository emailLogRepository;
     @SpringBean
     private LogRepository logRepository;
+    @SpringBean
+    private AbstractTaskRepository abstractTaskRepository;
 
     public PageTemplate() {
         Injector.get().inject(this);
@@ -123,5 +125,9 @@ public class PageTemplate extends WebPage {
 
     public EntityManager getEntityManager() {
         return entityManager;
+    }
+
+    public AbstractTaskRepository getAbstractTaskRepository() {
+        return abstractTaskRepository;
     }
 }

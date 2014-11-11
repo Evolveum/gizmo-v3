@@ -15,6 +15,10 @@ public class Log extends AbstractTask {
     private Customer customer;
     private Set<Attachment> attachments;
 
+    public Log() {
+        setType(TaskType.LOG);
+    }
+
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_log_customer"))
     public Customer getCustomer() {

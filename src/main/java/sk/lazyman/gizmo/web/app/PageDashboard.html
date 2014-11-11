@@ -4,6 +4,10 @@
 <wicket:extend>
     <form class="form-inline pull-right search" role="form" wicket:id="form">
         <div class="form-group">
+            <label class="sr-only"><wicket:message key="PageDashboard.type"/></label>
+            <select class="form-control input-sm" wicket:id="type"/>
+        </div>
+        <div class="form-group">
             <label class="sr-only"><wicket:message key="PageDashboard.dateFrom"/></label>
             <input class="form-control input-sm" wicket:id="from"
                    wicket:message="placeholder:PageDashboard.dateFrom">

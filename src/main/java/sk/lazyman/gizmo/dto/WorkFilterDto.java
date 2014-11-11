@@ -14,11 +14,13 @@ public class WorkFilterDto implements Serializable {
     public static final String F_TO = "to";
     public static final String F_PROJECT = "project";
     public static final String F_REALIZATOR = "realizator";
+    public static final String F_TYPE = "type";
 
     private Date from;
     private Date to;
     private CustomerProjectPartDto project;
     private User realizator;
+    private WorkType type = WorkType.ALL;
 
     public Date getFrom() {
         return from;
@@ -50,5 +52,16 @@ public class WorkFilterDto implements Serializable {
 
     public void setRealizator(User realizator) {
         this.realizator = realizator;
+    }
+
+    public WorkType getType() {
+        return type;
+    }
+
+    public void setType(WorkType type) {
+        if (type == null) {
+            type = WorkType.ALL;
+        }
+        this.type = type;
     }
 }

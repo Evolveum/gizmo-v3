@@ -3,6 +3,7 @@ package sk.lazyman.gizmo.web.app;
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -14,6 +15,7 @@ import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.*;
 import sk.lazyman.gizmo.data.Part;
+import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
@@ -135,18 +137,42 @@ public class PageWork extends PageAppTemplate {
             }
         };
         form.add(part);
+        FormComponent partText = part.getFormComponent();
+        partText.add(new AjaxFormComponentUpdatingBehavior("blur") {
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+            }
+        });
 
         HFormGroup date = new HDateFormGroup(ID_DATE, new PropertyModel<Date>(model, Work.F_DATE),
                 createStringResource("AbstractTask.date"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(date);
 
-        HFormGroup invoice = new HFormGroup(ID_INVOICE, new PropertyModel<String>(model, Work.F_INVOICE_LENGTH),
+        final HFormGroup invoice = new HFormGroup(ID_INVOICE, new PropertyModel<String>(model, Work.F_INVOICE_LENGTH),
                 createStringResource("Work.invoiceLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        invoice.setOutputMarkupId(true);
+        invoice.getFormComponent().setOutputMarkupId(true);
         form.add(invoice);
 
         HFormGroup length = new HFormGroup(ID_LENGTH, new PropertyModel<String>(model, Work.F_WORK_LENGTH),
                 createStringResource("AbstractTask.workLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(length);
+
+        FormComponent workLength = length.getFormComponent();
+        workLength.add(new AjaxFormComponentUpdatingBehavior("blur") {
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (isProjectCommercial()) {
+                    Work work = model.getObject();
+                    work.setInvoiceLength(work.getWorkLength());
+
+                    target.focusComponent(invoice.getFormComponent());
+                    target.add(invoice);
+                }
+            }
+        });
 
         HAreaFormGroup description = new HAreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Work.F_DESCRIPTION),
                 createStringResource("AbstractTask.description"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
@@ -158,6 +184,17 @@ public class PageWork extends PageAppTemplate {
         form.add(trackId);
 
         initButtons(form);
+    }
+
+    private boolean isProjectCommercial() {
+        Work work = model.getObject();
+        Part part = work.getPart();
+        if (part == null) {
+            return false;
+        }
+
+        Project project = part.getProject();
+        return project.isCommercial();
     }
 
     private IModel<CustomerProjectPartDto> createPartModel(final IModel<Part> model) {
