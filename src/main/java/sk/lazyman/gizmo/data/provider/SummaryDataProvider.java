@@ -6,15 +6,14 @@ import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.Predicate;
 import com.mysema.query.types.expr.DateTimeExpression;
 import com.mysema.query.types.template.DateTimeTemplate;
+import sk.lazyman.gizmo.data.QAbstractTask;
 import sk.lazyman.gizmo.data.QWork;
-import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
 import sk.lazyman.gizmo.dto.TaskLength;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.web.PageTemplate;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -40,47 +39,32 @@ public class SummaryDataProvider implements Serializable {
     public SummaryPanelDto createSummary(WorkFilterDto filter) {
         SummaryPanelDto dto = new SummaryPanelDto(filter);
 
-        List<Predicate> list = new ArrayList<>();
-        if (filter.getRealizator() != null) {
-            list.add(QWork.work.realizator.eq(filter.getRealizator()));
-        }
-        if (filter.getFrom() != null) {
-            list.add(QWork.work.date.goe(filter.getFrom()));
-        }
-        if (filter.getTo() != null) {
-            list.add(QWork.work.date.loe(filter.getTo()));
-        }
-        if (filter.getProject() != null) {
-            CustomerProjectPartDto projectDto = filter.getProject();
-            if (projectDto.getCustomerId() != null) {
-                list.add(QWork.work.part.project.customer.id.eq(projectDto.getCustomerId()));
-            } else if (projectDto.getProjectId() != null) {
-                list.add(QWork.work.part.project.id.eq(projectDto.getProjectId()));
-            }
-        }
+        List<Predicate> list = AbstractTaskDataProvider.createPredicates(filter);
+        QAbstractTask task = QAbstractTask.abstractTask;
+        QWork work = task.as(QWork.class);
 
         JPAQuery query = new JPAQuery(page.getEntityManager());
-        query.from(QWork.work);
+        query.from(task).leftJoin(work.part.project);
         if (!list.isEmpty()) {
             BooleanBuilder bb = new BooleanBuilder();
             bb.orAllOf(list.toArray(new Predicate[list.size()]));
             query.where(bb);
         }
-        query.groupBy(createDateTruncExpression());
+        query.groupBy(createDateTruncExpression(work));
 
-        List<Tuple> tuples = query.list(createDateTruncExpression(),
-                QWork.work.workLength.sum(), QWork.work.invoiceLength.sum());
+        List<Tuple> tuples = query.list(createDateTruncExpression(work),
+                task.workLength.sum(), work.invoiceLength.sum());
         if (tuples != null) {
             for (Tuple tuple : tuples) {
-                TaskLength task = new TaskLength(tuple.get(1, Double.class), tuple.get(1, Double.class));
-                dto.getDates().put(tuple.get(0, Date.class), task);
+                TaskLength taskLength = new TaskLength(tuple.get(1, Double.class), tuple.get(1, Double.class));
+                dto.getDates().put(tuple.get(0, Date.class), taskLength);
             }
         }
 
         return dto;
     }
 
-    private DateTimeExpression createDateTruncExpression() {
-        return DateTimeTemplate.create(Date.class, "date_trunc('day',{0})", QWork.work.date);
+    private DateTimeExpression createDateTruncExpression(QWork work) {
+        return DateTimeTemplate.create(Date.class, "date_trunc('day',{0})", work.date);
     }
 }

@@ -1,24 +1,18 @@
 package sk.lazyman.gizmo.data.provider;
 
 import com.mysema.query.BooleanBuilder;
-import com.mysema.query.JoinType;
 import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.OrderSpecifier;
 import com.mysema.query.types.Predicate;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.hibernate.jdbc.AbstractWork;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import sk.lazyman.gizmo.data.*;
+import sk.lazyman.gizmo.data.AbstractTask;
+import sk.lazyman.gizmo.data.QAbstractTask;
+import sk.lazyman.gizmo.data.QLog;
+import sk.lazyman.gizmo.data.QWork;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.dto.WorkType;
-import sk.lazyman.gizmo.repository.AbstractTaskRepository;
-import sk.lazyman.gizmo.repository.LogRepository;
-import sk.lazyman.gizmo.repository.WorkRepository;
 import sk.lazyman.gizmo.web.PageTemplate;
 
 import java.util.ArrayList;
@@ -84,6 +78,21 @@ public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask,
             return null;
         }
 
+        List<Predicate> list = createPredicates(filter);
+        if (list.isEmpty()) {
+            return null;
+        }
+
+        BooleanBuilder bb = new BooleanBuilder();
+        return bb.orAllOf(list.toArray(new Predicate[list.size()]));
+    }
+
+    public static List<Predicate> createPredicates(WorkFilterDto filter) {
+        QAbstractTask task = QAbstractTask.abstractTask;
+        if (filter == null) {
+            return null;
+        }
+
         List<Predicate> list = new ArrayList<>();
         if (filter.getRealizator() != null) {
             list.add(task.realizator.eq(filter.getRealizator()));
@@ -118,11 +127,6 @@ public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask,
             list.add(task.date.loe(filter.getTo()));
         }
 
-        if (list.isEmpty()) {
-            return null;
-        }
-
-        BooleanBuilder bb = new BooleanBuilder();
-        return bb.orAllOf(list.toArray(new Predicate[list.size()]));
+        return list;
     }
 }
