@@ -127,7 +127,7 @@ public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
 
                 TaskLength length = dto.getTaskLength(monthIndex, dayIndex);
                 if (length == null) {
-                    length = new TaskLength(0, 0);
+                    length = new TaskLength(0.0, 0.0);
                 }
                 return StringUtils.join(new Object[]{length.getLength(), length.getInvoice()}, '/');
             }

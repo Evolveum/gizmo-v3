@@ -10,9 +10,9 @@ public class TaskLength implements Serializable {
     private double length;
     private double invoice;
 
-    public TaskLength(double length, double invoice) {
-        this.length = length;
-        this.invoice = invoice;
+    public TaskLength(Double length, Double invoice) {
+        this.length = length != null ? length : 0;
+        this.invoice = invoice != null ? invoice : 0;
     }
 
     public double getLength() {

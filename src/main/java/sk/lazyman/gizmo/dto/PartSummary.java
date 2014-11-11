@@ -8,7 +8,7 @@ public class PartSummary extends TaskLength implements Comparable<PartSummary> {
     public static final String F_NAME = "name";
     private String name;
 
-    public PartSummary(String name, double length, double invoice) {
+    public PartSummary(String name, Double length, Double invoice) {
         super(length, invoice);
         this.name = name;
     }
