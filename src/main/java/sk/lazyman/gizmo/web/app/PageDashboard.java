@@ -102,7 +102,7 @@ public class PageDashboard extends PageAppTemplate {
         Form form = new Form(ID_FORM);
         add(form);
 
-        form.add(new DropDownChoice<WorkType>(ID_TYPE, new PropertyModel<WorkType>(filter, WorkFilterDto.F_TYPE),
+        form.add(new DropDownChoice<>(ID_TYPE, new PropertyModel<WorkType>(filter, WorkFilterDto.F_TYPE),
                 GizmoUtils.createReadonlyModelFromEnum(WorkType.class), GizmoUtils.createEnumRenderer(this)));
 
         form.add(new DateTextField(ID_FROM, new PropertyModel<Date>(filter, WorkFilterDto.F_FROM)));
@@ -289,20 +289,30 @@ public class PageDashboard extends PageAppTemplate {
         };
         form.add(display);
 
-        AjaxButton email = new AjaxButton(ID_BTN_EMAIL, createStringResource("PageDashboard.email")) {
+        AjaxSubmitButton email = new AjaxSubmitButton(ID_BTN_EMAIL, createStringResource("PageDashboard.email")) {
 
             @Override
-            public void onClick(AjaxRequestTarget target) {
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 emailPerformed(target);
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget target, Form<?> form) {
+                target.add(getFeedbackPanel());
             }
         };
         form.add(email);
 
-        AjaxButton print = new AjaxButton(ID_BTN_PRINT, createStringResource("PageDashboard.print")) {
+        AjaxSubmitButton print = new AjaxSubmitButton(ID_BTN_PRINT, createStringResource("PageDashboard.print")) {
 
             @Override
-            public void onClick(AjaxRequestTarget target) {
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 printPerformed(target);
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget target, Form<?> form) {
+                target.add(getFeedbackPanel());
             }
         };
         form.add(print);
@@ -362,10 +372,7 @@ public class PageDashboard extends PageAppTemplate {
     }
 
     private void printPerformed(AjaxRequestTarget target) {
-        PageParameters params = new PageParameters();
-        //todo send filter
-
-        setResponsePage(PagePrint.class, params);
+        setResponsePage(new PagePrint(filter));
     }
 
     private void newWorkPerformed(AjaxRequestTarget target) {

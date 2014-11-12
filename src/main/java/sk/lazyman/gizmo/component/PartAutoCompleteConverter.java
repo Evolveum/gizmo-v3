@@ -24,6 +24,34 @@ public class PartAutoCompleteConverter extends AbstractAutoCompleteTextRenderer<
 
     @Override
     protected String getTextValue(CustomerProjectPartDto object) {
+        return convertToString(object);
+    }
+
+    @Override
+    public CustomerProjectPartDto convertToObject(String value, Locale locale) throws ConversionException {
+        if (value == null) {
+            return null;
+        }
+
+        List<CustomerProjectPartDto> list = projects.getObject();
+        for (CustomerProjectPartDto dto : list) {
+            if (value.equals(convertToString(dto, locale))) {
+                return dto;
+            }
+        }
+
+        throw new ConversionException("DashboardProjectConverter.cantConvert").setSourceValue(value)
+                .setTargetType(CustomerProjectPartDto.class)
+                .setConverter(this)
+                .setLocale(locale);
+    }
+
+    @Override
+    public String convertToString(CustomerProjectPartDto value, Locale locale) {
+        return convertToString(value);
+    }
+
+    public static String convertToString(CustomerProjectPartDto object) {
         if (object == null) {
             return null;
         }
@@ -52,29 +80,5 @@ public class PartAutoCompleteConverter extends AbstractAutoCompleteTextRenderer<
         }
 
         return sb.toString();
-    }
-
-    @Override
-    public CustomerProjectPartDto convertToObject(String value, Locale locale) throws ConversionException {
-        if (value == null) {
-            return null;
-        }
-
-        List<CustomerProjectPartDto> list = projects.getObject();
-        for (CustomerProjectPartDto dto : list) {
-            if (value.equals(convertToString(dto, locale))) {
-                return dto;
-            }
-        }
-
-        throw new ConversionException("DashboardProjectConverter.cantConvert").setSourceValue(value)
-                .setTargetType(CustomerProjectPartDto.class)
-                .setConverter(this)
-                .setLocale(locale);
-    }
-
-    @Override
-    public String convertToString(CustomerProjectPartDto value, Locale locale) {
-        return getTextValue(value);
     }
 }

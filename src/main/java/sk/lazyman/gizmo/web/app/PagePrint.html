@@ -2,7 +2,49 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
+    <div class="container">
+        <table class="table table-condensed table-bordered">
+            <thead>
+                <tr>
+                    <th><wicket:message key="PagePrint.project"/></th>
+                    <th><wicket:message key="PagePrint.from"/></th>
+                    <th><wicket:message key="PagePrint.to"/></th>
+                    <th><wicket:message key="PagePrint.work"/></th>
+                    <th><wicket:message key="PagePrint.invoice"/></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td wicket:id="project"/>
+                    <td wicket:id="from"/>
+                    <td wicket:id="to"/>
+                    <td><span wicket:id="work"/><wicket:message key="PagePrint.hoursMd"/></td>
+                    <td><span wicket:id="invoice"/><wicket:message key="PagePrint.hoursMd"/></td>
+                </tr>
+            </tbody>
+        </table>
 
+        <table class="table table-condensed table-bordered">
+            <thead>
+                <tr>
+                    <th><wicket:message key="PagePrint.date"/></th>
+                    <th><wicket:message key="PagePrint.length"/></th>
+                    <th><wicket:message key="PagePrint.projectPart"/></th>
+                    <th><wicket:message key="PagePrint.realizator"/></th>
+                    <th><wicket:message key="PagePrint.description"/></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr wicket:id="data">
+                    <td wicket:id="date"/>
+                    <td wicket:id="length"/>
+                    <td wicket:id="projectPart"/>
+                    <td wicket:id="realizator"/>
+                    <td wicket:id="description"/>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </wicket:extend>
 </body>
 </html>
