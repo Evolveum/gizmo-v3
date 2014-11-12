@@ -1,6 +1,7 @@
 package sk.lazyman.gizmo.web.app;
 
 import de.agilecoders.wicket.less.LessResourceReference;
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
@@ -12,12 +13,16 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.PartAutoCompleteConverter;
+import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
+import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lazyman
@@ -65,15 +70,17 @@ public class PagePrint extends PageAppTemplate {
         Label to = new Label(ID_TO, createStringDateModel(new PropertyModel<Date>(filter, WorkFilterDto.F_TO)));
         add(to);
 
-        Label invoice = new Label(ID_INVOICE);
+        IModel<List<Work>> dataModel = createDataModel();
+
+        Label invoice = new Label(ID_INVOICE, createInvoiceModel(dataModel));
         invoice.setRenderBodyOnly(true);
         add(invoice);
 
-        Label work = new Label(ID_WORK);
+        Label work = new Label(ID_WORK, createWorkModel(dataModel));
         work.setRenderBodyOnly(true);
         add(work);
 
-        ListView data = new ListView(ID_DATA) {
+        ListView data = new ListView(ID_DATA, dataModel) {
 
             @Override
             protected void populateItem(ListItem item) {
@@ -100,14 +107,52 @@ public class PagePrint extends PageAppTemplate {
         item.add(description);
     }
 
-    private IModel<String> createHourMDModel() {
+    private IModel<List<Work>> createDataModel() {
+        return new LoadableModel(false) {
+
+            @Override
+            protected List<Work> load() {
+                return loadData();
+            }
+        };
+    }
+
+    private IModel<String> createInvoiceModel(final IModel<List<Work>> data) {
         return new AbstractReadOnlyModel<String>() {
 
             @Override
             public String getObject() {
-                return null;
+                List<Work> list = data.getObject();
+                double sum = 0;
+
+                for (Work work : list) {
+                    sum += work.getInvoiceLength();
+                }
+
+                return createHourMd(sum);
             }
         };
+    }
+
+    private IModel<String> createWorkModel(final IModel<List<Work>> data) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                List<Work> list = data.getObject();
+                double sum = 0;
+
+                for (Work work : list) {
+                    sum += work.getWorkLength();
+                }
+
+                return createHourMd(sum);
+            }
+        };
+    }
+
+    private String createHourMd(double hours) {
+        return StringUtils.join(new Object[]{hours, "/", hours / 8});
     }
 
     private IModel<String> createProjectModel() {
@@ -137,5 +182,16 @@ public class PagePrint extends PageAppTemplate {
                 return df.format(date);
             }
         };
+    }
+
+    private List<Work> loadData() {
+        List<Work> work = new ArrayList<>();
+        try {
+            throw new RuntimeException("asdf");
+        } catch (Exception ex) {
+            handleGuiException(this, "Message.couldntLoadWork", ex, null);
+        }
+
+        return work;
     }
 }

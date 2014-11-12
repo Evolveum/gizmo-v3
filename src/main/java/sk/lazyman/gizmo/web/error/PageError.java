@@ -8,6 +8,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.http.WebResponse;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
+import sk.lazyman.gizmo.component.MainFeedback;
 import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
 import sk.lazyman.gizmo.web.PageTemplate;
 import sk.lazyman.gizmo.web.app.PageDashboard;
@@ -26,6 +27,7 @@ public class PageError extends PageTemplate {
     private static final String ID_MESSAGE = "message";
     private static final String ID_BACK = "back";
     private static final String ID_TITLE = "titleHeader";
+    private static final String ID_FEEDBACK = "feedback";
 
     private Integer code;
     private String exClass;
@@ -85,6 +87,10 @@ public class PageError extends PageTemplate {
             }
         };
         add(back);
+
+        MainFeedback feedback = new MainFeedback(ID_FEEDBACK);
+        feedback.setOutputMarkupId(true);
+        add(feedback);
     }
 
     private int getCode() {
@@ -106,5 +112,9 @@ public class PageError extends PageTemplate {
     @Override
     public boolean isErrorPage() {
         return true;
+    }
+
+    protected MainFeedback getFeedbackPanel() {
+        return (MainFeedback) get(ID_FEEDBACK);
     }
 }

@@ -4,6 +4,7 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.ImmutableNavbarCo
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.Navbar;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarExternalLink;
 import de.agilecoders.wicket.less.LessResourceReference;
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -21,6 +22,7 @@ import sk.lazyman.gizmo.component.TopMenuItem;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.web.PageTemplate;
+import sk.lazyman.gizmo.web.error.PageError;
 
 /**
  * @author lazyman
@@ -122,17 +124,22 @@ public class PageAppTemplate extends PageTemplate {
         };
     }
 
-    protected void handleGuiException(PageTemplate page, String message, Exception ex, AjaxRequestTarget target) {
+    protected void handleGuiException(PageAppTemplate page, String message, Exception ex, AjaxRequestTarget target) {
         Logger LOG = LoggerFactory.getLogger(page.getClass());
         LOG.error("Exception occurred, {}, reason: {}", message, ex.getMessage());
         if (LOG.isDebugEnabled()) {
             LOG.debug("Exception occurred, {}", ex);
         }
 
-        page.error(createStringResource(message, ex.getMessage()).getString());
-
         if (target != null) {
-            target.add(getFeedbackPanel());
+            page.error(createStringResource(message, ex.getMessage()).getString());
+
+            target.add(page.getFeedbackPanel());
+        } else {
+            PageError errorPage = new PageError();
+            errorPage.error(createStringResource(message, ex.getMessage()).getString());
+
+            throw new RestartResponseException(errorPage);
         }
     }
 }
