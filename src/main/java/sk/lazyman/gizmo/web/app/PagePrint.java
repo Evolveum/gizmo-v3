@@ -1,5 +1,8 @@
 package sk.lazyman.gizmo.web.app;
 
+import com.mysema.query.BooleanBuilder;
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.Predicate;
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.head.CssHeaderItem;
@@ -13,9 +16,11 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.PartAutoCompleteConverter;
-import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.data.*;
+import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
+import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.text.DateFormat;
@@ -41,6 +46,7 @@ public class PagePrint extends PageAppTemplate {
     private static final String ID_PROJECT_PART = "projectPart";
     private static final String ID_REALIZATOR = "realizator";
     private static final String ID_DESCRIPTION = "description";
+    private static final String ID_CUSTOMER = "customer";
 
     private IModel<WorkFilterDto> filter;
 
@@ -70,7 +76,7 @@ public class PagePrint extends PageAppTemplate {
         Label to = new Label(ID_TO, createStringDateModel(new PropertyModel<Date>(filter, WorkFilterDto.F_TO)));
         add(to);
 
-        IModel<List<Work>> dataModel = createDataModel();
+        IModel<List<AbstractTask>> dataModel = createDataModel();
 
         Label invoice = new Label(ID_INVOICE, createInvoiceModel(dataModel));
         invoice.setRenderBodyOnly(true);
@@ -80,53 +86,127 @@ public class PagePrint extends PageAppTemplate {
         work.setRenderBodyOnly(true);
         add(work);
 
-        ListView data = new ListView(ID_DATA, dataModel) {
+        ListView<AbstractTask> data = new ListView<AbstractTask>(ID_DATA, dataModel) {
 
             @Override
-            protected void populateItem(ListItem item) {
+            protected void populateItem(ListItem<AbstractTask> item) {
                 initItem(item);
             }
         };
         add(data);
     }
 
-    private void initItem(ListItem item) {
-        Label date = new Label(ID_DATE);
+    private void initItem(ListItem<AbstractTask> item) {
+        IModel<AbstractTask> model = item.getModel();
+
+        Label date = new Label(ID_DATE, createStringDateModel(new PropertyModel<Date>(model, AbstractTask.F_DATE)));
         item.add(date);
 
-        Label length = new Label(ID_LENGTH);
+        Label length = new Label(ID_LENGTH, createLengthModel(model));
         item.add(length);
 
-        Label projectPart = new Label(ID_PROJECT_PART);
+        Label customer = new Label(ID_CUSTOMER, createCustomerModel(model));
+        item.add(customer);
+
+        Label projectPart = new Label(ID_PROJECT_PART, createProjectPartModel(model));
         item.add(projectPart);
 
-        Label realizator = new Label(ID_REALIZATOR);
+        Label realizator = new Label(ID_REALIZATOR, createRealizatorModel(model));
         item.add(realizator);
 
-        Label description = new Label(ID_DESCRIPTION);
+        Label description = new Label(ID_DESCRIPTION, new PropertyModel<>(model, AbstractTask.F_DESCRIPTION));
         item.add(description);
     }
 
-    private IModel<List<Work>> createDataModel() {
+    private IModel<String> createCustomerModel(final IModel<AbstractTask> model) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                AbstractTask task = model.getObject();
+                if (!(task instanceof Log)) {
+                    return null;
+                }
+
+                Log log = (Log) task;
+                Customer customer = log.getCustomer();
+                return customer != null ? customer.getName() : null;
+            }
+        };
+    }
+
+    private IModel<String> createProjectPartModel(final IModel<AbstractTask> model) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                AbstractTask task = model.getObject();
+                if (!(task instanceof Work)) {
+                    return null;
+                }
+
+                Work work = (Work) task;
+                Part part = work.getPart();
+
+                return GizmoUtils.describeProjectPart(part, " - ");
+            }
+        };
+    }
+
+    private IModel<String> createLengthModel(final IModel<AbstractTask> model) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                AbstractTask task = model.getObject();
+                double work = task.getWorkLength();
+                double invoice = 0;
+                if (task instanceof Work) {
+                    invoice = ((Work) task).getInvoiceLength();
+                }
+
+                return StringUtils.join(new Object[]{work, "/", invoice});
+            }
+        };
+    }
+
+    private IModel<String> createRealizatorModel(final IModel<AbstractTask> model) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                User user = model.getObject().getRealizator();
+                if (user == null) {
+                    return null;
+                }
+
+                return user.getFullName();
+            }
+        };
+    }
+
+    private IModel<List<AbstractTask>> createDataModel() {
         return new LoadableModel(false) {
 
             @Override
-            protected List<Work> load() {
+            protected List<AbstractTask> load() {
                 return loadData();
             }
         };
     }
 
-    private IModel<String> createInvoiceModel(final IModel<List<Work>> data) {
+    private IModel<String> createInvoiceModel(final IModel<List<AbstractTask>> data) {
         return new AbstractReadOnlyModel<String>() {
 
             @Override
             public String getObject() {
-                List<Work> list = data.getObject();
+                List<AbstractTask> list = data.getObject();
                 double sum = 0;
 
-                for (Work work : list) {
-                    sum += work.getInvoiceLength();
+                for (AbstractTask task : list) {
+                    if (task instanceof Work) {
+                        sum += ((Work) task).getInvoiceLength();
+                    }
                 }
 
                 return createHourMd(sum);
@@ -134,16 +214,16 @@ public class PagePrint extends PageAppTemplate {
         };
     }
 
-    private IModel<String> createWorkModel(final IModel<List<Work>> data) {
+    private IModel<String> createWorkModel(final IModel<List<AbstractTask>> data) {
         return new AbstractReadOnlyModel<String>() {
 
             @Override
             public String getObject() {
-                List<Work> list = data.getObject();
+                List<AbstractTask> list = data.getObject();
                 double sum = 0;
 
-                for (Work work : list) {
-                    sum += work.getWorkLength();
+                for (AbstractTask task : list) {
+                    sum += task.getWorkLength();
                 }
 
                 return createHourMd(sum);
@@ -184,14 +264,34 @@ public class PagePrint extends PageAppTemplate {
         };
     }
 
-    private List<Work> loadData() {
-        List<Work> work = new ArrayList<>();
+    private List<AbstractTask> loadData() {
+        List<AbstractTask> data = new ArrayList<>();
+
+        WorkFilterDto filter = this.filter.getObject();
+        if (filter == null) {
+            return data;
+        }
+
         try {
-            throw new RuntimeException("asdf");
+            List<Predicate> predicates = AbstractTaskDataProvider.createPredicates(filter);
+
+            QAbstractTask task = QAbstractTask.abstractTask;
+            QWork work = task.as(QWork.class);
+
+            JPAQuery query = new JPAQuery(getEntityManager());
+            query.from(task).leftJoin(work.part.project);
+            if (!predicates.isEmpty()) {
+                BooleanBuilder where = new BooleanBuilder();
+                where.orAllOf(predicates.toArray(new Predicate[predicates.size()]));
+                query.where(where);
+            }
+            query.orderBy(task.date.asc());
+
+            data = query.list(task);
         } catch (Exception ex) {
             handleGuiException(this, "Message.couldntLoadWork", ex, null);
         }
 
-        return work;
+        return data;
     }
 }
