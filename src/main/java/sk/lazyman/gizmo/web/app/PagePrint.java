@@ -7,6 +7,7 @@ import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
@@ -16,6 +17,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.PartAutoCompleteConverter;
+import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
 import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
@@ -47,8 +49,11 @@ public class PagePrint extends PageAppTemplate {
     private static final String ID_REALIZATOR = "realizator";
     private static final String ID_DESCRIPTION = "description";
     private static final String ID_CUSTOMER = "customer";
+    private static final String ID_CUSTOMER_HEADER = "customerHeader";
+    private static final String ID_PROJECT_PART_HEADER = "projectPartHeader";
 
     private IModel<WorkFilterDto> filter;
+    private IModel<List<AbstractTask>> dataModel;
 
     public PagePrint() {
         this(null);
@@ -56,6 +61,8 @@ public class PagePrint extends PageAppTemplate {
 
     public PagePrint(IModel<WorkFilterDto> filter) {
         this.filter = filter != null ? filter : new Model<>(new WorkFilterDto());
+
+        dataModel = createDataModel();
 
         initLayout();
     }
@@ -76,8 +83,6 @@ public class PagePrint extends PageAppTemplate {
         Label to = new Label(ID_TO, createStringDateModel(new PropertyModel<Date>(filter, WorkFilterDto.F_TO)));
         add(to);
 
-        IModel<List<AbstractTask>> dataModel = createDataModel();
-
         Label invoice = new Label(ID_INVOICE, createInvoiceModel(dataModel));
         invoice.setRenderBodyOnly(true);
         add(invoice);
@@ -94,6 +99,14 @@ public class PagePrint extends PageAppTemplate {
             }
         };
         add(data);
+
+        WebMarkupContainer customerHeader = new WebMarkupContainer(ID_CUSTOMER_HEADER);
+        customerHeader.add(createCustomerColumnBehaviour(dataModel));
+        add(customerHeader);
+
+        WebMarkupContainer projectPartHeader = new WebMarkupContainer(ID_PROJECT_PART_HEADER);
+        projectPartHeader.add(createProjectPartColumnBehaviour(dataModel));
+        add(projectPartHeader);
     }
 
     private void initItem(ListItem<AbstractTask> item) {
@@ -106,9 +119,11 @@ public class PagePrint extends PageAppTemplate {
         item.add(length);
 
         Label customer = new Label(ID_CUSTOMER, createCustomerModel(model));
+        customer.add(createCustomerColumnBehaviour(dataModel));
         item.add(customer);
 
         Label projectPart = new Label(ID_PROJECT_PART, createProjectPartModel(model));
+        projectPart.add(createProjectPartColumnBehaviour(dataModel));
         item.add(projectPart);
 
         Label realizator = new Label(ID_REALIZATOR, createRealizatorModel(model));
@@ -116,6 +131,40 @@ public class PagePrint extends PageAppTemplate {
 
         Label description = new Label(ID_DESCRIPTION, new PropertyModel<>(model, AbstractTask.F_DESCRIPTION));
         item.add(description);
+    }
+
+    private VisibleEnableBehaviour createCustomerColumnBehaviour(final IModel<List<AbstractTask>> data) {
+        return new VisibleEnableBehaviour() {
+
+            @Override
+            public boolean isVisible() {
+                List<AbstractTask> tasks = data.getObject();
+                for (AbstractTask task : tasks) {
+                    if (task instanceof Log) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        };
+    }
+
+    private VisibleEnableBehaviour createProjectPartColumnBehaviour(final IModel<List<AbstractTask>> data) {
+        return new VisibleEnableBehaviour() {
+
+            @Override
+            public boolean isVisible() {
+                List<AbstractTask> tasks = data.getObject();
+                for (AbstractTask task : tasks) {
+                    if (task instanceof Work) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        };
     }
 
     private IModel<String> createCustomerModel(final IModel<AbstractTask> model) {
