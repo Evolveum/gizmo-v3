@@ -47,6 +47,12 @@ public class PageCustomer extends PageAppCustomers {
     private IModel<Customer> model;
 
     public PageCustomer() {
+        this(null);
+    }
+
+    public PageCustomer(PageParameters params) {
+        super(params);
+
         model = new LoadableModel<Customer>() {
 
             @Override
@@ -58,7 +64,9 @@ public class PageCustomer extends PageAppCustomers {
         initLayout();
     }
 
-    public PageCustomer(IModel<Customer> model) {
+    public PageCustomer(PageParameters params, IModel<Customer> model) {
+        super(params);
+
         Validate.notNull(model, "Model must not be null");
         this.model = model;
 
@@ -201,11 +209,12 @@ public class PageCustomer extends PageAppCustomers {
             customer = repository.saveAndFlush(customer);
 
             PageParameters params = createPageParams(CUSTOMER_ID, customer.getId());
-            setResponsePage(PageCustomer.class, params);
-            return;
+            PageCustomer page = new PageCustomer(params);
+            page.success(getString("Message.customerSavedSuccessfully"));
+
+            setResponsePage(page);
         } catch (Exception ex) {
-            //todo error handling
-            ex.printStackTrace();
+            handleGuiException(this, "Message.couldntSaveCustomer", ex, target);
         }
     }
 }

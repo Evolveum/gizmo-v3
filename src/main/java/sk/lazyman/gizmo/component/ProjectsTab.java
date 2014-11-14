@@ -5,7 +5,6 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.springframework.data.domain.Sort;
 import sk.lazyman.gizmo.component.data.LinkColumn;
@@ -95,9 +94,15 @@ public class ProjectsTab extends SimplePanel {
     }
 
     private void newProjectPerformed(AjaxRequestTarget target) {
+        PageAppTemplate page = (PageAppTemplate) getPage();
         try {
-            PageAppTemplate page = (PageAppTemplate) getPage();
             Integer customerId = page.getIntegerParam(PageCustomer.CUSTOMER_ID);
+
+            if (customerId == null) {
+                page.error(getString("Message.couldntCreateNewProjectUnknownCustomer"));
+                target.add(page.getFeedbackPanel());
+                return;
+            }
 
             CustomerRepository repository = page.getCustomerRepository();
             Customer customer = repository.findOne(customerId);
@@ -105,10 +110,9 @@ public class ProjectsTab extends SimplePanel {
             Project project = new Project();
             project.setCustomer(customer);
 
-            setResponsePage(new PageProject(new Model<>(project)));
+            setResponsePage(new PageProject());
         } catch (Exception ex) {
-            ex.printStackTrace();
-            //todo handle exception
+            page.handleGuiException(page, ex, target);
         }
     }
 

@@ -1,5 +1,6 @@
 package sk.lazyman.gizmo.web.app;
 
+import com.github.sommeri.less4j.core.ast.Page;
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
 import de.agilecoders.wicket.core.markup.html.bootstrap.tabs.AjaxBootstrapTabbedPanel;
 import org.apache.commons.lang.Validate;
@@ -58,6 +59,12 @@ public class PageProject extends PageAppProjects {
     private IModel<Project> model;
 
     public PageProject() {
+        this(null);
+    }
+
+    public PageProject(PageParameters params) {
+        super(params);
+
         model = new LoadableModel<Project>() {
 
             @Override
@@ -69,7 +76,9 @@ public class PageProject extends PageAppProjects {
         initLayout();
     }
 
-    public PageProject(IModel<Project> model) {
+    public PageProject(PageParameters params, IModel<Project> model) {
+        super(params);
+
         Validate.notNull(model, "Model must not be null.");
         this.model = model;
 
@@ -215,9 +224,11 @@ public class PageProject extends PageAppProjects {
 
             model.setObject(project);
 
-            PageProjects response = new PageProjects();
-            response.success(createStringResource("Message.projectSavedSuccessfully").getString());
-            setResponsePage(response);
+            PageParameters params = createPageParams(PROJECT_ID, project.getId());
+            PageProject page = new PageProject(params);
+            page.success(getString("Message.projectSavedSuccessfully"));
+
+            setResponsePage(page);
         } catch (Exception ex) {
             handleGuiException(this, "Message.couldntSaveProject", ex, target);
         }

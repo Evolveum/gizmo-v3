@@ -34,6 +34,12 @@ public class PageAppTemplate extends PageTemplate {
     private static final String ID_FEEDBACK = "feedback";
 
     public PageAppTemplate() {
+        this(null);
+    }
+
+    public PageAppTemplate(PageParameters parameters) {
+        super(parameters);
+
         initLayout();
     }
 
@@ -82,7 +88,7 @@ public class PageAppTemplate extends PageTemplate {
         add(feedback);
     }
 
-    protected MainFeedback getFeedbackPanel() {
+    public MainFeedback getFeedbackPanel() {
         return (MainFeedback) get(ID_FEEDBACK);
     }
 
@@ -124,7 +130,11 @@ public class PageAppTemplate extends PageTemplate {
         };
     }
 
-    protected void handleGuiException(PageAppTemplate page, String message, Exception ex, AjaxRequestTarget target) {
+    public void handleGuiException(PageAppTemplate page, Exception ex, AjaxRequestTarget target) {
+        handleGuiException(page, getString("Message.unknownError"), ex, target);
+    }
+
+    public void handleGuiException(PageAppTemplate page, String message, Exception ex, AjaxRequestTarget target) {
         Logger LOG = LoggerFactory.getLogger(page.getClass());
         LOG.error("Exception occurred, {}, reason: {}", message, ex.getMessage());
         if (LOG.isDebugEnabled()) {
