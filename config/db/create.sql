@@ -16,30 +16,31 @@ CREATE TABLE g_Notification_emails (
 );
 
 CREATE TABLE g_abstract_task (
-  id            INT4   NOT NULL,
-  date          TIMESTAMP,
+  id            INT4      NOT NULL,
+  date          TIMESTAMP NOT NULL,
   description   VARCHAR(3000),
   trackId       VARCHAR(255),
-  workLength    FLOAT4 NOT NULL,
-  realizator_id INT4,
+  type          INT4      NOT NULL,
+  workLength    FLOAT4    NOT NULL,
+  realizator_id INT4      NOT NULL,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE g_attachment (
-  id          INT4 NOT NULL,
+  id          INT4         NOT NULL,
   description VARCHAR(3000),
-  name        VARCHAR(255),
+  name        VARCHAR(255) NOT NULL,
   value       BYTEA,
-  log_id      INT4,
+  log_id      INT4         NOT NULL,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE g_contact (
-  id          INT4 NOT NULL,
+  id          INT4         NOT NULL,
   city        VARCHAR(255),
   country     VARCHAR(255),
   description VARCHAR(255),
-  name        VARCHAR(255),
+  name        VARCHAR(255) NOT NULL,
   street      VARCHAR(255),
   zip         VARCHAR(255),
   PRIMARY KEY (id)
@@ -49,32 +50,32 @@ CREATE TABLE g_contact_value (
   id         INT4 NOT NULL,
   type       INT4,
   value      VARCHAR(255),
-  contact_id INT4,
+  contact_id INT4 NOT NULL,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE g_customer (
-  id          INT4 NOT NULL,
+  id          INT4         NOT NULL,
   description VARCHAR(3000),
-  name        VARCHAR(255),
+  name        VARCHAR(255) NOT NULL,
   type        INT4,
   partner_id  INT4,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE g_email_log (
-  id             INT4    NOT NULL,
+  id             INT4      NOT NULL,
   description    VARCHAR(3000),
   fromDate       TIMESTAMP,
   mailBcc        VARCHAR(255),
   mailCc         VARCHAR(255),
   mailTo         VARCHAR(255),
-  sentDate       TIMESTAMP,
-  successful     BOOLEAN NOT NULL,
-  summaryInvoice FLOAT4  NOT NULL,
-  summaryWork    FLOAT4  NOT NULL,
+  sentDate       TIMESTAMP NOT NULL,
+  successful     BOOLEAN   NOT NULL,
+  summaryInvoice FLOAT4    NOT NULL,
+  summaryWork    FLOAT4    NOT NULL,
   toDate         TIMESTAMP,
-  sender_id      INT4,
+  sender_id      INT4      NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -89,36 +90,36 @@ CREATE TABLE g_notification (
   alarm       TIMESTAMP NOT NULL,
   created     TIMESTAMP NOT NULL,
   description VARCHAR(3000),
-  owner       BYTEA     NOT NULL,
-  customer_id INT4,
+  customer_id INT4      NOT NULL,
+  owner_id    INT4      NOT NULL,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE g_part (
-  id          INT4 NOT NULL,
+  id          INT4         NOT NULL,
   description VARCHAR(3000),
-  name        VARCHAR(255),
-  project_id  INT4,
+  name        VARCHAR(255) NOT NULL,
+  project_id  INT4         NOT NULL,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE g_project (
-  id          INT4    NOT NULL,
-  closed      BOOLEAN NOT NULL,
-  commercial  BOOLEAN NOT NULL,
+  id          INT4         NOT NULL,
+  closed      BOOLEAN      NOT NULL,
+  commercial  BOOLEAN      NOT NULL,
   description VARCHAR(3000),
-  name        VARCHAR(255),
-  customer_id INT4,
+  name        VARCHAR(255) NOT NULL,
+  customer_id INT4         NOT NULL,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE g_user (
-  id         INT4    NOT NULL,
-  enabled    BOOLEAN NOT NULL,
+  id         INT4         NOT NULL,
+  enabled    BOOLEAN      NOT NULL,
   familyName VARCHAR(255),
   givenName  VARCHAR(255),
   ldapDn     VARCHAR(255),
-  name       VARCHAR(255),
+  name       VARCHAR(255) NOT NULL,
   password   VARCHAR(255),
   PRIMARY KEY (id)
 );
@@ -126,7 +127,7 @@ CREATE TABLE g_user (
 CREATE TABLE g_work (
   invoiceLength FLOAT4 NOT NULL,
   id            INT4   NOT NULL,
-  part_id       INT4,
+  part_id       INT4   NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -200,6 +201,11 @@ ALTER TABLE g_notification
 ADD CONSTRAINT fk_notification_customer
 FOREIGN KEY (customer_id)
 REFERENCES g_customer;
+
+ALTER TABLE g_notification
+ADD CONSTRAINT fk_notification_owner
+FOREIGN KEY (owner_id)
+REFERENCES g_user;
 
 ALTER TABLE g_part
 ADD CONSTRAINT FK_hbetssupir7kry5d3ik0209np
