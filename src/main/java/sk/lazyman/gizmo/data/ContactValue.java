@@ -31,11 +31,12 @@ public class ContactValue implements Serializable {
         return type;
     }
 
+    @Column(nullable = false)
     public String getValue() {
         return value;
     }
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_contactValue_contact"))
     public Contact getContact() {
         return contact;

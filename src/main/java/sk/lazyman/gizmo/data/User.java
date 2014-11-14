@@ -38,6 +38,7 @@ public class User implements Serializable {
         return id;
     }
 
+    @Column(nullable = false)
     public String getName() {
         return name;
     }

@@ -30,12 +30,13 @@ public class Attachment implements Serializable {
         return id;
     }
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_attachment_log"))
     public Log getLog() {
         return log;
     }
 
+    @Column(nullable = false)
     public String getName() {
         return name;
     }

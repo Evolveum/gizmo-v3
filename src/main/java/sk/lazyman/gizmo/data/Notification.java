@@ -42,12 +42,13 @@ public class Notification implements Serializable {
         return created;
     }
 
-    @Column(nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_notification_owner"))
     public User getOwner() {
         return owner;
     }
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_notification_customer"))
     public Customer getCustomer() {
         return customer;

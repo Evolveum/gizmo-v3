@@ -28,11 +28,12 @@ public class Part implements Serializable {
         return id;
     }
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     public Project getProject() {
         return project;
     }
 
+    @Column(nullable = false)
     public String getName() {
         return name;
     }

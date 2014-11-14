@@ -38,6 +38,7 @@ public class Contact implements Serializable {
         return id;
     }
 
+    @Column(nullable = false)
     public String getName() {
         return name;
     }

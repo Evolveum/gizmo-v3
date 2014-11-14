@@ -39,7 +39,7 @@ public class AbstractTask implements Serializable {
         return id;
     }
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_abstractTask_user"))
     public User getRealizator() {
         return realizator;
@@ -49,6 +49,7 @@ public class AbstractTask implements Serializable {
         return workLength;
     }
 
+    @Column(nullable = false)
     public Date getDate() {
         return date;
     }
@@ -63,6 +64,7 @@ public class AbstractTask implements Serializable {
     }
 
     @Enumerated
+    @Column(nullable = false)
     public TaskType getType() {
         return type;
     }

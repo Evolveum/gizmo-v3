@@ -40,11 +40,12 @@ public class Project implements Serializable {
         return commercial;
     }
 
+    @Column(nullable = false)
     public String getName() {
         return name;
     }
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_project_customer"))
     public Customer getCustomer() {
         return customer;
