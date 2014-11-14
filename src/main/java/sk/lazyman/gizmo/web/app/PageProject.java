@@ -16,6 +16,8 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
@@ -29,6 +31,7 @@ import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Part;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.repository.CustomerRepository;
+import sk.lazyman.gizmo.repository.PartRepository;
 import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
@@ -43,6 +46,8 @@ import java.util.List;
 public class PageProject extends PageAppProjects {
 
     public static final String PROJECT_ID = "projectId";
+
+    private static final Logger LOG = LoggerFactory.getLogger(PageProject.class);
 
     private static final String ID_FORM = "form";
     private static final String ID_NAME = "name";
@@ -89,7 +94,15 @@ public class PageProject extends PageAppProjects {
         Form dialogForm = new Form(ID_DIALOG_FORM);
         add(dialogForm);
 
-        ProjectPartModal modal = new ProjectPartModal(ID_PROJECT_PART);
+        ProjectPartModal modal = new ProjectPartModal(ID_PROJECT_PART) {
+
+            @Override
+            protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {
+                super.savePerformed(target, model);
+
+                savePartPerformed(target, model);
+            }
+        };
         dialogForm.add(modal);
     }
 
@@ -184,6 +197,7 @@ public class PageProject extends PageAppProjects {
         });
 
         AjaxBootstrapTabbedPanel tabs = new AjaxBootstrapTabbedPanel(ID_TABS, tabList);
+        tabs.setOutputMarkupId(true);
         add(tabs);
     }
 
@@ -243,5 +257,20 @@ public class PageProject extends PageAppProjects {
         part.setProject(model.getObject());
 
         modal.setModel(new Model(part));
+    }
+
+    private void savePartPerformed(AjaxRequestTarget target, IModel<Part> model) {
+        try {
+            PartRepository repository = getProjectPartRepository();
+            Part part = model.getObject();
+            LOG.debug("Saving {}", part);
+
+            repository.save(part);
+
+            success(getString("Message.projectPartSavedSuccessfully"));
+            target.add(getFeedbackPanel(), get(ID_TABS));
+        } catch (Exception ex) {
+            handleGuiException(this, "Message.couldntSaveProjectPart", ex, target);
+        }
     }
 }

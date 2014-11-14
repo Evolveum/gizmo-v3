@@ -1,11 +1,16 @@
 package sk.lazyman.gizmo.component.modal;
 
+import de.agilecoders.wicket.core.markup.html.bootstrap.behavior.CssClassNameModifier;
 import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxButton;
+import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxLink;
 import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons;
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.*;
+import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.Part;
@@ -41,14 +46,16 @@ public class ProjectPartModal extends Modal<Part> {
     }
 
     private void initLayout() {
-        FormGroup name = new FormGroup(ID_NAME,
+        final FormGroup name = new FormGroup(ID_NAME,
                 new PropertyModel<String>(getModel(), Part.F_NAME),
                 createStringResource("Part.name"), true);
+        name.setOutputMarkupId(true);
         add(name);
 
-        FormGroup description = new AreaFormGroup(ID_DESCRIPTION,
+        final FormGroup description = new AreaFormGroup(ID_DESCRIPTION,
                 new PropertyModel<String>(getModel(), Part.F_DESCRIPTION),
                 createStringResource("Part.description"), true);
+        description.setOutputMarkupId(true);
         add(description);
 
         BootstrapAjaxButton cancel = new BootstrapAjaxButton(BUTTON_MARKUP_ID,
@@ -61,7 +68,7 @@ public class ProjectPartModal extends Modal<Part> {
 
             @Override
             protected void onError(AjaxRequestTarget target, Form<?> form) {
-                target.add(form);
+                cancelPerformed(target);
             }
         };
         addButton(cancel);
@@ -71,12 +78,12 @@ public class ProjectPartModal extends Modal<Part> {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                savePerformed(target);
+                savePerformed(target, ProjectPartModal.this.getModel());
             }
 
             @Override
             protected void onError(AjaxRequestTarget target, Form<?> form) {
-                target.add(form);
+                target.add(name, description);
             }
         };
         addButton(save);
@@ -90,7 +97,7 @@ public class ProjectPartModal extends Modal<Part> {
         close(target);
     }
 
-    protected void savePerformed(AjaxRequestTarget target) {
+    protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {
         close(target);
     }
 }

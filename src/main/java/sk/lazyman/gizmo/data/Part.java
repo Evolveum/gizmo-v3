@@ -81,6 +81,7 @@ public class Part implements Serializable {
         sb.append("id=").append(id);
         sb.append(", project=").append(project);
         sb.append(", name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
         sb.append('}');
         return sb.toString();
     }
