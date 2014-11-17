@@ -20,8 +20,8 @@
         <testng.version>6.8.8</testng.version>
         <slf4j.version>1.6.4</slf4j.version>
         <postgresql.version>9.1-901.jdbc4</postgresql.version>
-        <wicket.version>6.17.0</wicket.version>
-        <wicket.bootstrap.version>0.9.5</wicket.bootstrap.version>
+        <wicket.version>6.18.0</wicket.version>
+        <wicket.bootstrap.version>0.9.7</wicket.bootstrap.version>
         <logback.version>0.9.29</logback.version>
         <querydsl.version>3.5.0</querydsl.version>
         <boostrap.switch.version>3.0.2</boostrap.switch.version>
@@ -204,6 +204,11 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
         </dependency>
 
         <!-- TEST -->
