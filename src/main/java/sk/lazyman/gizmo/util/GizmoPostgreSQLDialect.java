@@ -12,6 +12,6 @@ public class GizmoPostgreSQLDialect extends PostgresPlusDialect {
     public GizmoPostgreSQLDialect() {
         super();
 
-        registerColumnType( Types.DOUBLE, "float4" );
+        registerColumnType(Types.DOUBLE, "float4");
     }
 }

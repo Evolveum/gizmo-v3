@@ -17,6 +17,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.PartAutoCompleteConverter;
+import sk.lazyman.gizmo.component.ReportSearchSummary;
 import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
 import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
@@ -37,11 +38,7 @@ import java.util.List;
 @MountPath("/app/print")
 public class PagePrint extends PageAppTemplate {
 
-    private static final String ID_PROJECT = "project";
-    private static final String ID_FROM = "from";
-    private static final String ID_TO = "to";
-    private static final String ID_INVOICE = "invoice";
-    private static final String ID_WORK = "work";
+    private static final String ID_REPORT_SUMMARY="reportSummary";
     private static final String ID_DATA = "data";
     private static final String ID_DATE = "date";
     private static final String ID_LENGTH = "length";
@@ -74,22 +71,8 @@ public class PagePrint extends PageAppTemplate {
     }
 
     private void initLayout() {
-        Label project = new Label(ID_PROJECT, createProjectModel());
-        add(project);
-
-        Label from = new Label(ID_FROM, createStringDateModel(new PropertyModel<Date>(filter, WorkFilterDto.F_FROM)));
-        add(from);
-
-        Label to = new Label(ID_TO, createStringDateModel(new PropertyModel<Date>(filter, WorkFilterDto.F_TO)));
-        add(to);
-
-        Label invoice = new Label(ID_INVOICE, createInvoiceModel(dataModel));
-        invoice.setRenderBodyOnly(true);
-        add(invoice);
-
-        Label work = new Label(ID_WORK, createWorkModel(dataModel));
-        work.setRenderBodyOnly(true);
-        add(work);
+        ReportSearchSummary reportSummary = new ReportSearchSummary(ID_REPORT_SUMMARY, filter, dataModel);
+        add(reportSummary);
 
         ListView<AbstractTask> data = new ListView<AbstractTask>(ID_DATA, dataModel) {
 
@@ -240,59 +223,6 @@ public class PagePrint extends PageAppTemplate {
             @Override
             protected List<AbstractTask> load() {
                 return loadData();
-            }
-        };
-    }
-
-    private IModel<String> createInvoiceModel(final IModel<List<AbstractTask>> data) {
-        return new AbstractReadOnlyModel<String>() {
-
-            @Override
-            public String getObject() {
-                List<AbstractTask> list = data.getObject();
-                double sum = 0;
-
-                for (AbstractTask task : list) {
-                    if (task instanceof Work) {
-                        sum += ((Work) task).getInvoiceLength();
-                    }
-                }
-
-                return createHourMd(sum);
-            }
-        };
-    }
-
-    private IModel<String> createWorkModel(final IModel<List<AbstractTask>> data) {
-        return new AbstractReadOnlyModel<String>() {
-
-            @Override
-            public String getObject() {
-                List<AbstractTask> list = data.getObject();
-                double sum = 0;
-
-                for (AbstractTask task : list) {
-                    sum += task.getWorkLength();
-                }
-
-                return createHourMd(sum);
-            }
-        };
-    }
-
-    private String createHourMd(double hours) {
-        return StringUtils.join(new Object[]{hours, "/", hours / 8});
-    }
-
-    private IModel<String> createProjectModel() {
-        return new AbstractReadOnlyModel<String>() {
-
-            @Override
-            public String getObject() {
-                WorkFilterDto dto = filter.getObject();
-                CustomerProjectPartDto projectDto = dto.getProject();
-
-                return PartAutoCompleteConverter.convertToString(projectDto);
             }
         };
     }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <table class="table table-condensed table-bordered">
+        <thead>
+        <tr>
+            <th><wicket:message key="ReportSearchSummary.project"/></th>
+            <th><wicket:message key="ReportSearchSummary.from"/></th>
+            <th><wicket:message key="ReportSearchSummary.to"/></th>
+            <th><wicket:message key="ReportSearchSummary.work"/></th>
+            <th><wicket:message key="ReportSearchSummary.invoice"/></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td wicket:id="project"/>
+            <td wicket:id="from"/>
+            <td wicket:id="to"/>
+            <td><span wicket:id="work"/>&nbsp;<wicket:message key="ReportSearchSummary.hoursMd"/></td>
+            <td><span wicket:id="invoice"/>&nbsp;<wicket:message key="ReportSearchSummary.hoursMd"/></td>
+        </tr>
+        </tbody>
+    </table>
+</wicket:panel>
+</body>
+</html>

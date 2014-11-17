@@ -114,8 +114,7 @@ public class PageUser extends PageAppUsers {
 
             setResponsePage(PageUsers.class);
         } catch (Exception ex) {
-            //todo show error message
-            target.add(getFeedbackPanel());
+            handleGuiException(this, "Message.couldntSaveUser", ex, target);
         }
     }
 }
