@@ -192,6 +192,11 @@ public class PageProject extends PageAppProjects {
                     protected void newPartPerformed(AjaxRequestTarget target) {
                         PageProject.this.newPartPerformed(target);
                     }
+
+                    @Override
+                    protected void editPartPerformed(AjaxRequestTarget target, Part part) {
+                        PageProject.this.editPartPerformed(target, part);
+                    }
                 };
             }
         });
@@ -227,7 +232,15 @@ public class PageProject extends PageAppProjects {
     }
 
     private void cancelPerformed(AjaxRequestTarget target) {
-        setResponsePage(PageProjects.class);
+        Project project = model.getObject();
+        Customer customer = project.getCustomer();
+
+        if (customer == null || customer.getId() == null) {
+            setResponsePage(PageProjects.class);
+        }
+
+        PageParameters params = createPageParams(PageCustomer.CUSTOMER_ID, customer.getId());
+        setResponsePage(PageCustomer.class, params);
     }
 
     private void savePerformed(AjaxRequestTarget target) {
@@ -249,14 +262,18 @@ public class PageProject extends PageAppProjects {
     }
 
     private void newPartPerformed(AjaxRequestTarget target) {
-        Modal modal = (Modal) get(ID_DIALOG_FORM + ":" + ID_PROJECT_PART);
-        target.add(modal);
-        modal.show(target);
-
         Part part = new Part();
         part.setProject(model.getObject());
 
-        modal.setModel(new Model(part));
+        editPartPerformed(target, part);
+    }
+
+    private void editPartPerformed(AjaxRequestTarget target, Part part) {
+        ProjectPartModal modal = (ProjectPartModal) get(ID_DIALOG_FORM + ":" + ID_PROJECT_PART);
+        target.add(modal);
+        modal.show(target);
+
+        modal.setPart(part);
     }
 
     private void savePartPerformed(AjaxRequestTarget target, IModel<Part> model) {
@@ -265,7 +282,7 @@ public class PageProject extends PageAppProjects {
             Part part = model.getObject();
             LOG.debug("Saving {}", part);
 
-            repository.save(part);
+            repository.saveAndFlush(part);
 
             success(getString("Message.projectPartSavedSuccessfully"));
             target.add(getFeedbackPanel(), get(ID_TABS));

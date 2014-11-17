@@ -1,16 +1,11 @@
 package sk.lazyman.gizmo.component.modal;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.behavior.CssClassNameModifier;
 import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxButton;
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxLink;
 import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons;
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.*;
-import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.Part;
@@ -25,8 +20,16 @@ public class ProjectPartModal extends Modal<Part> {
     private static final String ID_DESCRIPTION = "description";
     private static final String ID_PROJECT = "project";
 
+    private IModel<Part> partModel;
+
     public ProjectPartModal(String id) {
-        super(id, new Model<>(new Part()));
+        this(id, new Model<>(new Part()));
+    }
+
+    public ProjectPartModal(String id, IModel<Part> partModel) {
+        super(id);
+
+        this.partModel = partModel;
 
         header(createTitle());
         initLayout();
@@ -37,7 +40,7 @@ public class ProjectPartModal extends Modal<Part> {
 
             @Override
             public String getObject() {
-                Part part = getModelObject();
+                Part part = partModel.getObject();
 
                 String key = part.getId() != null ? "ProjectPartModal.edit" : "ProjectPartModal.new";
                 return createStringResource(key).getObject();
@@ -47,14 +50,14 @@ public class ProjectPartModal extends Modal<Part> {
 
     private void initLayout() {
         final FormGroup name = new FormGroup(ID_NAME,
-                new PropertyModel<String>(getModel(), Part.F_NAME),
+                new PropertyModel<String>(partModel, Part.F_NAME),
                 createStringResource("Part.name"), true);
         name.setOutputMarkupId(true);
         add(name);
 
         final FormGroup description = new AreaFormGroup(ID_DESCRIPTION,
-                new PropertyModel<String>(getModel(), Part.F_DESCRIPTION),
-                createStringResource("Part.description"), true);
+                new PropertyModel<String>(partModel, Part.F_DESCRIPTION),
+                createStringResource("Part.description"), false);
         description.setOutputMarkupId(true);
         add(description);
 
@@ -78,7 +81,7 @@ public class ProjectPartModal extends Modal<Part> {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                savePerformed(target, ProjectPartModal.this.getModel());
+                savePerformed(target, partModel);
             }
 
             @Override
@@ -87,6 +90,18 @@ public class ProjectPartModal extends Modal<Part> {
             }
         };
         addButton(save);
+    }
+
+    public Part getPart() {
+        return partModel.getObject();
+    }
+
+    public IModel<Part> getPartModel() {
+        return partModel;
+    }
+
+    public void setPart(Part part) {
+        this.partModel.setObject(part);
     }
 
     private IModel<String> createStringResource(String key) {

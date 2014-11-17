@@ -5,6 +5,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.springframework.data.domain.Sort;
 import sk.lazyman.gizmo.component.data.LinkColumn;
@@ -96,21 +97,17 @@ public class ProjectsTab extends SimplePanel {
     private void newProjectPerformed(AjaxRequestTarget target) {
         PageAppTemplate page = (PageAppTemplate) getPage();
         try {
-            Integer customerId = page.getIntegerParam(PageCustomer.CUSTOMER_ID);
+            Project project = new Project();
 
-            if (customerId == null) {
-                page.error(getString("Message.couldntCreateNewProjectUnknownCustomer"));
-                target.add(page.getFeedbackPanel());
-                return;
+            Integer customerId = page.getIntegerParam(PageCustomer.CUSTOMER_ID);
+            if (customerId != null) {
+                CustomerRepository repository = page.getCustomerRepository();
+                Customer customer = repository.findOne(customerId);
+                project.setCustomer(customer);
             }
 
-            CustomerRepository repository = page.getCustomerRepository();
-            Customer customer = repository.findOne(customerId);
-
-            Project project = new Project();
-            project.setCustomer(customer);
-
-            setResponsePage(new PageProject());
+            PageProject next = new PageProject(null, new Model<>(project));
+            setResponsePage(next);
         } catch (Exception ex) {
             page.handleGuiException(page, ex, target);
         }
