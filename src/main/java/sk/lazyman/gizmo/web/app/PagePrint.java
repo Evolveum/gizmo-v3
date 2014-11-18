@@ -233,12 +233,7 @@ public class PagePrint extends PageAppTemplate {
             @Override
             public String getObject() {
                 Date date = dateModel.getObject();
-                if (date == null) {
-                    return null;
-                }
-
-                DateFormat df = new SimpleDateFormat("EEE dd. MMM. yyyy");
-                return df.format(date);
+                return GizmoUtils.formatDate(date);
             }
         };
     }

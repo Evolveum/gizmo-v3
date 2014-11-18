@@ -22,6 +22,8 @@ import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.web.PageTemplate;
 import sk.lazyman.gizmo.web.error.PageError;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -285,5 +287,14 @@ public class GizmoUtils {
         Collections.sort(list);
 
         return list;
+    }
+
+    public static String formatDate(Date date) {
+        if (date == null) {
+            return null;
+        }
+
+        DateFormat df = new SimpleDateFormat("EEE dd. MMM. yyyy");
+        return df.format(date);
     }
 }

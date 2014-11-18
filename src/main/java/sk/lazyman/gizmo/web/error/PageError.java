@@ -10,10 +10,10 @@ import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.MainFeedback;
 import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
+import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.web.PageTemplate;
 import sk.lazyman.gizmo.web.app.PageDashboard;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -64,8 +64,7 @@ public class PageError extends PageTemplate {
                     return null;
                 }
 
-                SimpleDateFormat df = new SimpleDateFormat();
-                return df.format(new Date()) + "\t" + exClass + ": " + exMessage;
+                return GizmoUtils.formatDate(new Date()) + "\t" + exClass + ": " + exMessage;
             }
         };
 

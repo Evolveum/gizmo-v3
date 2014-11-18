@@ -1,9 +1,12 @@
 package sk.lazyman.gizmo.dto;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author lazyman
@@ -102,6 +105,21 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
         sb.append(", partId=").append(partId);
         sb.append('}');
         return sb.toString();
+    }
+
+    public String getDescription() {
+        List<String> values = new ArrayList<>();
+        if (StringUtils.isNotEmpty(customerName)) {
+            values.add(customerName);
+        }
+        if (StringUtils.isNotEmpty(projectName)) {
+            values.add(projectName);
+        }
+        if (StringUtils.isNotEmpty(partName)) {
+            values.add(partName);
+        }
+
+        return StringUtils.join(values, " - ");
     }
 
     public boolean match(String input) {

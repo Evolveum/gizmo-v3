@@ -155,12 +155,7 @@ public class PageDashboard extends PageAppTemplate {
                     public String getObject() {
                         PropertyModel<Date> propertyModel = new PropertyModel<>(rowModel, getPropertyExpression());
                         Date date = propertyModel.getObject();
-                        if (date == null) {
-                            return null;
-                        }
-
-                        DateFormat df = new SimpleDateFormat("EEE dd. MMM. yyyy");
-                        return df.format(date);
+                        return GizmoUtils.formatDate(date);
                     }
                 };
             }
@@ -365,10 +360,8 @@ public class PageDashboard extends PageAppTemplate {
     }
 
     private void emailPerformed(AjaxRequestTarget target) {
-        PageParameters params = new PageParameters();
-        //todo send filter
-
-        setResponsePage(PageEmail.class, params);
+        PageEmail next = new PageEmail(filter);
+        setResponsePage(next);
     }
 
     private void printPerformed(AjaxRequestTarget target) {

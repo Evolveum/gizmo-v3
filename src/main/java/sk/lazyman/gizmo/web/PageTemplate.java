@@ -3,6 +3,7 @@ package sk.lazyman.gizmo.web;
 import de.agilecoders.wicket.core.Bootstrap;
 import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Alert;
 import de.agilecoders.wicket.less.LessResourceReference;
+import org.apache.commons.lang.Validate;
 import org.apache.wicket.Component;
 import org.apache.wicket.devutils.debugbar.DebugBar;
 import org.apache.wicket.injection.Injector;
@@ -15,6 +16,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.springframework.core.env.Environment;
 import sk.lazyman.gizmo.repository.*;
 
 import javax.persistence.EntityManager;
@@ -45,6 +47,8 @@ public class PageTemplate extends WebPage {
     private LogRepository logRepository;
     @SpringBean
     private AbstractTaskRepository abstractTaskRepository;
+    @SpringBean
+    private Environment environment;
 
     public PageTemplate() {
         this(null);
@@ -139,5 +143,10 @@ public class PageTemplate extends WebPage {
 
     public AbstractTaskRepository getAbstractTaskRepository() {
         return abstractTaskRepository;
+    }
+
+    public String getPropertyValue(String name) {
+        Validate.notEmpty(name, "Property name must not be null or empty.");
+        return environment.getProperty(name);
     }
 }
