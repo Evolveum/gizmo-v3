@@ -44,8 +44,6 @@ import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -105,8 +103,15 @@ public class PageDashboard extends PageAppTemplate {
         form.add(new DropDownChoice<>(ID_TYPE, new PropertyModel<WorkType>(filter, WorkFilterDto.F_TYPE),
                 GizmoUtils.createReadonlyModelFromEnum(WorkType.class), GizmoUtils.createEnumRenderer(this)));
 
-        form.add(new DateTextField(ID_FROM, new PropertyModel<Date>(filter, WorkFilterDto.F_FROM)));
-        form.add(new DateTextField(ID_TO, new PropertyModel<Date>(filter, WorkFilterDto.F_TO)));
+        DateTextField from = new DateTextField(ID_FROM, new PropertyModel<Date>(filter, WorkFilterDto.F_FROM));
+        from.setLabel(createStringResource("PageDashboard.dateFrom"));
+        from.setRequired(true);
+        form.add(from);
+
+        DateTextField to = new DateTextField(ID_TO, new PropertyModel<Date>(filter, WorkFilterDto.F_TO));
+        to.setLabel(createStringResource("PageDashboard.dateTo"));
+        to.setRequired(true);
+        form.add(to);
 
         form.add(new DropDownChoice<User>(ID_REALIZATOR, new PropertyModel<User>(filter, WorkFilterDto.F_REALIZATOR),
                 GizmoUtils.createUsersModel(this), GizmoUtils.createUserChoiceRenderer()) {
