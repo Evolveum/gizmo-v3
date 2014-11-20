@@ -12,8 +12,10 @@ import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
+import sk.lazyman.gizmo.data.EmailLog;
 import sk.lazyman.gizmo.dto.EmailDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
+import sk.lazyman.gizmo.repository.EmailLogRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
@@ -25,6 +27,7 @@ import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -139,20 +142,51 @@ public class PageEmail extends PageAppTemplate {
             Message mail = buildMail(session);
             Transport.send(mail);
 
-            //todo log email success
+            logEmail(true, target);
 
             PageDashboard next = new PageDashboard();
             next.success(getString("Message.emailSuccess"));
             setResponsePage(next);
         } catch (Exception ex) {
-            //todo log email failure
-
+            logEmail(false, target);
             handleGuiException(this, "Message.couldntSendEmail", ex, target);
         }
     }
 
     private void cancelPerformed(AjaxRequestTarget target) {
         setResponsePage(PageDashboard.class);
+    }
+
+    private void logEmail(boolean success, AjaxRequestTarget target) {
+        try {
+            EmailLog log = new EmailLog();
+            log.setSuccessful(success);
+            GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
+            log.setSender(principal.getUser());
+            log.setSentDate(new Date());
+
+            EmailDto dto = model.getObject();
+            log.setMailTo(dto.getTo());
+            log.setMailCc(dto.getCc());
+            log.setMailBcc(dto.getBcc());
+
+            log.setDescription(dto.getBody());
+
+            WorkFilterDto filter = this.filter.getObject();
+            log.setFromDate(filter.getFrom());
+            log.setToDate(filter.getTo());
+
+            //todo log email
+//        log.setProjectList();
+//        log.setRealizatorList();
+//        log.setSummaryInvoice();
+//        log.setSummaryWork();
+
+            EmailLogRepository repository = getEmailLogRepository();
+            repository.save(log);
+        } catch (Exception ex) {
+            handleGuiException(this, ex, target);
+        }
     }
 
     private Message buildMail(Session session) throws MessagingException, IOException {
@@ -207,13 +241,14 @@ public class PageEmail extends PageAppTemplate {
     private String createSubject() {
         WorkFilterDto dto = filter.getObject();
 
-        String from = GizmoUtils.formatDate(dto.getFrom());
-        String to = GizmoUtils.formatDate(dto.getTo());
+        String format = "dd. MMM. yyyy";
+        String from = GizmoUtils.formatDate(dto.getFrom(), format);
+        String to = GizmoUtils.formatDate(dto.getTo(), format);
 
         String project = dto.getProject() == null ? "*" : dto.getProject().getDescription();
 
         StringBuilder subject = new StringBuilder();
-        subject.append("Report ");
+        subject.append("Report for ");
         subject.append(project);
         subject.append(" (");
         subject.append(from);
@@ -241,7 +276,7 @@ public class PageEmail extends PageAppTemplate {
     }
 
     private Message createMimeMessage(Session session, String subject)
-            throws AddressException, UnsupportedEncodingException, MessagingException {
+            throws UnsupportedEncodingException, MessagingException {
 
         Message mimeMessage = new MimeMessage(session);
         String from = getPropertyValue(MAIL_FROM);

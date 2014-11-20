@@ -287,11 +287,15 @@ public class GizmoUtils {
     }
 
     public static String formatDate(Date date) {
+        return formatDate(date, "EEE dd. MMM. yyyy");
+    }
+
+    public static String formatDate(Date date, String pattern) {
         if (date == null) {
             return null;
         }
 
-        DateFormat df = new SimpleDateFormat("EEE dd. MMM. yyyy");
+        DateFormat df = new SimpleDateFormat(pattern);
         return df.format(date);
     }
 }
