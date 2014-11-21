@@ -1,19 +1,32 @@
 package sk.lazyman.gizmo.web.app;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.core.util.string.ComponentRenderer;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.mock.MockWebRequest;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.protocol.http.BufferedWebResponse;
+import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.protocol.http.mock.MockHttpServletRequest;
+import org.apache.wicket.protocol.http.mock.MockHttpServletResponse;
+import org.apache.wicket.protocol.http.mock.MockHttpSession;
+import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
+import org.apache.wicket.request.http.WebRequest;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
+import sk.lazyman.gizmo.component.ReportSearchSummary;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.EmailLog;
 import sk.lazyman.gizmo.dto.EmailDto;
+import sk.lazyman.gizmo.dto.ReportSearchSummaryDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.repository.EmailLogRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
@@ -25,6 +38,8 @@ import javax.activation.DataHandler;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -95,10 +110,7 @@ public class PageEmail extends PageAppTemplate {
                 createStringResource("PageEmail.body"), false);
         form.add(body);
 
-//        ReportSearchSummary summary = new ReportSearchSummary(ID_SUMMARY);
-//        add(summary);
-
-        WebMarkupContainer summary = new WebMarkupContainer(ID_SUMMARY);
+        ReportSearchSummary summary = new ReportSearchSummary(ID_SUMMARY, createSummaryModel());
         add(summary);
 
         WebMarkupContainer table = new WebMarkupContainer(ID_TABLE);
@@ -234,8 +246,10 @@ public class PageEmail extends PageAppTemplate {
     }
 
     private String createHtml() {
-        //todo create html content
-        return "todo create html content";
+        PagePrint page = new PagePrint(filter);
+
+        ComponentRenderer renderer = new ComponentRenderer();
+        return renderer.renderComponent(page).toString();
     }
 
     private String createSubject() {
@@ -327,4 +341,58 @@ public class PageEmail extends PageAppTemplate {
 
         return retval;
     }
+
+    private IModel<ReportSearchSummaryDto> createSummaryModel() {
+        return new LoadableModel<ReportSearchSummaryDto>(false) {
+
+            @Override
+            protected ReportSearchSummaryDto load() {
+                return new ReportSearchSummaryDto();
+            }
+        };
+    }
+
+//    protected String renderPage(Class<? extends Page> pageClass, PageParameters pageParameters) {
+//
+//        //get the servlet context
+//        WebApplication application = (WebApplication) WebApplication.get();
+//
+//        ServletContext context = application.getServletContext();
+//
+//        //fake a request/response cycle
+//        MockHttpSession servletSession = new MockHttpSession(context);
+//        servletSession.setTemporary(true);
+//
+//        MockHttpServletRequest servletRequest = new MockHttpServletRequest(
+//                application, servletSession, context);
+//        MockHttpServletResponse servletResponse = new MockHttpServletResponse(
+//                servletRequest);
+//
+//        //initialize request and response
+//        servletRequest.initialize();
+//        servletResponse.initialize();
+//
+//        WebRequest webRequest = new ServletWebRequest(servletRequest, null);
+//
+//        BufferedWebResponse webResponse = new BufferedWebResponse(servletResponse);
+//        webResponse.setAjax(true);
+//
+//        WebRequestCycle requestCycle = new WebRequestCycle(
+//                application, webRequest, webResponse);
+//
+//        requestCycle.setRequestTarget(new BookmarkablePageRequestTarget(pageClass, pageParameters));
+//
+//        try {
+//            requestCycle.request();
+//
+//            if (requestCycle.wasHandled() == false) {
+//                requestCycle.setRequestTarget(new WebErrorCodeResponseTarget(
+//                        HttpServletResponse.SC_NOT_FOUND));
+//            }
+//            requestCycle.detach();
+//
+//        } finally {
+//            requestCycle.getResponse().close();
+//        }		return webResponse.toString();
+//    }
 }
