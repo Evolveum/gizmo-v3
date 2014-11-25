@@ -105,10 +105,6 @@ public class PageTemplate extends WebPage {
         return createStringResource("page.title");
     }
 
-    public void addAlert(IModel<String> text, Alert.Type type) {
-
-    }
-
     public CustomerRepository getCustomerRepository() {
         return customerRepository;
     }
@@ -149,4 +145,16 @@ public class PageTemplate extends WebPage {
         Validate.notEmpty(name, "Property name must not be null or empty.");
         return environment.getProperty(name);
     }
+
+    /**
+     * It's here only because of some IDEs - it's not properly filtering resources during maven build.
+     * "describe" variable is not replaced.
+     *
+     * @return "unknown" instead of "git describe" for current build.
+     */
+    @Deprecated
+    public String getDescribe() {
+        return getString("GizmoApplication.projectVersionUnknown");
+    }
+
 }

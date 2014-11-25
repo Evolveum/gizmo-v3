@@ -1,11 +1,13 @@
 package sk.lazyman.gizmo.web.app;
 
+import de.agilecoders.wicket.core.markup.html.bootstrap.behavior.CssClassNameAppender;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.ImmutableNavbarComponent;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.Navbar;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarExternalLink;
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
@@ -51,7 +53,15 @@ public class PageAppTemplate extends PageTemplate {
     }
 
     private void initLayout() {
-        Navbar navbar = new Navbar(ID_NAVBAR);
+        Navbar navbar = new Navbar(ID_NAVBAR) {
+
+            @Override
+            protected Label newBrandLabel(String markupId) {
+                Label label = super.newBrandLabel(markupId);
+                label.add(AttributeAppender.replace("title", createStringResource("GizmoApplication.projectVersion")));
+                return label;
+            }
+        };
         navbar.setBrandName(createStringResource("GizmoApplication.projectName"));
         navbar.setPosition(Navbar.Position.STATIC_TOP);
         add(navbar);
