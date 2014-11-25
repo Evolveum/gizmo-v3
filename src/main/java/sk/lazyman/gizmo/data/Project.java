@@ -4,6 +4,7 @@ import sk.lazyman.gizmo.util.GizmoUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * @author lazyman
@@ -24,6 +25,7 @@ public class Project implements Serializable {
     private Customer customer;
     private boolean closed;
     private boolean commercial;
+    private Set<Part> parts;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_id")
@@ -54,6 +56,15 @@ public class Project implements Serializable {
     @Column(length = GizmoUtils.DESCRIPTION_SIZE)
     public String getDescription() {
         return description;
+    }
+
+    @OneToMany(mappedBy = Part.F_PROJECT)
+    public Set<Part> getParts() {
+        return parts;
+    }
+
+    public void setParts(Set<Part> parts) {
+        this.parts = parts;
     }
 
     public void setId(Integer id) {

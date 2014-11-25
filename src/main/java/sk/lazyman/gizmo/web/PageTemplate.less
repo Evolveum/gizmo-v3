@@ -3,27 +3,31 @@
 }
 
 // autocomplete
-div.wicket-aa {
-  font-size: 12px;
-  background-color: #fff;
-  color: #555;
-  border-width: 1px;
-  border-color: #ccc;
-  border-style: solid;
-  padding: 2px;
-  margin: 1px 0 0 0;
-  text-align: left;
+div.wicket-aa-container {
+  z-index: 100;
 
-  ul {
-    list-style: none;
+  div.wicket-aa {
+    font-size: 12px;
+    background-color: #fff;
+    color: #555;
+    border-width: 1px;
+    border-color: #ccc;
+    border-style: solid;
     padding: 2px;
+    margin: 1px 0 0 0;
+    text-align: left;
 
-    li {
-      padding: 2px 4px;
+    ul {
+      list-style: none;
+      padding: 2px;
 
-      &.selected {
-        background-color: #eee;
-        color: #262626;
+      li {
+        padding: 2px 4px;
+
+        &.selected {
+          background-color: #eee;
+          color: #262626;
+        }
       }
     }
   }

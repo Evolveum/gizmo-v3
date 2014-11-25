@@ -15,6 +15,13 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
 
     private static final Logger LOG = LoggerFactory.getLogger(CustomerProjectPartDto.class);
 
+    public static final String F_CUSTOMER_NAME = "customerName";
+    public static final String F_PROJECT_NAME = "projectName";
+    public static final String F_PART_NAME = "partName";
+    public static final String F_CUSTOMER_ID = "customerId";
+    public static final String F_PROJECT_ID = "projectId";
+    public static final String F_PART_ID = "partId";
+
     private String customerName;
     private String projectName;
     private String partName;
@@ -22,6 +29,9 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
     private Integer customerId;
     private Integer projectId;
     private Integer partId;
+
+    public CustomerProjectPartDto() {
+    }
 
     public CustomerProjectPartDto(String customerName, Integer customerId) {
         this(customerName, null, null, customerId, null, null);
@@ -123,15 +133,12 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
     }
 
     public boolean match(String input) {
-        LOG.trace("Matching '{}'", input);
-
         if (input == null || input.isEmpty()) {
             return true;
         }
 
         input = input.toLowerCase().trim();
         if (!input.contains("/")) {
-            LOG.trace("Input doesn't contain '/'.");
             return matchCustomerProject(input, input, false);
         } else {
             String[] array = input.split("/");
@@ -140,11 +147,9 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
                     return matchCustomerProject(array[0].trim(), array[1].trim(), true)
                             && matchProjectPart(array[1].trim(), array[2].trim(), true);
                 case 2:
-                    LOG.trace("Input contain '/' and two parts.");
                     return matchCustomerProject(array[0].trim(), array[1].trim(), true)
                             || matchProjectPart(array[0].trim(), array[1].trim(), true);
                 default:
-                    LOG.trace("Input contain '/'.");
                     boolean retVal;
                     for (int i = 0; i < array.length; i++) {
                         String item = array[i].trim();

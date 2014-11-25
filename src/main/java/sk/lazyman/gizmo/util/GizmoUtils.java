@@ -1,5 +1,9 @@
 package sk.lazyman.gizmo.util;
 
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.Expression;
+import com.mysema.query.types.Projections;
+import com.mysema.query.types.QBean;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseException;
@@ -10,10 +14,7 @@ import org.apache.wicket.model.StringResourceModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
-import sk.lazyman.gizmo.data.Customer;
-import sk.lazyman.gizmo.data.Part;
-import sk.lazyman.gizmo.data.Project;
-import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.PartRepository;
@@ -22,6 +23,7 @@ import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.web.PageTemplate;
 import sk.lazyman.gizmo.web.error.PageError;
 
+import javax.persistence.EntityManager;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -194,12 +196,14 @@ public class GizmoUtils {
 
             @Override
             protected List<CustomerProjectPartDto> load() {
-                List<CustomerProjectPartDto> list = new ArrayList<>();
+                List<CustomerProjectPartDto> list = null;
                 try {
                     if (showCustomers && showProjects && !showParts) {
-                        list = listCustomersProjects(page);
+
+                        List<CustomerProjectPartDto> dbList = listProjectsFromDb(page.getEntityManager());
+                        list = listCustomersProjects(dbList);
                     } else if (showCustomers && showProjects && showParts) {
-                        list = listCustomersProjectsParts(page);
+                        list = listProjectsFromDb(page.getEntityManager());
                     } else if (showCustomers && !showProjects && !showParts) {
                         list = listCustomers(page);
                     }
@@ -207,11 +211,47 @@ public class GizmoUtils {
                     handleModelException(page, "Message.couldntLoadProjectData", ex);
                 }
 
+                if (list == null) {
+                    list = new ArrayList<>();
+                }
+
                 LOG.debug("Found {} items.", list.size());
+
+                Collections.sort(list);
 
                 return list;
             }
         };
+    }
+
+    private static List<CustomerProjectPartDto> listProjectsFromDb(EntityManager entityManager) {
+        QCustomer customer = QCustomer.customer;
+        QProject project = QProject.project;
+        QPart part = QPart.part;
+
+        JPAQuery query = new JPAQuery(entityManager);
+        query.from(customer).leftJoin(customer.projects, project).leftJoin(QProject.project.parts, part);
+        query.where(QProject.project.closed.eq(false));
+        query.orderBy(customer.name.asc(), project.name.asc(), part.name.asc());
+
+//        QBean projection = Projections.bean(CustomerProjectPartDto.class,
+//                customer.id.as(CustomerProjectPartDto.F_CUSTOMER_ID),
+//                customer.name.as(CustomerProjectPartDto.F_CUSTOMER_NAME),
+//                project.id.as(CustomerProjectPartDto.F_PROJECT_ID),
+//                project.name.as(CustomerProjectPartDto.F_PROJECT_NAME),
+//                part.id.as(CustomerProjectPartDto.F_PART_ID),
+//                part.name.as(CustomerProjectPartDto.F_PART_NAME));
+
+        Map<String,Expression<?>> bindings = new HashMap<>();
+        bindings.put(CustomerProjectPartDto.F_CUSTOMER_ID, customer.id);
+        bindings.put(CustomerProjectPartDto.F_CUSTOMER_NAME, customer.name);
+        bindings.put(CustomerProjectPartDto.F_PROJECT_ID, project.id);
+        bindings.put(CustomerProjectPartDto.F_PROJECT_NAME, project.name);
+        bindings.put(CustomerProjectPartDto.F_PART_ID, part.id);
+        bindings.put(CustomerProjectPartDto.F_PART_NAME, part.name);
+        QBean projection = new QBean(CustomerProjectPartDto.class, true, bindings);
+
+        return query.list(projection);
     }
 
     private static void handleModelException(PageTemplate page, String message, Exception ex) {
@@ -226,24 +266,6 @@ public class GizmoUtils {
         throw new RestartResponseException(errorPage);
     }
 
-    private static List<CustomerProjectPartDto> listCustomersProjectsParts(PageTemplate page) {
-        List<CustomerProjectPartDto> list = new ArrayList<>();
-
-        PartRepository repository = page.getProjectPartRepository();
-        List<Part> parts = repository.findOpenedProjectParts();
-        for (Part part : parts) {
-            Project project = part.getProject();
-            Customer customer = project.getCustomer();
-
-            list.add(new CustomerProjectPartDto(customer.getName(), project.getName(), part.getName(),
-                    customer.getId(), project.getId(), part.getId()));
-        }
-
-        Collections.sort(list);
-
-        return list;
-    }
-
     private static List<CustomerProjectPartDto> listCustomers(PageTemplate page) {
         List<CustomerProjectPartDto> list = new ArrayList<>();
 
@@ -253,35 +275,25 @@ public class GizmoUtils {
             list.add(new CustomerProjectPartDto(customer.getName(), customer.getId()));
         }
 
-        Collections.sort(list);
-
         return list;
     }
 
-    private static List<CustomerProjectPartDto> listCustomersProjects(PageTemplate page) {
+    private static List<CustomerProjectPartDto> listCustomersProjects(List<CustomerProjectPartDto> dbList) {
         List<CustomerProjectPartDto> list = new ArrayList<>();
 
-        ProjectRepository repository = page.getProjectRepository();
-        List<Project> projects = repository.findOpenedProjects();
-        Set<Customer> customers = new HashSet<>();
-
-        for (Project project : projects) {
-            Customer customer = project.getCustomer();
-            String customerName = null;
-            if (customer != null) {
-                customers.add(customer);
-                customerName = customer.getName();
+        Set<Integer> addedCustomers = new HashSet<>();
+        Set<Integer> addedProjects = new HashSet<>();
+        for (CustomerProjectPartDto dto : dbList) {
+            if (!addedCustomers.contains(dto.getCustomerId())) {
+                list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getCustomerId()));
+                addedCustomers.add(dto.getCustomerId());
             }
-
-            list.add(new CustomerProjectPartDto(customerName, project.getName(),
-                    customer.getId(), project.getId()));
+            if (!addedProjects.contains(dto.getProjectId())) {
+                list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getProjectName(),
+                        dto.getCustomerId(), dto.getProjectId()));
+                addedProjects.add(dto.getProjectId());
+            }
         }
-
-        for (Customer customer : customers) {
-            list.add(new CustomerProjectPartDto(customer.getName(), customer.getId()));
-        }
-
-        Collections.sort(list);
 
         return list;
     }

@@ -13,9 +13,6 @@ import java.util.List;
  */
 public interface ProjectRepository extends JpaRepository<Project, Integer>, QueryDslPredicateExecutor<Project> {
 
-    @Query("from Project p where p.customer.id = :customerId order by p.name")
-    public List<Project> findProjects(@Param("customerId") Integer companyId);
-
-    @Query("from Project p where p.closed != false order by p.name")
+    @Query("from Project p where p.closed = false order by p.name")
     public List<Project> findOpenedProjects();
 }
