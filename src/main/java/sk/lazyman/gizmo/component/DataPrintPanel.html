@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <div wicket:id="reportSummary"/>
+
+    <table class="table table-condensed table-bordered">
+        <thead>
+        <tr>
+            <th><wicket:message key="DataPrintPanel.date"/></th>
+            <th><wicket:message key="DataPrintPanel.length"/></th>
+            <th wicket:id="customerHeader"><wicket:message key="DataPrintPanel.customer"/></th>
+            <th wicket:id="projectPartHeader"><wicket:message key="DataPrintPanel.projectPart"/></th>
+            <th><wicket:message key="DataPrintPanel.realizator"/></th>
+            <th><wicket:message key="DataPrintPanel.description"/></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr wicket:id="data">
+            <td wicket:id="date"/>
+            <td wicket:id="length"/>
+            <td wicket:id="customer"/>
+            <td wicket:id="projectPart"/>
+            <td wicket:id="realizator"/>
+            <td wicket:id="description"/>
+        </tr>
+        </tbody>
+    </table>
+</wicket:panel>
+</body>
+</html>

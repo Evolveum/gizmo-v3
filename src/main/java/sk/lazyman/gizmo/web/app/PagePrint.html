@@ -3,30 +3,7 @@
 <body>
 <wicket:extend>
     <div class="container-fluid">
-        <div wicket:id="reportSummary"/>
-
-        <table class="table table-condensed table-bordered">
-            <thead>
-                <tr>
-                    <th><wicket:message key="PagePrint.date"/></th>
-                    <th><wicket:message key="PagePrint.length"/></th>
-                    <th wicket:id="customerHeader"><wicket:message key="PagePrint.customer"/></th>
-                    <th wicket:id="projectPartHeader"><wicket:message key="PagePrint.projectPart"/></th>
-                    <th><wicket:message key="PagePrint.realizator"/></th>
-                    <th><wicket:message key="PagePrint.description"/></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr wicket:id="data">
-                    <td wicket:id="date"/>
-                    <td wicket:id="length"/>
-                    <td wicket:id="customer"/>
-                    <td wicket:id="projectPart"/>
-                    <td wicket:id="realizator"/>
-                    <td wicket:id="description"/>
-                </tr>
-            </tbody>
-        </table>
+        <div wicket:id="dataPrint"/>
     </div>
 </wicket:extend>
 </body>

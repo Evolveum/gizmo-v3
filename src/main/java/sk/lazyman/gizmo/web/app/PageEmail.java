@@ -1,23 +1,13 @@
 package sk.lazyman.gizmo.web.app;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.core.util.string.ComponentRenderer;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.mock.MockWebRequest;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.protocol.http.BufferedWebResponse;
-import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.protocol.http.mock.MockHttpServletRequest;
-import org.apache.wicket.protocol.http.mock.MockHttpServletResponse;
-import org.apache.wicket.protocol.http.mock.MockHttpSession;
-import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
-import org.apache.wicket.request.http.WebRequest;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
@@ -38,8 +28,6 @@ import javax.activation.DataHandler;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -246,7 +234,7 @@ public class PageEmail extends PageAppTemplate {
     }
 
     private String createHtml() {
-        PagePrint page = new PagePrint(filter);
+        PageEmailPrint page = new PageEmailPrint(filter);
 
         ComponentRenderer renderer = new ComponentRenderer();
         return renderer.renderComponent(page).toString();
