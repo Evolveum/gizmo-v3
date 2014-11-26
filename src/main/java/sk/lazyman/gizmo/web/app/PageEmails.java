@@ -144,8 +144,8 @@ public class PageEmails extends PageAppTemplate {
                     @Override
                     public String getObject() {
                         EmailLog log = rowModel.getObject();
-                        return "fa fa-fw " +
-                                (log.isSuccessful() ? "fa-check-circle fa-lg text-success" : "fa-times-circle text-danger");
+                        return "fa fa-fw fa-lg " +
+                                (log.isSuccessful() ? "fa-check-circle text-success" : "fa-times-circle text-danger");
                     }
                 };
             }

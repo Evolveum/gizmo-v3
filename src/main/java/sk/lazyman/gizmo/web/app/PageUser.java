@@ -118,7 +118,9 @@ public class PageUser extends PageAppUsers {
             UserRepository repo = getUserRepository();
             repo.saveAndFlush(model.getObject());
 
-            setResponsePage(PageUsers.class);
+            PageUsers next = new PageUsers();
+            next.success(getString("Message.userSavedSuccessfully"));
+            setResponsePage(next);
         } catch (Exception ex) {
             handleGuiException(this, "Message.couldntSaveUser", ex, target);
         }
