@@ -139,7 +139,7 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
 
         input = input.toLowerCase().trim();
         if (!input.contains("/")) {
-            return matchCustomerProject(input, input, false);
+            return matchCustomerProject(input, input, false) || matchProjectPart(input, input, false);
         } else {
             String[] array = input.split("/");
             switch (array.length) {
