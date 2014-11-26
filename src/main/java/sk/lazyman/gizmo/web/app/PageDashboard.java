@@ -103,12 +103,14 @@ public class PageDashboard extends PageAppTemplate {
         form.add(new DropDownChoice<>(ID_TYPE, new PropertyModel<WorkType>(filter, WorkFilterDto.F_TYPE),
                 GizmoUtils.createReadonlyModelFromEnum(WorkType.class), GizmoUtils.createEnumRenderer(this)));
 
-        DateTextField from = new DateTextField(ID_FROM, new PropertyModel<Date>(filter, WorkFilterDto.F_FROM));
+        DateTextField from = new DateTextField(ID_FROM, new PropertyModel<Date>(filter, WorkFilterDto.F_FROM),
+                GizmoUtils.DATE_FIELD_FORMAT);
         from.setLabel(createStringResource("PageDashboard.dateFrom"));
         from.setRequired(true);
         form.add(from);
 
-        DateTextField to = new DateTextField(ID_TO, new PropertyModel<Date>(filter, WorkFilterDto.F_TO));
+        DateTextField to = new DateTextField(ID_TO, new PropertyModel<Date>(filter, WorkFilterDto.F_TO),
+                GizmoUtils.DATE_FIELD_FORMAT);
         to.setLabel(createStringResource("PageDashboard.dateTo"));
         to.setRequired(true);
         form.add(to);

@@ -69,8 +69,10 @@ public class PageEmails extends PageAppTemplate {
         Form form = new Form(ID_FORM);
         add(form);
 
-        form.add(new DateTextField(ID_FROM, new PropertyModel<Date>(filter, EmailFilterDto.F_FROM)));
-        form.add(new DateTextField(ID_TO, new PropertyModel<Date>(filter, EmailFilterDto.F_TO)));
+        form.add(new DateTextField(ID_FROM, new PropertyModel<Date>(filter, EmailFilterDto.F_FROM),
+                GizmoUtils.DATE_FIELD_FORMAT));
+        form.add(new DateTextField(ID_TO, new PropertyModel<Date>(filter, EmailFilterDto.F_TO),
+                GizmoUtils.DATE_FIELD_FORMAT));
 
         form.add(new DropDownChoice<User>(ID_SENDER, new PropertyModel<User>(filter, EmailFilterDto.F_SENDER),
                 GizmoUtils.createUsersModel(this), new IChoiceRenderer<User>() {

@@ -34,6 +34,7 @@ import java.util.*;
 public class GizmoUtils {
 
     public static final int DESCRIPTION_SIZE = 3000;
+    public static final String DATE_FIELD_FORMAT = "dd/mm/yyyy";
 
     private static final Logger LOG = LoggerFactory.getLogger(GizmoUtils.class);
 
