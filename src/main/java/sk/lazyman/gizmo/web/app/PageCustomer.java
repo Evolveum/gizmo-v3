@@ -152,21 +152,21 @@ public class PageCustomer extends PageAppCustomers {
             }
         });
 
-        tabList.add(new AbstractTab(createStringResource("PageCustomer.logs")) {
-
-            @Override
-            public WebMarkupContainer getPanel(String panelId) {
-                return new CustomerLogsTab(panelId);
-            }
-        });
-
-        tabList.add(new AbstractTab(createStringResource("PageCustomer.notifications")) {
-
-            @Override
-            public WebMarkupContainer getPanel(String panelId) {
-                return new CustomerNotificationsTab(panelId);
-            }
-        });
+//        tabList.add(new AbstractTab(createStringResource("PageCustomer.logs")) {
+//
+//            @Override
+//            public WebMarkupContainer getPanel(String panelId) {
+//                return new CustomerLogsTab(panelId);
+//            }
+//        });
+//
+//        tabList.add(new AbstractTab(createStringResource("PageCustomer.notifications")) {
+//
+//            @Override
+//            public WebMarkupContainer getPanel(String panelId) {
+//                return new CustomerNotificationsTab(panelId);
+//            }
+//        });
 
         AjaxBootstrapTabbedPanel tabs = new AjaxBootstrapTabbedPanel(ID_TABS, tabList);
         add(tabs);

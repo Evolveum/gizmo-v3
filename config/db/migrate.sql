@@ -1,5 +1,8 @@
 insert into g_user (id,name,givenname,familyname,ldapdn,enabled)
-    select id,username,firstname,lastname,ldapdn,true from users;
+    select id,username,firstname,lastname,ldapdn,true from users where role <> 3;
+
+insert into g_user (id,name,givenname,familyname,ldapdn,enabled)
+  select id,username,firstname,lastname,ldapdn,false from users where role = 3;
 
 insert into g_customer (id,name,description,type)
     select id,name,description,0 from company;

@@ -45,6 +45,11 @@ public class GizmoAuthenticationProvider implements AuthenticationProvider {
         if (user == null) {
             user = createUser(ctx, principal);
         }
+
+        if (!user.isEnabled()) {
+            throw new BadCredentialsException("GizmoAuthenticationProvider.userDisabled");
+        }
+
         GizmoPrincipal gizmoPrincipal = new GizmoPrincipal(user);
 
         LOGGER.debug("User '{}' authenticated ({}), authorities: {}", new Object[]{authentication.getPrincipal(),
@@ -70,6 +75,7 @@ public class GizmoAuthenticationProvider implements AuthenticationProvider {
         user.setGivenName(ctx.getStringAttribute("givenName"));
         user.setName(name);
         user.setLdapDn(ctx.getNameInNamespace());
+        user.setEnabled(false);
 
         return userRepository.save(user);
     }

@@ -9,6 +9,7 @@ import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
+import sk.lazyman.gizmo.component.form.HCheckFormGroup;
 import sk.lazyman.gizmo.component.form.HFormGroup;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.repository.UserRepository;
@@ -27,6 +28,7 @@ public class PageUser extends PageAppUsers {
     private static final String ID_GIVEN_NAME = "givenName";
     private static final String ID_FAMILY_NAME = "familyName";
     private static final String ID_LDAP_DN = "ldapDn";
+    private static final String ID_ENABLED = "enabled";
     private static final String ID_SAVE = "save";
     private static final String ID_CANCEL = "cancel";
 
@@ -78,6 +80,10 @@ public class PageUser extends PageAppUsers {
         HFormGroup email = new HFormGroup(ID_LDAP_DN, new PropertyModel<String>(model, User.F_LDAP_DN),
                 createStringResource("User.ldapDn"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(email);
+
+        HFormGroup enabled = new HCheckFormGroup(ID_ENABLED, new PropertyModel<Boolean>(model, User.F_ENABLED),
+                createStringResource("User.enabled"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        form.add(enabled);
 
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
