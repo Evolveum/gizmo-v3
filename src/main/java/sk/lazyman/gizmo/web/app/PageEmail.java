@@ -14,7 +14,9 @@ import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.ReportSearchSummary;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
+import sk.lazyman.gizmo.data.AbstractTask;
 import sk.lazyman.gizmo.data.EmailLog;
+import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.dto.EmailDto;
 import sk.lazyman.gizmo.dto.ReportSearchSummaryDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
@@ -30,8 +32,7 @@ import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author lazyman
@@ -55,6 +56,7 @@ public class PageEmail extends PageAppTemplate {
 
     private IModel<EmailDto> model = new Model<>(new EmailDto());
     private IModel<WorkFilterDto> filter;
+    private IModel<List<AbstractTask>> dataModel;
 
     public PageEmail() {
         this(new LoadableModel<WorkFilterDto>(false) {
@@ -72,8 +74,15 @@ public class PageEmail extends PageAppTemplate {
         });
     }
 
-    public PageEmail(IModel<WorkFilterDto> filter) {
+    public PageEmail(final IModel<WorkFilterDto> filter) {
         this.filter = filter;
+        this.dataModel = new LoadableModel<List<AbstractTask>>(false) {
+
+            @Override
+            protected List<AbstractTask> load() {
+                return GizmoUtils.loadData(filter.getObject(), getEntityManager());
+            }
+        };
 
         initLayout();
     }
@@ -98,7 +107,7 @@ public class PageEmail extends PageAppTemplate {
                 createStringResource("PageEmail.body"), false);
         form.add(body);
 
-        ReportSearchSummary summary = new ReportSearchSummary(ID_SUMMARY, createSummaryModel());
+        ReportSearchSummary summary = new ReportSearchSummary(ID_SUMMARY, filter, dataModel);
         add(summary);
 
         WebMarkupContainer table = new WebMarkupContainer(ID_TABLE);
@@ -176,17 +185,25 @@ public class PageEmail extends PageAppTemplate {
             log.setFromDate(filter.getFrom());
             log.setToDate(filter.getTo());
 
+            Set<User> realizators = createRealizators(filter);
+            log.setRealizatorList(realizators);
             //todo log email
 //        log.setProjectList();
-//        log.setRealizatorList();
-//        log.setSummaryInvoice();
-//        log.setSummaryWork();
+            log.setSummaryInvoice(GizmoUtils.sumInvoiceLength(dataModel));
+            log.setSummaryWork(GizmoUtils.sumWorkLength(dataModel));
 
             EmailLogRepository repository = getEmailLogRepository();
             repository.save(log);
         } catch (Exception ex) {
             handleGuiException(this, ex, target);
         }
+    }
+
+    private Set<User> createRealizators(WorkFilterDto filter) {
+        Set<User> realizators = new HashSet<>();
+        realizators.add(filter.getRealizator());
+
+        return realizators;
     }
 
     private Message buildMail(Session session) throws MessagingException, IOException {
@@ -234,7 +251,7 @@ public class PageEmail extends PageAppTemplate {
     }
 
     private String createHtml() {
-        PageEmailPrint page = new PageEmailPrint(filter);
+        PageEmailPrint page = new PageEmailPrint(filter, dataModel);
 
         ComponentRenderer renderer = new ComponentRenderer();
         return renderer.renderComponent(page).toString();
@@ -339,48 +356,4 @@ public class PageEmail extends PageAppTemplate {
             }
         };
     }
-
-//    protected String renderPage(Class<? extends Page> pageClass, PageParameters pageParameters) {
-//
-//        //get the servlet context
-//        WebApplication application = (WebApplication) WebApplication.get();
-//
-//        ServletContext context = application.getServletContext();
-//
-//        //fake a request/response cycle
-//        MockHttpSession servletSession = new MockHttpSession(context);
-//        servletSession.setTemporary(true);
-//
-//        MockHttpServletRequest servletRequest = new MockHttpServletRequest(
-//                application, servletSession, context);
-//        MockHttpServletResponse servletResponse = new MockHttpServletResponse(
-//                servletRequest);
-//
-//        //initialize request and response
-//        servletRequest.initialize();
-//        servletResponse.initialize();
-//
-//        WebRequest webRequest = new ServletWebRequest(servletRequest, null);
-//
-//        BufferedWebResponse webResponse = new BufferedWebResponse(servletResponse);
-//        webResponse.setAjax(true);
-//
-//        WebRequestCycle requestCycle = new WebRequestCycle(
-//                application, webRequest, webResponse);
-//
-//        requestCycle.setRequestTarget(new BookmarkablePageRequestTarget(pageClass, pageParameters));
-//
-//        try {
-//            requestCycle.request();
-//
-//            if (requestCycle.wasHandled() == false) {
-//                requestCycle.setRequestTarget(new WebErrorCodeResponseTarget(
-//                        HttpServletResponse.SC_NOT_FOUND));
-//            }
-//            requestCycle.detach();
-//
-//        } finally {
-//            requestCycle.getResponse().close();
-//        }		return webResponse.toString();
-//    }
 }

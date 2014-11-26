@@ -1,8 +1,5 @@
 package sk.lazyman.gizmo.component;
 
-import com.mysema.query.BooleanBuilder;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -13,13 +10,11 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import sk.lazyman.gizmo.data.*;
-import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,16 +34,21 @@ public class DataPrintPanel extends SimplePanel<WorkFilterDto> {
     private static final String ID_CUSTOMER_HEADER = "customerHeader";
     private static final String ID_PROJECT_PART_HEADER = "projectPartHeader";
 
-    private EntityManager entityManager;
     private IModel<List<AbstractTask>> dataModel;
+
+    public DataPrintPanel(String id, IModel<WorkFilterDto> filter, IModel<List<AbstractTask>> dataModel) {
+        super(id, filter);
+        setRenderBodyOnly(true);
+
+        this.dataModel = dataModel;
+        initPanelLayout();
+    }
 
     public DataPrintPanel(String id, IModel<WorkFilterDto> filter, EntityManager entityManager) {
         super(id, filter != null ? filter : new Model<>(new WorkFilterDto()));
         setRenderBodyOnly(true);
 
-        dataModel = createDataModel();
-
-        this.entityManager = entityManager;
+        dataModel = createDataModel(entityManager);
 
         initPanelLayout();
     }
@@ -200,12 +200,12 @@ public class DataPrintPanel extends SimplePanel<WorkFilterDto> {
         };
     }
 
-    private IModel<List<AbstractTask>> createDataModel() {
+    private IModel<List<AbstractTask>> createDataModel(final EntityManager entityManager) {
         return new LoadableModel(false) {
 
             @Override
             protected List<AbstractTask> load() {
-                return loadData();
+                return loadData(entityManager);
             }
         };
     }
@@ -221,28 +221,8 @@ public class DataPrintPanel extends SimplePanel<WorkFilterDto> {
         };
     }
 
-    private List<AbstractTask> loadData() {
-        List<AbstractTask> data = new ArrayList<>();
-
+    private List<AbstractTask> loadData(EntityManager entityManager) {
         WorkFilterDto filter = getModel().getObject();
-        if (filter == null) {
-            return data;
-        }
-
-        List<Predicate> predicates = AbstractTaskDataProvider.createPredicates(filter);
-
-        QAbstractTask task = QAbstractTask.abstractTask;
-        QWork work = task.as(QWork.class);
-
-        JPAQuery query = new JPAQuery(entityManager);
-        query.from(task).leftJoin(work.part.project);
-        if (!predicates.isEmpty()) {
-            BooleanBuilder where = new BooleanBuilder();
-            where.orAllOf(predicates.toArray(new Predicate[predicates.size()]));
-            query.where(where);
-        }
-        query.orderBy(task.date.asc());
-
-        return query.list(task);
+        return GizmoUtils.loadData(filter, entityManager);
     }
 }

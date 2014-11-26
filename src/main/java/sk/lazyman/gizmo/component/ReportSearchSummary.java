@@ -10,6 +10,7 @@ import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.ReportSearchSummaryDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
+import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.text.DateFormat;
@@ -48,8 +49,8 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
                 dto.setFrom(filter.getFrom());
                 dto.setTo(filter.getTo());
 
-                dto.setInvoice(sumInvoiceLength(dataModel));
-                dto.setWork(sumWorkLength(dataModel));
+                dto.setInvoice(GizmoUtils.sumInvoiceLength(dataModel));
+                dto.setWork(GizmoUtils.sumWorkLength(dataModel));
 
                 return dto;
             }
@@ -118,27 +119,5 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
 
     private String createHourMd(double hours) {
         return StringUtils.join(new Object[]{hours, "/", hours / 8});
-    }
-
-    private static double sumInvoiceLength(final IModel<List<AbstractTask>> data) {
-        List<AbstractTask> list = data.getObject();
-
-        double sum = 0;
-        for (AbstractTask task : list) {
-            if (task instanceof Work) {
-                sum += ((Work) task).getInvoiceLength();
-            }
-        }
-        return sum;
-    }
-
-    private static double sumWorkLength(final IModel<List<AbstractTask>> data) {
-        List<AbstractTask> list = data.getObject();
-
-        double sum = 0;
-        for (AbstractTask task : list) {
-            sum += task.getWorkLength();
-        }
-        return sum;
     }
 }

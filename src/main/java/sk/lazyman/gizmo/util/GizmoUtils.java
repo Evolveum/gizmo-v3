@@ -1,8 +1,9 @@
 package sk.lazyman.gizmo.util;
 
+import com.mysema.query.BooleanBuilder;
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.Expression;
-import com.mysema.query.types.Projections;
+import com.mysema.query.types.Predicate;
 import com.mysema.query.types.QBean;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
@@ -15,10 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import sk.lazyman.gizmo.data.*;
+import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
+import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.repository.CustomerRepository;
-import sk.lazyman.gizmo.repository.PartRepository;
-import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.web.PageTemplate;
 import sk.lazyman.gizmo.web.error.PageError;
@@ -243,7 +244,7 @@ public class GizmoUtils {
 //                part.id.as(CustomerProjectPartDto.F_PART_ID),
 //                part.name.as(CustomerProjectPartDto.F_PART_NAME));
 
-        Map<String,Expression<?>> bindings = new HashMap<>();
+        Map<String, Expression<?>> bindings = new HashMap<>();
         bindings.put(CustomerProjectPartDto.F_CUSTOMER_ID, customer.id);
         bindings.put(CustomerProjectPartDto.F_CUSTOMER_NAME, customer.name);
         bindings.put(CustomerProjectPartDto.F_PROJECT_ID, project.id);
@@ -310,5 +311,50 @@ public class GizmoUtils {
 
         DateFormat df = new SimpleDateFormat(pattern);
         return df.format(date);
+    }
+
+    public static double sumInvoiceLength(final IModel<List<AbstractTask>> data) {
+        List<AbstractTask> list = data.getObject();
+
+        double sum = 0;
+        for (AbstractTask task : list) {
+            if (task instanceof Work) {
+                sum += ((Work) task).getInvoiceLength();
+            }
+        }
+        return sum;
+    }
+
+    public static double sumWorkLength(final IModel<List<AbstractTask>> data) {
+        List<AbstractTask> list = data.getObject();
+
+        double sum = 0;
+        for (AbstractTask task : list) {
+            sum += task.getWorkLength();
+        }
+        return sum;
+    }
+
+    public static List<AbstractTask> loadData(WorkFilterDto filter, EntityManager entityManager) {
+        List<AbstractTask> data = new ArrayList<>();
+        if (filter == null) {
+            return data;
+        }
+
+        List<Predicate> predicates = AbstractTaskDataProvider.createPredicates(filter);
+
+        QAbstractTask task = QAbstractTask.abstractTask;
+        QWork work = task.as(QWork.class);
+
+        JPAQuery query = new JPAQuery(entityManager);
+        query.from(task).leftJoin(work.part.project);
+        if (!predicates.isEmpty()) {
+            BooleanBuilder where = new BooleanBuilder();
+            where.orAllOf(predicates.toArray(new Predicate[predicates.size()]));
+            query.where(where);
+        }
+        query.orderBy(task.date.asc());
+
+        return query.list(task);
     }
 }
