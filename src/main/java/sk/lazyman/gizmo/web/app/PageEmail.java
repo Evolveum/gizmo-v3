@@ -3,7 +3,8 @@ package sk.lazyman.gizmo.web.app;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.core.util.string.ComponentRenderer;
-import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -12,9 +13,12 @@ import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.ReportSearchSummary;
+import sk.lazyman.gizmo.component.data.DateColumn;
+import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.*;
+import sk.lazyman.gizmo.data.provider.ListDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.EmailDto;
 import sk.lazyman.gizmo.dto.ReportSearchSummaryDto;
@@ -31,7 +35,6 @@ import javax.activation.DataHandler;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -112,10 +115,27 @@ public class PageEmail extends PageAppTemplate {
         ReportSearchSummary summary = new ReportSearchSummary(ID_SUMMARY, filter, dataModel);
         add(summary);
 
-        WebMarkupContainer table = new WebMarkupContainer(ID_TABLE);
+        List<IColumn> columns = createColumns();
+        ListDataProvider<AbstractTask> provider = new ListDataProvider<>(dataModel);
+        TablePanel table = new TablePanel(ID_TABLE, provider, columns, 50);
+        table.setOutputMarkupId(true);
         add(table);
 
         initButtons(form);
+    }
+
+    private List<IColumn> createColumns() {
+        List<IColumn> columns = new ArrayList<>();
+
+        columns.add(new DateColumn(createStringResource("AbstractTask.date"), AbstractTask.F_DATE,
+                GizmoUtils.BASIC_DATE_FORMAT));
+        columns.add(GizmoUtils.createWorkInvoiceColumn(this));
+        columns.add(GizmoUtils.createAbstractTaskRealizatorColumn(this));
+        columns.add(GizmoUtils.createWorkProjectColumn(this));
+        columns.add(GizmoUtils.createLogCustomerColumn(this));
+        columns.add(new PropertyColumn(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));
+
+        return columns;
     }
 
     private void initButtons(Form form) {

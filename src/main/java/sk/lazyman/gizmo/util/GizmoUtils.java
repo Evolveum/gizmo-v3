@@ -8,7 +8,13 @@ import com.mysema.query.types.QBean;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseException;
+import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.StringResourceModel;
@@ -36,6 +42,7 @@ public class GizmoUtils {
 
     public static final int DESCRIPTION_SIZE = 3000;
     public static final String DATE_FIELD_FORMAT = "dd/mm/yyyy";
+    public static final String BASIC_DATE_FORMAT = "EEE dd. MMM. yyyy";
 
     private static final Logger LOG = LoggerFactory.getLogger(GizmoUtils.class);
 
@@ -60,7 +67,7 @@ public class GizmoUtils {
             return null;
         }
 
-        return StringUtils.join(new Object[]{project.getName(), project.getCustomer().getName()}, " - ");
+        return StringUtils.join(new Object[]{project.getCustomer().getName(), project.getName()}, " - ");
     }
 
     public static String describeProjectPart(Part part, String delimiter) {
@@ -301,7 +308,7 @@ public class GizmoUtils {
     }
 
     public static String formatDate(Date date) {
-        return formatDate(date, "EEE dd. MMM. yyyy");
+        return formatDate(date, BASIC_DATE_FORMAT);
     }
 
     public static String formatDate(Date date, String pattern) {
@@ -356,5 +363,93 @@ public class GizmoUtils {
         query.orderBy(task.date.asc());
 
         return query.list(task);
+    }
+
+    public static IColumn createAbstractTaskRealizatorColumn(PageTemplate page) {
+        return new PropertyColumn(page.createStringResource("AbstractTask.realizator"),
+                StringUtils.join(new Object[]{AbstractTask.F_REALIZATOR, User.M_FULL_NAME}, '.'));
+    }
+
+    public static IColumn createWorkInvoiceColumn(PageTemplate page) {
+        return new AbstractColumn<AbstractTask, String>(page.createStringResource("Task.length")) {
+
+            @Override
+            public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId,
+                                     IModel<AbstractTask> rowModel) {
+                cellItem.add(new Label(componentId, createInvoiceModel(rowModel)));
+            }
+        };
+    }
+
+    private static IModel<String> createInvoiceModel(final IModel<AbstractTask> rowModel) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                AbstractTask task = rowModel.getObject();
+                double length = task.getWorkLength();
+                double invoice = 0;
+
+                if (task instanceof Work) {
+                    Work work = (Work) task;
+                    invoice = work.getInvoiceLength();
+                }
+
+                return StringUtils.join(new Object[]{length, " (", invoice, ')'});
+            }
+        };
+    }
+
+    public static IColumn createWorkProjectColumn(PageTemplate page) {
+        return new AbstractColumn<AbstractTask, String>(page.createStringResource("Work.part")) {
+
+            @Override
+            public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId,
+                                     IModel<AbstractTask> rowModel) {
+                cellItem.add(new Label(componentId, createProjectModel(rowModel)));
+            }
+        };
+    }
+
+    private static IModel<String> createProjectModel(final IModel<AbstractTask> rowModel) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                AbstractTask task = rowModel.getObject();
+                if (!(task instanceof Work)) {
+                    return null;
+                }
+
+                Work work = (Work) task;
+                return GizmoUtils.describeProjectPart(work.getPart(), " - ");
+            }
+        };
+    }
+
+    public static IColumn createLogCustomerColumn(PageTemplate page) {
+        return new AbstractColumn<AbstractTask, String>(page.createStringResource("Log.customer")) {
+
+            @Override
+            public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId, IModel<AbstractTask> rowModel) {
+                cellItem.add(new Label(componentId, createCustomerModel(rowModel)));
+            }
+        };
+    }
+
+    private static IModel<String> createCustomerModel(final IModel<AbstractTask> rowModel) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                AbstractTask task = rowModel.getObject();
+                if (!(task instanceof Log)) {
+                    return null;
+                }
+
+                Log log = (Log) task;
+                return log.getCustomer().getName();
+            }
+        };
     }
 }

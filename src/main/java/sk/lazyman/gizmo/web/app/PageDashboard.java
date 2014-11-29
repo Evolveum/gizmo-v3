@@ -7,20 +7,15 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.button.dropdown.SplitBut
 import de.agilecoders.wicket.core.markup.html.bootstrap.image.IconType;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
 import de.agilecoders.wicket.less.LessResourceReference;
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
-import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.AbstractLink;
-import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -126,7 +121,7 @@ public class PageDashboard extends PageAppTemplate {
 
         AutoCompleteTextField project = new PartAutoCompleteText(ID_PROJECT,
                 new PropertyModel<CustomerProjectPartDto>(filter, WorkFilterDto.F_PROJECT), projects);
-        project.setLabel(createStringResource("PageDashboard.project"));
+        project.setLabel(createStringResource("PageDashboard.customerProjectPart"));
         form.add(project);
 
         initButtons(form);
@@ -180,99 +175,13 @@ public class PageDashboard extends PageAppTemplate {
                 }
             }
         });
-        columns.add(new AbstractColumn<AbstractTask, String>(createStringResource("PageDashboard.length")) {
-
-            @Override
-            public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId, IModel<AbstractTask> rowModel) {
-                cellItem.add(new Label(componentId, createInvoiceModel(rowModel)));
-            }
-        });
-        columns.add(new AbstractColumn<AbstractTask, String>(createStringResource("PageDashboard.realizator")) {
-
-            @Override
-            public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId, IModel<AbstractTask> rowModel) {
-                cellItem.add(new Label(componentId, createRealizatorModel(rowModel)));
-            }
-        });
-        columns.add(new AbstractColumn<AbstractTask, String>(createStringResource("PageDashboard.project")) {
-
-            @Override
-            public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId, IModel<AbstractTask> rowModel) {
-                cellItem.add(new Label(componentId, createProjectModel(rowModel)));
-            }
-        });
-        columns.add(new AbstractColumn<AbstractTask, String>(createStringResource("PageDashboard.customer")) {
-
-            @Override
-            public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId, IModel<AbstractTask> rowModel) {
-                cellItem.add(new Label(componentId, createCustomerModel(rowModel)));
-            }
-        });
+        columns.add(GizmoUtils.createWorkInvoiceColumn(this));
+        columns.add(GizmoUtils.createAbstractTaskRealizatorColumn(this));
+        columns.add(GizmoUtils.createWorkProjectColumn(this));
+        columns.add(GizmoUtils.createLogCustomerColumn(this));
         columns.add(new PropertyColumn(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));
 
         return columns;
-    }
-
-    private IModel<String> createCustomerModel(final IModel<AbstractTask> rowModel) {
-        return new AbstractReadOnlyModel<String>() {
-
-            @Override
-            public String getObject() {
-                AbstractTask task = rowModel.getObject();
-                if (!(task instanceof Log)) {
-                    return null;
-                }
-
-                Log log = (Log) task;
-                return log.getCustomer().getName();
-            }
-        };
-    }
-
-    private IModel<String> createProjectModel(final IModel<AbstractTask> rowModel) {
-        return new AbstractReadOnlyModel<String>() {
-
-            @Override
-            public String getObject() {
-                AbstractTask task = rowModel.getObject();
-                if (!(task instanceof Work)) {
-                    return null;
-                }
-
-                Work work = (Work) task;
-                return GizmoUtils.describeProjectPart(work.getPart(), " ");
-            }
-        };
-    }
-
-    private IModel<String> createRealizatorModel(final IModel<AbstractTask> rowModel) {
-        return new AbstractReadOnlyModel<String>() {
-
-            @Override
-            public String getObject() {
-                AbstractTask task = rowModel.getObject();
-                return task.getRealizator().getFullName();
-            }
-        };
-    }
-
-    private IModel<String> createInvoiceModel(final IModel<AbstractTask> rowModel) {
-        return new AbstractReadOnlyModel<String>() {
-
-            @Override
-            public String getObject() {
-                AbstractTask task = rowModel.getObject();
-                double length = task.getWorkLength();
-                double invoice = 0;
-
-                if (task instanceof Work) {
-                    Work work = (Work) task;
-                    invoice = work.getInvoiceLength();
-                }
-
-                return StringUtils.join(new Object[]{length, " (", invoice, ')'});
-            }
-        };
     }
 
     private void initButtons(Form form) {

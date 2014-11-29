@@ -23,6 +23,8 @@ public class User implements Serializable {
     public static final String F_ENABLED = "enabled";
     public static final String F_PASSWORD = "password";
 
+    public static final String M_FULL_NAME = "fullName";
+
     private Integer id;
     private String name;
     private String givenName;
