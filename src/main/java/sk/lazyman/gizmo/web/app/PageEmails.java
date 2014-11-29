@@ -7,7 +7,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
-import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.basic.MultiLineLabel;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -23,6 +22,7 @@ import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.data.DateColumn;
 import sk.lazyman.gizmo.component.data.IconColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
+import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.EmailLog;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
@@ -174,6 +174,15 @@ public class PageEmails extends PageAppTemplate {
                 cellItem.add(label);
             }
         });
+        columns.add(new AbstractColumn<EmailLog, String>(createStringResource("EmailLog.customers")) {
+
+            @Override
+            public void populateItem(Item<ICellPopulator<EmailLog>> cellItem, String componentId,
+                                     final IModel<EmailLog> rowModel) {
+                MultiLineLabel label = new MultiLineLabel(componentId, createCustomers(rowModel));
+                cellItem.add(label);
+            }
+        });
 
         TablePanel table = new TablePanel(ID_TABLE, provider, columns, 15);
         table.setOutputMarkupId(true);
@@ -194,6 +203,28 @@ public class PageEmails extends PageAppTemplate {
                 List<String> names = new ArrayList<>();
                 for (User user : set) {
                     names.add(user.getFullName());
+                }
+                Collections.sort(names);
+
+                return StringUtils.join(names, '\n');
+            }
+        };
+    }
+
+    private IModel<String> createCustomers(final IModel<EmailLog> rowModel) {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                EmailLog log = rowModel.getObject();
+                Set<Customer> set = log.getCustomerList();
+                if (set == null) {
+                    return null;
+                }
+
+                List<String> names = new ArrayList<>();
+                for (Customer customer : set) {
+                    names.add(customer.getName());
                 }
                 Collections.sort(names);
 

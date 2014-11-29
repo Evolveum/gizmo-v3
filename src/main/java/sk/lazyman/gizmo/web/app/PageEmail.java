@@ -14,13 +14,14 @@ import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.ReportSearchSummary;
 import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
-import sk.lazyman.gizmo.data.AbstractTask;
-import sk.lazyman.gizmo.data.EmailLog;
-import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.data.*;
+import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.EmailDto;
 import sk.lazyman.gizmo.dto.ReportSearchSummaryDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
+import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.EmailLogRepository;
+import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
@@ -30,6 +31,7 @@ import javax.activation.DataHandler;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -151,10 +153,13 @@ public class PageEmail extends PageAppTemplate {
             Message mail = buildMail(session);
             Transport.send(mail);
 
-            logEmail(true, target);
+            boolean logged = logEmail(true, target);
 
             PageDashboard next = new PageDashboard();
             next.success(getString("Message.emailSuccess"));
+            if (!logged) {
+                next.warn(getString("Message.emailWasNotLogged"));
+            }
             setResponsePage(next);
         } catch (Exception ex) {
             logEmail(false, target);
@@ -166,7 +171,8 @@ public class PageEmail extends PageAppTemplate {
         setResponsePage(PageDashboard.class);
     }
 
-    private void logEmail(boolean success, AjaxRequestTarget target) {
+    private boolean logEmail(boolean success, AjaxRequestTarget target) {
+        boolean logged = false;
         try {
             EmailLog log = new EmailLog();
             log.setSuccessful(success);
@@ -187,16 +193,60 @@ public class PageEmail extends PageAppTemplate {
 
             Set<User> realizators = createRealizators(filter);
             log.setRealizatorList(realizators);
-            //todo log email
-//        log.setProjectList();
+
+            log.setProjectList(createProjects());
+            log.setCustomerList(createCustomers());
             log.setSummaryInvoice(GizmoUtils.sumInvoiceLength(dataModel));
             log.setSummaryWork(GizmoUtils.sumWorkLength(dataModel));
 
             EmailLogRepository repository = getEmailLogRepository();
             repository.save(log);
+
+            logged = true;
         } catch (Exception ex) {
             handleGuiException(this, ex, target);
         }
+        return logged;
+    }
+
+    private Set<Project> createProjects() {
+        Set<Project> set = new HashSet<>();
+
+        WorkFilterDto dto = filter.getObject();
+        CustomerProjectPartDto cppDto = dto.getProject();
+        if (cppDto == null || cppDto.getProjectId() == null) {
+            return null;
+        }
+
+        ProjectRepository repository = getProjectRepository();
+        Project project = repository.findOne(cppDto.getProjectId());
+        if (project != null) {
+            set.add(project);
+        }
+
+        return set.isEmpty() ? null : set;
+    }
+
+    private Set<Customer> createCustomers() {
+        Set<Customer> set = new HashSet<>();
+
+        WorkFilterDto dto = filter.getObject();
+        CustomerProjectPartDto cppDto = dto.getProject();
+        if (cppDto == null) {
+            return null;
+        }
+
+        if (cppDto.getCustomerId() == null || cppDto.getProjectId() != null) {
+            return null;
+        }
+
+        CustomerRepository repository = getCustomerRepository();
+        Customer customer = repository.findOne(cppDto.getCustomerId());
+        if (customer != null) {
+            set.add(customer);
+        }
+
+        return set.isEmpty() ? null : set;
     }
 
     private Set<User> createRealizators(WorkFilterDto filter) {

@@ -26,6 +26,7 @@ public class EmailLog implements Serializable {
     public static final String F_SUMMARY_INVOICE = "summaryInvoice";
     public static final String F_REALIZATOR_LIST = "realizatorList";
     public static final String F_PROJECT_LIST = "projectList";
+    public static final String F_CUSTOMER_LIST = "customerList";
     public static final String F_DESCRIPTION = "description";
 
     private Integer id;
@@ -42,6 +43,7 @@ public class EmailLog implements Serializable {
     private Date toDate;
     private Set<User> realizatorList;
     private Set<Project> projectList;
+    private Set<Customer> customerList;
     private double summaryWork;
     private double summaryInvoice;
     private String description;
@@ -77,20 +79,23 @@ public class EmailLog implements Serializable {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             joinColumns = {
-                    @JoinColumn(name = "log_id",// nullable = false, updatable = false,
+                    @JoinColumn(name = "log_id",
                             foreignKey = @ForeignKey(name = "fk_emailLogUser_log"))},
             inverseJoinColumns = {
-                    @JoinColumn(name = "user_id",// nullable = false, updatable = false,
+                    @JoinColumn(name = "user_id",
                             foreignKey = @ForeignKey(name = "fk_emailLogUser_realizator"))})
     public Set<User> getRealizatorList() {
         return realizatorList;
     }
 
     @ManyToMany(fetch = FetchType.EAGER)
-//    @JoinTable(joinColumns = {@JoinColumn(name = "log_id", nullable = false, updatable = false)},
-//            inverseJoinColumns = {@JoinColumn(name = "project_id", nullable = false, updatable = false)})
     public Set<Project> getProjectList() {
         return projectList;
+    }
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    public Set<Customer> getCustomerList() {
+        return customerList;
     }
 
     public Date getFromDate() {
@@ -177,6 +182,10 @@ public class EmailLog implements Serializable {
         this.description = description;
     }
 
+    public void setCustomerList(Set<Customer> customerList) {
+        this.customerList = customerList;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -199,7 +208,7 @@ public class EmailLog implements Serializable {
         StringBuilder builder = new StringBuilder();
 
         builder.append("sentDate: " + sentDate);
-        builder.append(", sender: " + sender.getFullName());
+        builder.append(", sender: " + (sender != null ? sender.getFullName() : null));
         builder.append(", mail toDate: " + mailTo);
         builder.append(", mail cc: " + mailCc);
         builder.append(", mail bcc: " + mailBcc + "\n");
@@ -210,14 +219,25 @@ public class EmailLog implements Serializable {
         builder.append(", summary invoice: " + summaryInvoice + "\n");
 
         builder.append("realizator list: ");
-        for (User user : realizatorList) {
-            builder.append(user.getFullName() + "; ");
+        if (realizatorList != null) {
+            for (User user : realizatorList) {
+                builder.append(user.getFullName() + "; ");
+            }
         }
         builder.append("\n");
 
         builder.append("project list: ");
-        for (Project project : projectList) {
-            builder.append(project.getName() + "; ");
+        if (projectList != null) {
+            for (Project project : projectList) {
+                builder.append(project.getName() + "; ");
+            }
+        }
+
+        builder.append("customer list: ");
+        if (customerList != null) {
+            for (Customer customer : customerList) {
+                builder.append(customer.getName() + "; ");
+            }
         }
 
         return builder.toString();

@@ -7,6 +7,12 @@ CREATE DATABASE gizmo3 WITH OWNER = gizmo3
 
 COMMENT ON DATABASE gizmo3 IS 'New Gizmo database';
 
+CREATE TABLE g_EmailLog_Customer (
+  EmailLog_id     INT4 NOT NULL,
+  customerList_id INT4 NOT NULL,
+  PRIMARY KEY (EmailLog_id, customerList_id)
+);
+
 CREATE TABLE g_EmailLog_Project (
   EmailLog_id    INT4 NOT NULL,
   projectList_id INT4 NOT NULL,
@@ -58,7 +64,7 @@ CREATE TABLE g_contact (
 CREATE TABLE g_contact_value (
   id         INT4 NOT NULL,
   type       INT4,
-  value      VARCHAR(255),
+  value      VARCHAR(255) NOT NULL,
   contact_id INT4 NOT NULL,
   PRIMARY KEY (id)
 );
@@ -145,6 +151,16 @@ ADD CONSTRAINT u_ldapdn UNIQUE (ldapDn);
 
 ALTER TABLE g_user
 ADD CONSTRAINT u_name UNIQUE (name);
+
+ALTER TABLE g_EmailLog_Customer
+ADD CONSTRAINT FK_g23s45xg3a3hbtmhd9s3bou8g
+FOREIGN KEY (customerList_id)
+REFERENCES g_customer;
+
+ALTER TABLE g_EmailLog_Customer
+ADD CONSTRAINT FK_d428p4two6kc3ph7qwwwg7mdx
+FOREIGN KEY (EmailLog_id)
+REFERENCES g_email_log;
 
 ALTER TABLE g_EmailLog_Project
 ADD CONSTRAINT FK_cekxbqvdbixd13gxa3qslkafj
