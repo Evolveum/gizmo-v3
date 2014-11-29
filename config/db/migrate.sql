@@ -28,4 +28,7 @@ insert into g_abstract_task (id,date,description,worklength,realizator_id,type)
   select id,date,description,length,realizator_id,0 from tasks;
 
 insert into g_work (id,invoicelength,part_id)
-  select id,invoice,part_id from tasks;
+  select id,invoice,part_id from tasks where part_id is not null;
+
+insert into g_work (id,invoicelength,part_id)
+  select id,invoice,188 from tasks where part_id is null;

@@ -70,7 +70,10 @@ public class SummaryPartsDataProvider implements Serializable {
                 //part id
                 partIds.add(id);
             } else {
-                customerIds.add(tuple.get(1, Integer.class));
+                Integer custId = tuple.get(1, Integer.class);
+                if (custId != null) {
+                    customerIds.add(custId);
+                }
             }
         }
         LOG.debug("Id list size {}", partIds.size());
