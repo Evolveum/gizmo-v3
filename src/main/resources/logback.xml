@@ -2,26 +2,27 @@
 <configuration>
     <appender name="GIZMO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <Append>true</Append>
-        <File>${catalina.base}/logs/gizmo.log</File>
+        <File>${catalina.base}/logs/gizmo3.log</File>
         <encoder>
             <pattern>%date [%thread] %-5level \(%logger{46}\): %message%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${catalina.base}/logs/gizmo.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <fileNamePattern>${catalina.base}/logs/gizmo3.log.%d{yyyy-MM-dd}</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>100MB</maxFileSize>
+                <maxFileSize>15MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <maxHistory>20</maxHistory>
         </rollingPolicy>
     </appender>
 
-    <root level="WARN">
+    <root level="INFO">
         <appender-ref ref="GIZMO_LOG"/>
     </root>
 
     <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="OFF"/>
-    <logger name="org.hibernate.SQL" level="DEBUG"/>
-    <logger name="sk.lazyman.gizmo" level="TRACE"/>
+    <!--<logger name="org.hibernate.SQL" level="DEBUG"/>-->
+    <logger name="sk.lazyman.gizmo" level="INFO"/>
+    <!--<logger name="sk.lazyman.gizmo.security" level="DEBUG"/>-->
 </configuration>
 
 

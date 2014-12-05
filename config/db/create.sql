@@ -1,4 +1,4 @@
-CREATE DATABASE gizmo3 WITH OWNER = gizmo3
+CREATE DATABASE gizmo3 WITH OWNER = gizmo
   ENCODING = 'UTF8'
   TABLESPACE = pg_default
   LC_COLLATE = 'en_US.UTF-8'

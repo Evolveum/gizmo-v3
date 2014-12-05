@@ -14,7 +14,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
         @PropertySource("classpath:gizmo-defaults.properties"),
         @PropertySource(value = "file:/opt/gizmo.properties", ignoreResourceNotFound = true),
         @PropertySource(value = "file:./gizmo.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "file:../conf/gizmo.properties", ignoreResourceNotFound = true)
+        @PropertySource(value = "file:${catalina.home}/conf/gizmo.properties", ignoreResourceNotFound = true)
 })
 public class GizmoProperties {
 
