@@ -11,6 +11,7 @@ import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.HCheckFormGroup;
 import sk.lazyman.gizmo.component.form.HFormGroup;
+import sk.lazyman.gizmo.component.form.HPasswordGroup;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.util.LoadableModel;
@@ -29,6 +30,7 @@ public class PageUser extends PageAppUsers {
     private static final String ID_FAMILY_NAME = "familyName";
     private static final String ID_LDAP_DN = "ldapDn";
     private static final String ID_ENABLED = "enabled";
+    private static final String ID_PASSWORD = "password";
     private static final String ID_SAVE = "save";
     private static final String ID_CANCEL = "cancel";
 
@@ -84,6 +86,10 @@ public class PageUser extends PageAppUsers {
         HFormGroup enabled = new HCheckFormGroup(ID_ENABLED, new PropertyModel<Boolean>(model, User.F_ENABLED),
                 createStringResource("User.enabled"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(enabled);
+
+        HFormGroup password = new HPasswordGroup(ID_PASSWORD, new PropertyModel<String>(model, User.F_PASSWORD),
+                createStringResource("User.password"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, false);
+        form.add(password);
 
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
