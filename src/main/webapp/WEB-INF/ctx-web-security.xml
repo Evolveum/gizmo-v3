@@ -34,33 +34,8 @@
         <authentication-provider ref="authProvider"/>
     </authentication-manager>
 
-    <beans:bean id="contextSource" class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
-        <beans:constructor-arg value="${gizmo.ldap.host}" />
-        <beans:property name="userDn" value="${gizmo.ldap.username}" />
-        <beans:property name="password" value="${gizmo.ldap.password}" />
-    </beans:bean>
-
     <beans:bean id="authProvider"
-                class="sk.lazyman.gizmo.security.GizmoAuthenticationProvider">
-        <beans:constructor-arg ref="ldapBindAuthenticator" />
-    </beans:bean>
-
-    <beans:bean id="ldapBindAuthenticator"
-                class="sk.lazyman.gizmo.security.SimpleBindAunthenticator">
-        <beans:constructor-arg ref="contextSource" />
-        <beans:property name="userDnPatterns">
-            <beans:list>
-                <beans:value>${gizmo.ldap.userDnPattern}</beans:value>
-            </beans:list>
-        </beans:property>
-    </beans:bean>
-
-    <beans:bean id="ldapAuthoritiesPopulator"
-                class="org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator">
-        <beans:constructor-arg ref="contextSource"/>
-        <beans:constructor-arg value="${gizmo.ldap.groupSearchBase}"/>
-        <beans:property name="groupRoleAttribute" value="${gizmo.ldap.groupRoleAttribute}"/>
-        <beans:property name="groupSearchFilter" value="${gizmo.ldap.groupSearchFilter}"/>
-    </beans:bean>
+                class="sk.lazyman.gizmo.security.GizmoAuthProvider"
+                init-method="init"/>
 
 </beans:beans>
