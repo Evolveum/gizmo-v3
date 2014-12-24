@@ -11,9 +11,13 @@ import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.form.*;
+import sk.lazyman.gizmo.data.Part;
+import sk.lazyman.gizmo.data.TaskType;
 import sk.lazyman.gizmo.data.User;
+import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.dto.BulkDto;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
+import sk.lazyman.gizmo.repository.PartRepository;
 import sk.lazyman.gizmo.repository.WorkRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
@@ -37,6 +41,8 @@ public class PageBulk extends PageAppTemplate {
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
     private static final String ID_PART = "part";
+
+    private static final int MAX_BULK_CREATE = 20;
 
     private IModel<List<User>> users = GizmoUtils.createUsersModel(this);
     private IModel<List<CustomerProjectPartDto>> projects =
@@ -147,12 +153,48 @@ public class PageBulk extends PageAppTemplate {
         try {
             BulkDto bulk = model.getObject();
 
-//            Work work = repository.save(work);
+            PartRepository parts = getProjectPartRepository();
+            CustomerProjectPartDto partDto = bulk.getPart();
+            Part part = parts.getOne(partDto.getPartId());
+
+            Date date = GizmoUtils.clearTime(bulk.getFrom());
+            Date to = GizmoUtils.clearTime(bulk.getTo());
+            to = GizmoUtils.removeOneMilis(GizmoUtils.addOneDay(to));
+
+            int count = 0;
+            while (date.before(to)) {
+                System.out.println(date + "\t->\t" + to);
+                Work work = createWork(bulk, part, date);
+                repository.save(work);
+
+                count++;
+                date = GizmoUtils.addOneDay(date);
+
+                if (count > MAX_BULK_CREATE) {
+                    break;
+                }
+            }
             PageDashboard response = new PageDashboard();
             response.success(createStringResource("Message.workSavedSuccessfully").getString());
+            if (count > MAX_BULK_CREATE) {
+                response.warn(createStringResource("Message.bulkStopped", MAX_BULK_CREATE).getString());
+            }
             setResponsePage(response);
         } catch (Exception ex) {
             handleGuiException(this, "Message.couldntSaveWork", ex, target);
         }
+    }
+
+    private Work createWork(BulkDto bulk, Part part, Date date) {
+        Work work = new Work();
+        work.setRealizator(bulk.getRealizator());
+        work.setPart(part);
+        work.setDate(date);
+        work.setDescription(bulk.getDescription());
+        work.setInvoiceLength(0);
+        work.setWorkLength(8);
+        work.setType(TaskType.WORK);
+
+        return work;
     }
 }

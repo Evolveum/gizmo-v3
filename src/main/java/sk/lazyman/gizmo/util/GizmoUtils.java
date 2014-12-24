@@ -20,7 +20,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
@@ -45,6 +44,32 @@ public class GizmoUtils {
     public static final String BASIC_DATE_FORMAT = "EEE dd. MMM. yyyy";
 
     private static final Logger LOG = LoggerFactory.getLogger(GizmoUtils.class);
+
+    public static Date addOneDay(Date date) {
+        if (date == null) {
+            return null;
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        cal.add(Calendar.DAY_OF_YEAR, 1);
+
+        return cal.getTime();
+    }
+
+    public static Date removeOneMilis(Date date) {
+        if (date == null) {
+            return null;
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        cal.add(Calendar.MILLISECOND, -1);
+
+        return cal.getTime();
+    }
 
     public static Date clearTime(Date date) {
         if (date == null) {
