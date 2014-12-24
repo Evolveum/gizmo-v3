@@ -78,7 +78,7 @@ public class PageUser extends PageAppUsers {
         form.add(lastName);
 
         HFormGroup email = new HFormGroup(ID_LDAP_DN, new PropertyModel<String>(model, User.F_LDAP_DN),
-                createStringResource("User.ldapDn"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+                createStringResource("User.ldapDn"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, false);
         form.add(email);
 
         HFormGroup enabled = new HCheckFormGroup(ID_ENABLED, new PropertyModel<Boolean>(model, User.F_ENABLED),

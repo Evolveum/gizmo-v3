@@ -18,4 +18,7 @@ public interface UserRepository extends JpaRepository<User, Integer>, QueryDslPr
 
     @Query("from User u where u.name = :name")
     User findUserByName(@Param("name") String name);
+
+    @Query("from User u where u.enabled = true order by u.givenName asc, u.familyName asc")
+    List<User> findAllEnabledUsers();
 }

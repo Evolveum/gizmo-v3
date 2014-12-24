@@ -187,7 +187,7 @@ public class GizmoUtils {
                 try {
                     UserRepository repository = page.getUserRepository();
 
-                    return repository.findAll(new Sort(Sort.Direction.ASC, User.F_GIVEN_NAME, User.F_FAMILY_NAME));
+                    return repository.findAllEnabledUsers();
                 } catch (Exception ex) {
                     handleModelException(page, "Message.couldntLoadUsers", ex);
                 }
