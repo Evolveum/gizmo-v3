@@ -48,10 +48,6 @@ public class PageWork extends PageAppTemplate {
     private static final String ID_SAVE = "save";
     private static final String ID_PART = "part";
 
-    private static final String LABEL_SIZE = "col-sm-3 col-md-2 control-label";
-    private static final String TEXT_SIZE = "col-sm-5 col-md-4";
-    private static final String FEEDBACK_SIZE = "col-sm-4 col-md-4";
-
     private IModel<List<User>> users = GizmoUtils.createUsersModel(this);
     private IModel<List<CustomerProjectPartDto>> projects =
             GizmoUtils.createCustomerProjectPartList(this, true, true, true);

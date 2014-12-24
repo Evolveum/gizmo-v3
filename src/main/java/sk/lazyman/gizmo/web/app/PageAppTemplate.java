@@ -35,6 +35,10 @@ public class PageAppTemplate extends PageTemplate {
     private static final String ID_TITLE = "titleHeader";
     private static final String ID_FEEDBACK = "feedback";
 
+    protected static final String LABEL_SIZE = "col-sm-3 col-md-2 control-label";
+    protected static final String TEXT_SIZE = "col-sm-5 col-md-4";
+    protected static final String FEEDBACK_SIZE = "col-sm-4 col-md-4";
+
     public PageAppTemplate() {
         this(null);
     }

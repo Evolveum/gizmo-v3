@@ -261,6 +261,13 @@ public class PageDashboard extends PageAppTemplate {
                 newLogPerformed(target);
             }
         });
+        list.add(new LabeledLink(id, createStringResource("PageDashboard.newBulk")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                newBulkPerformed(target);
+            }
+        });
 
 
         return list;
@@ -290,6 +297,10 @@ public class PageDashboard extends PageAppTemplate {
 
     private void newLogPerformed(AjaxRequestTarget target) {
         setResponsePage(PageLog.class);
+    }
+
+    private void newBulkPerformed(AjaxRequestTarget target) {
+        setResponsePage(PageBulk.class);
     }
 
     private void workDetailsPerformed(AjaxRequestTarget target, Work work) {
