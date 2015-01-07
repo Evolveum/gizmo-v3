@@ -28,33 +28,34 @@ public class GizmoAuthProvider implements AuthenticationProvider {
     @Autowired
     private UserRepository userRepository;
 
-    @Value("gizmo.authentication.provider")
+    @Value("${gizmo.authentication.provider}")
     private String providerType;
 
-    @Value("gizmo.ldap.host")
+    @Value("${gizmo.ldap.host}")
     private String ldapHost;
-    @Value("gizmo.ldap.username")
+    @Value("${gizmo.ldap.username}")
     private String ldapUsername;
-    @Value("gizmo.ldap.password")
+    @Value("${gizmo.ldap.password}")
     private String ldapPassword;
-    @Value("gizmo.ldap.groupSearchBase")
+    @Value("${gizmo.ldap.groupSearchBase}")
     private String ldapGroupSearchBase;
-    @Value("gizmo.ldap.groupRoleAttribute")
+    @Value("${gizmo.ldap.groupRoleAttribute}")
     private String ldapGroupRoleAttribute;
-    @Value("gizmo.ldap.groupSearchFilter")
+    @Value("${gizmo.ldap.groupSearchFilter}")
     private String ldapGroupSearchFilter;
-    @Value("gizmo.ldap.userDnPattern")
+    @Value("${gizmo.ldap.userDnPattern}")
     private String userDnPattern;
 
     private SimpleBindAunthenticator ldapBindAuthenticator;
 
-    public void init() {
+    public void init() throws Exception {
         if (!useLdapAuth()) {
             return;
         }
         LdapContextSource contextSource = new DefaultSpringSecurityContextSource(ldapHost);
         contextSource.setUserDn(ldapUsername);
         contextSource.setPassword(ldapPassword);
+        contextSource.afterPropertiesSet();
 
         DefaultLdapAuthoritiesPopulator ldapAuthoritiesPopulator =
                 new DefaultLdapAuthoritiesPopulator(contextSource, ldapGroupSearchBase);

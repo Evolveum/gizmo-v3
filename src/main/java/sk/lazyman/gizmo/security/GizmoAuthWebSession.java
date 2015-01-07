@@ -59,6 +59,7 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             authenticated = authentication.isAuthenticated();
         } catch (AuthenticationException ex) {
+            LOGGER.error("Couldn't authenticate user, reason: {}", ex.getMessage());
             LOGGER.debug("Couldn't authenticate user.", ex);
             authenticated = false;
 
