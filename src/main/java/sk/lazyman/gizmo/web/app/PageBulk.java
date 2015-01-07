@@ -163,7 +163,6 @@ public class PageBulk extends PageAppTemplate {
 
             int count = 0;
             while (date.before(to)) {
-                System.out.println(date + "\t->\t" + to);
                 Work work = createWork(bulk, part, date);
                 repository.save(work);
 
