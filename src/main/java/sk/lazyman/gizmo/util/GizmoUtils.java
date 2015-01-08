@@ -20,6 +20,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.codec.Hex;
 import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
@@ -30,6 +31,9 @@ import sk.lazyman.gizmo.web.PageTemplate;
 import sk.lazyman.gizmo.web.error.PageError;
 
 import javax.persistence.EntityManager;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -476,5 +480,24 @@ public class GizmoUtils {
                 return log.getCustomer().getName();
             }
         };
+    }
+
+    public static String toSha1(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            md.reset();
+            md.update(value.getBytes(StandardCharsets.UTF_8));
+
+            char[] array = Hex.encode(md.digest());
+            return new String(array);
+        } catch (NoSuchAlgorithmException e) {
+            new RuntimeException(e);
+        }
+
+        return null;
     }
 }

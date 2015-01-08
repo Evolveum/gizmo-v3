@@ -14,6 +14,7 @@ import sk.lazyman.gizmo.component.form.HFormGroup;
 import sk.lazyman.gizmo.component.form.HPasswordGroup;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.repository.UserRepository;
+import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 /**
@@ -118,7 +119,9 @@ public class PageUser extends PageAppUsers {
     private void userSavePerformed(AjaxRequestTarget target) {
         try {
             UserRepository repo = getUserRepository();
-            repo.saveAndFlush(model.getObject());
+            User user = model.getObject();
+            user.setPassword(GizmoUtils.toSha1(user.getPassword()));
+            repo.saveAndFlush(user);
 
             PageUsers next = new PageUsers();
             next.success(getString("Message.userSavedSuccessfully"));

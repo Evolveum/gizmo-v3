@@ -17,6 +17,7 @@ import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopul
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.repository.UserRepository;
+import sk.lazyman.gizmo.util.GizmoUtils;
 
 /**
  * @author lazyman
@@ -45,6 +46,8 @@ public class GizmoAuthProvider implements AuthenticationProvider {
     private String ldapGroupSearchFilter;
     @Value("${gizmo.ldap.userDnPattern}")
     private String userDnPattern;
+    @Value("${gizmo.ldap.group}")
+    private String gizmoGroup;
 
     private SimpleBindAunthenticator ldapBindAuthenticator;
 
@@ -62,7 +65,7 @@ public class GizmoAuthProvider implements AuthenticationProvider {
         ldapAuthoritiesPopulator.setGroupRoleAttribute(ldapGroupRoleAttribute);
         ldapAuthoritiesPopulator.setGroupSearchFilter(ldapGroupSearchFilter);
 
-        ldapBindAuthenticator = new SimpleBindAunthenticator(contextSource);
+        ldapBindAuthenticator = new SimpleBindAunthenticator(contextSource, gizmoGroup);
         ldapBindAuthenticator.setUserDnPatterns(new String[]{userDnPattern});
     }
 
@@ -88,8 +91,7 @@ public class GizmoAuthProvider implements AuthenticationProvider {
             throw new BadCredentialsException("web.security.provider.invalid");
         }
 
-        //todo sha1 password
-        if (user.getPassword() == null || !user.getPassword().equals(password)) {
+        if (user.getPassword() == null || !user.getPassword().equals(GizmoUtils.toSha1(password))) {
             throw new BadCredentialsException("GizmoAuthenticationProvider.userPasswordIncorrect");
         }
 

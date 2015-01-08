@@ -1,5 +1,6 @@
 package sk.lazyman.gizmo.security;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ldap.NamingException;
@@ -15,10 +16,11 @@ import org.springframework.security.ldap.authentication.AbstractLdapAuthenticato
 import org.springframework.security.ldap.ppolicy.PasswordPolicyControl;
 import org.springframework.security.ldap.ppolicy.PasswordPolicyControlExtractor;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
+import javax.naming.NamingEnumeration;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
+import javax.naming.directory.SearchControls;
 
 /**
  * @author lazyman
@@ -27,8 +29,13 @@ public class SimpleBindAunthenticator extends AbstractLdapAuthenticator {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleBindAunthenticator.class);
 
-    public SimpleBindAunthenticator(BaseLdapPathContextSource contextSource) {
+    private String GROUP_SEARCH_QUERY = "(&(%s)(member=%s))";
+
+    private String gizmoGroup;
+
+    public SimpleBindAunthenticator(BaseLdapPathContextSource contextSource, String gizmoGroup) {
         super(contextSource);
+        this.gizmoGroup = gizmoGroup;
     }
 
     @Override
@@ -40,7 +47,7 @@ public class SimpleBindAunthenticator extends AbstractLdapAuthenticator {
         String username = authentication.getName();
         String password = (String) authentication.getCredentials();
 
-        if (!StringUtils.hasLength(password)) {
+        if (StringUtils.isEmpty(password)) {
             LOG.debug("Rejecting empty password for user " + username);
             throw new BadCredentialsException(messages.getMessage("BindAuthenticator.emptyPassword",
                     "Empty Password"));
@@ -59,6 +66,27 @@ public class SimpleBindAunthenticator extends AbstractLdapAuthenticator {
         if (user == null && getUserSearch() != null) {
             DirContextOperations userFromSearch = getUserSearch().searchForUser(username);
             user = bindWithDn(userFromSearch.getDn().toString(), username, password);
+        }
+
+        try {
+            if (user != null && StringUtils.isNotEmpty(gizmoGroup)) {
+                BaseLdapPathContextSource ctxSource = (BaseLdapPathContextSource) getContextSource();
+                DirContext ctx = ctxSource.getReadOnlyContext();
+
+                DistinguishedName userDn = new DistinguishedName(user.getDn());
+                userDn.prepend(ctxSource.getBaseLdapPath());
+
+                SearchControls controls = new SearchControls();
+                controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+                String filter = String.format(GROUP_SEARCH_QUERY, gizmoGroup, userDn.toCompactString());
+                NamingEnumeration en = ctx.search("", filter, controls);
+                if (!en.hasMore()) {
+                    throw new BadCredentialsException(
+                            messages.getMessage("BindAuthenticator.badCredentials", "Bad credentials"));
+                }
+            }
+        } catch (javax.naming.NamingException ex) {
+            throw new BadCredentialsException("Couldn't check group membership");
         }
 
         if (user == null) {
