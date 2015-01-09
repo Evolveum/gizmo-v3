@@ -56,7 +56,7 @@ public class SummaryDataProvider implements Serializable {
                 task.workLength.sum(), work.invoiceLength.sum());
         if (tuples != null) {
             for (Tuple tuple : tuples) {
-                TaskLength taskLength = new TaskLength(tuple.get(1, Double.class), tuple.get(1, Double.class));
+                TaskLength taskLength = new TaskLength(tuple.get(1, Double.class), tuple.get(2, Double.class));
                 dto.getDates().put(tuple.get(0, Date.class), taskLength);
             }
         }
