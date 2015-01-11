@@ -23,7 +23,7 @@ public class InvoiceHeader implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "header_id")
-    @SequenceGenerator(name = "header_id", sequenceName = "g_header_id_seq")
+    @SequenceGenerator(name = "header_id", sequenceName = "g_header_id_seq", allocationSize = 1, initialValue = 40000)
     public Integer getId() {
         return id;
     }

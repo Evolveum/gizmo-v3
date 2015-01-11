@@ -23,7 +23,7 @@ public class Part implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "part_id")
-    @SequenceGenerator(name = "part_id", sequenceName = "g_part_id_seq")
+    @SequenceGenerator(name = "part_id", sequenceName = "g_part_id_seq", allocationSize = 1, initialValue = 40000)
     public Integer getId() {
         return id;
     }

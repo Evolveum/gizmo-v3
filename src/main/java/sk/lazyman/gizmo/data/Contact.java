@@ -33,7 +33,7 @@ public class Contact implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "contact_id")
-    @SequenceGenerator(name = "contact_id", sequenceName = "g_contact_id_seq")
+    @SequenceGenerator(name = "contact_id", sequenceName = "g_contact_id_seq", allocationSize = 1, initialValue = 40000)
     public Integer getId() {
         return id;
     }

@@ -34,7 +34,7 @@ public class AbstractTask implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_id")
-    @SequenceGenerator(name = "task_id", sequenceName = "g_task_id_seq")
+    @SequenceGenerator(name = "task_id", sequenceName = "g_task_id_seq", allocationSize = 1, initialValue = 40000)
     public Integer getId() {
         return id;
     }

@@ -50,7 +50,7 @@ public class EmailLog implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "email_log_id")
-    @SequenceGenerator(name = "email_log_id", sequenceName = "g_email_log_id_seq")
+    @SequenceGenerator(name = "email_log_id", sequenceName = "g_email_log_id_seq", allocationSize = 1, initialValue = 40000)
     public Integer getId() {
         return id;
     }

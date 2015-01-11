@@ -29,7 +29,7 @@ public class Project implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_id")
-    @SequenceGenerator(name = "project_id", sequenceName = "g_project_id_seq")
+    @SequenceGenerator(name = "project_id", sequenceName = "g_project_id_seq", allocationSize = 1, initialValue = 40000)
     public Integer getId() {
         return id;
     }

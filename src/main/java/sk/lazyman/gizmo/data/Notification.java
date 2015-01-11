@@ -32,7 +32,7 @@ public class Notification implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "notification_id")
-    @SequenceGenerator(name = "notification_id", sequenceName = "g_notification_id_seq")
+    @SequenceGenerator(name = "notification_id", sequenceName = "g_notification_id_seq", allocationSize = 1, initialValue = 40000)
     public Integer getId() {
         return id;
     }

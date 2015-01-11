@@ -25,7 +25,7 @@ public class Attachment implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "attachment_id")
-    @SequenceGenerator(name = "attachment_id", sequenceName = "g_attachment_id_seq")
+    @SequenceGenerator(name = "attachment_id", sequenceName = "g_attachment_id_seq", allocationSize = 1, initialValue = 40000)
     public Integer getId() {
         return id;
     }
