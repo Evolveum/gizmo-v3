@@ -1,7 +1,6 @@
 package sk.lazyman.gizmo.web;
 
 import de.agilecoders.wicket.core.Bootstrap;
-import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Alert;
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.Component;
@@ -156,5 +155,4 @@ public class PageTemplate extends WebPage {
     public String getDescribe() {
         return getString("GizmoApplication.projectVersionUnknown");
     }
-
 }

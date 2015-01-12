@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import sk.lazyman.gizmo.dto.WorkFilterDto;
 
 import java.util.Locale;
 
@@ -27,6 +28,8 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
 
     @SpringBean(name = "authProvider")
     private AuthenticationProvider authenticationProvider;
+
+    private WorkFilterDto dashboardFilter;
 
     public GizmoAuthWebSession(Request request) {
         super(request);
@@ -68,5 +71,13 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
         }
 
         return authenticated;
+    }
+
+    public WorkFilterDto getDashboardFilter() {
+        return dashboardFilter;
+    }
+
+    public void setDashboardFilter(WorkFilterDto dashboardFilter) {
+        this.dashboardFilter = dashboardFilter;
     }
 }

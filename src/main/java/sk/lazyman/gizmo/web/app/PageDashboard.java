@@ -8,6 +8,7 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.image.IconType;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -18,11 +19,13 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.*;
 import sk.lazyman.gizmo.component.data.LinkColumn;
+import sk.lazyman.gizmo.component.data.LinkIconColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.AbstractTask;
 import sk.lazyman.gizmo.data.Log;
@@ -34,6 +37,8 @@ import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.dto.WorkType;
+import sk.lazyman.gizmo.repository.AbstractTaskRepository;
+import sk.lazyman.gizmo.security.GizmoAuthWebSession;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
@@ -72,12 +77,19 @@ public class PageDashboard extends PageAppTemplate {
 
             @Override
             protected WorkFilterDto load() {
-                WorkFilterDto dto = new WorkFilterDto();
-                dto.setFrom(GizmoUtils.createWorkDefaultFrom());
-                dto.setTo(GizmoUtils.createWorkDefaultTo());
+                GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
+                WorkFilterDto dto = session.getDashboardFilter();
+                if (dto == null) {
+                    dto = new WorkFilterDto();
+                    dto.setFrom(GizmoUtils.createWorkDefaultFrom());
+                    dto.setTo(GizmoUtils.createWorkDefaultTo());
 
-                GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
-                dto.setRealizator(principal.getUser());
+                    GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
+                    dto.setRealizator(principal.getUser());
+
+                    session.setDashboardFilter(dto);
+                }
+
                 return dto;
             }
         };
@@ -88,7 +100,8 @@ public class PageDashboard extends PageAppTemplate {
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
-        response.render(CssHeaderItem.forReference(new LessResourceReference(PageDashboard.class, "PageDashboard.less")));
+        response.render(CssHeaderItem.forReference(
+                new LessResourceReference(PageDashboard.class, "PageDashboard.less")));
     }
 
     private void initLayout() {
@@ -180,6 +193,23 @@ public class PageDashboard extends PageAppTemplate {
         columns.add(GizmoUtils.createWorkProjectColumn(this));
         columns.add(GizmoUtils.createLogCustomerColumn(this));
         columns.add(new PropertyColumn(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));
+        columns.add(new LinkIconColumn<AbstractTask>(new Model<>("")) {
+
+            @Override
+            protected IModel<String> createIconModel(IModel rowModel) {
+                return new Model<>("fa fa-lg fa-trash-o text-danger");
+            }
+
+            @Override
+            protected IModel<String> createTitleModel(IModel rowModel) {
+                return PageDashboard.this.createStringResource("PageDashboard.delete");
+            }
+
+            @Override
+            protected void onClickPerformed(AjaxRequestTarget target, IModel<AbstractTask> rowModel, AjaxLink link) {
+                deletePerformed(target, rowModel.getObject());
+            }
+        });
 
         return columns;
     }
@@ -274,10 +304,15 @@ public class PageDashboard extends PageAppTemplate {
     }
 
     private void displayPerformed(AjaxRequestTarget target) {
+        WorkFilterDto dto = filter.getObject();
+
         TablePanel table = (TablePanel) get(ID_TABLE);
         AbstractTaskDataProvider provider = (AbstractTaskDataProvider) table.getDataTable().getDataProvider();
-        provider.setFilter(filter.getObject());
+        provider.setFilter(dto);
         table.setCurrentPage(0L);
+
+        GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
+        session.setDashboardFilter(dto);
 
         target.add(get(ID_SUMMARY), get(ID_SUMMARY_PARTS), table);
     }
@@ -315,5 +350,18 @@ public class PageDashboard extends PageAppTemplate {
         params.add(PageLog.LOG_ID, log.getId());
 
         setResponsePage(PageLog.class, params);
+    }
+
+    private void deletePerformed(AjaxRequestTarget target, AbstractTask task) {
+        //todo add confirmation
+        try {
+            AbstractTaskRepository repository = getAbstractTaskRepository();
+            repository.delete(task.getId());
+
+            success(createStringResource("Message.successfullyDeleted").getString());
+            target.add(getFeedbackPanel(), get(ID_TABLE));
+        } catch (Exception ex){
+            handleGuiException(this, "Message.couldntSaveWork", ex, target);
+        }
     }
 }
