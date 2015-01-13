@@ -25,6 +25,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.validation.validator.RangeValidator;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
@@ -153,6 +154,8 @@ public class PageLog extends PageAppTemplate {
 
         HFormGroup length = new HFormGroup(ID_LENGTH, new PropertyModel<String>(model, Log.F_WORK_LENGTH),
                 createStringResource("AbstractTask.workLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        length.getFormComponent().add(new RangeValidator<>(0, 2000));
+        length.getFormComponent().setType(Double.class);
         form.add(length);
 
         HAreaFormGroup description = new HAreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Log.F_DESCRIPTION),

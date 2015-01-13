@@ -26,6 +26,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.validation.validator.RangeValidator;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
@@ -161,14 +162,18 @@ public class PageWork extends PageAppTemplate {
                 createStringResource("AbstractTask.date"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         form.add(date);
 
-        final HFormGroup invoice = new HFormGroup(ID_INVOICE, new PropertyModel<String>(model, Work.F_INVOICE_LENGTH),
+        final HFormGroup invoice = new HFormGroup(ID_INVOICE, new PropertyModel<Double>(model, Work.F_INVOICE_LENGTH),
                 createStringResource("Work.invoiceLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
         invoice.setOutputMarkupId(true);
+        invoice.getFormComponent().add(new RangeValidator<>(0.0, 2000.0));
+        invoice.getFormComponent().setType(Double.class);
         invoice.getFormComponent().setOutputMarkupId(true);
         form.add(invoice);
 
-        HFormGroup length = new HFormGroup(ID_LENGTH, new PropertyModel<String>(model, Work.F_WORK_LENGTH),
+        HFormGroup length = new HFormGroup(ID_LENGTH, new PropertyModel<Double>(model, Work.F_WORK_LENGTH),
                 createStringResource("AbstractTask.workLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        length.getFormComponent().add(new RangeValidator<>(0.0, 2000.0));
+        length.getFormComponent().setType(Double.class);
         form.add(length);
 
         FormComponent workLength = length.getFormComponent();
