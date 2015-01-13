@@ -72,7 +72,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
                     public String getObject() {
                         PartSummary part = item.getModelObject();
                         Double hours = part.getLength();
-                        return createLenght(hours);
+                        return createLength(hours);
                     }
                 });
                 work.setRenderBodyOnly(true);
@@ -84,7 +84,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
                     public String getObject() {
                         PartSummary part = item.getModelObject();
                         Double hours = part.getInvoice();
-                        return createLenght(hours);
+                        return createLength(hours);
                     }
                 });
                 invoice.setRenderBodyOnly(true);
@@ -113,7 +113,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
                     sum += part.getLength();
                 }
 
-                return createLenght(sum);
+                return createLength(sum);
             }
         };
     }
@@ -129,16 +129,16 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
                     sum += part.getInvoice();
                 }
 
-                return createLenght(sum);
+                return createLength(sum);
             }
         };
     }
 
-    private String createLenght(Double hours) {
+    private String createLength(Double hours) {
         if (hours == null) {
             hours = 0d;
         }
-        Double days = hours / 24;
+        Double days = hours / 8;
 
         DecimalFormat twoDForm = new DecimalFormat("#.##");
         return hours + " (" + twoDForm.format(days) + "d)";

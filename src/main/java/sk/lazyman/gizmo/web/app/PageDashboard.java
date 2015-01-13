@@ -375,7 +375,7 @@ public class PageDashboard extends PageAppTemplate {
             repository.delete(task.getId());
 
             success(createStringResource("Message.successfullyDeleted").getString());
-            target.add(getFeedbackPanel(), get(ID_TABLE));
+            target.add(getFeedbackPanel(), get(ID_TABLE), get(ID_SUMMARY), get(ID_SUMMARY_PARTS));
         } catch (Exception ex){
             handleGuiException(this, "Message.couldntSaveWork", ex, target);
         }
