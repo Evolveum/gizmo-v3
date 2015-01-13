@@ -61,6 +61,7 @@ import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -83,6 +84,8 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_SUMMARY = "summary";
     private static final String ID_SUMMARY_PARTS = "summaryParts";
     private static final String ID_TYPE = "type";
+    private static final String ID_BTN_PREVIOUS = "previous";
+    private static final String ID_BTN_NEXT = "next";
 
     private IModel<WorkFilterDto> filter;
     private IModel<List<CustomerProjectPartDto>> projects =
@@ -122,6 +125,7 @@ public class PageDashboard extends PageAppTemplate {
 
     private void initLayout() {
         Form form = new Form(ID_FORM);
+        form.setOutputMarkupId(true);
         add(form);
 
         form.add(new DropDownChoice<>(ID_TYPE, new PropertyModel<WorkType>(filter, WorkFilterDto.F_TYPE),
@@ -231,6 +235,34 @@ public class PageDashboard extends PageAppTemplate {
     }
 
     private void initButtons(Form form) {
+        AjaxSubmitButton previous = new AjaxSubmitButton(ID_BTN_PREVIOUS) {
+
+            @Override
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                moveMonth(target, -1);
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget target, Form<?> form) {
+                target.add(getFeedbackPanel());
+            }
+        };
+        form.add(previous);
+
+        AjaxSubmitButton next = new AjaxSubmitButton(ID_BTN_NEXT) {
+
+            @Override
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                moveMonth(target, 1);
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget target, Form<?> form) {
+                target.add(getFeedbackPanel());
+            }
+        };
+        form.add(next);
+
         AjaxSubmitButton display = new AjaxSubmitButton(ID_BTN_DISPLAY,
                 createStringResource("PageDashboard.display")) {
 
@@ -319,6 +351,25 @@ public class PageDashboard extends PageAppTemplate {
         return list;
     }
 
+    private void moveMonth(AjaxRequestTarget target, int add) {
+        WorkFilterDto dto = filter.getObject();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(GizmoUtils.clearTime(dto.getFrom()));
+        cal.add(Calendar.MONTH, add);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        dto.setFrom(cal.getTime());
+
+        cal = Calendar.getInstance();
+        cal.setTime(dto.getFrom());
+        cal.add(Calendar.MONTH, 1);
+        cal.add(Calendar.MILLISECOND, -1);
+        dto.setTo(cal.getTime());
+
+        displayPerformed(target);
+        target.add(get(ID_FORM));
+    }
+
     private void displayPerformed(AjaxRequestTarget target) {
         WorkFilterDto dto = filter.getObject();
 
@@ -376,7 +427,7 @@ public class PageDashboard extends PageAppTemplate {
 
             success(createStringResource("Message.successfullyDeleted").getString());
             target.add(getFeedbackPanel(), get(ID_TABLE), get(ID_SUMMARY), get(ID_SUMMARY_PARTS));
-        } catch (Exception ex){
+        } catch (Exception ex) {
             handleGuiException(this, "Message.couldntSaveWork", ex, target);
         }
     }
