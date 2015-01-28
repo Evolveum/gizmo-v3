@@ -107,7 +107,7 @@ public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
                                 }
 
                                 if (!dto.isFullDayDone(item.getIndex(), dayIndex)) {
-                                    return "danger";
+                                    return "text-danger";
                                 }
 
                                 return null;

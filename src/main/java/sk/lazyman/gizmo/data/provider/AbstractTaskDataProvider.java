@@ -19,6 +19,8 @@ package sk.lazyman.gizmo.data.provider;
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.Predicate;
+import com.mysema.query.types.expr.BooleanExpression;
+import com.mysema.query.types.path.EntityPathBase;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -89,7 +91,6 @@ public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask,
     }
 
     private Predicate createPredicate() {
-        QAbstractTask task = QAbstractTask.abstractTask;
         if (filter == null) {
             return null;
         }
@@ -110,29 +111,18 @@ public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask,
         }
 
         List<Predicate> list = new ArrayList<>();
-        if (filter.getRealizator() != null) {
-            list.add(task.realizator.eq(filter.getRealizator()));
+        Predicate p = createListPredicate(filter.getRealizators(), task.realizator);
+        if (p != null) {
+            list.add(p);
         }
 
         if (!WorkType.ALL.equals(filter.getType())) {
             list.add(task.type.eq(filter.getType().getType()));
         }
 
-        if (filter.getProject() != null) {
-            BooleanBuilder bb = new BooleanBuilder();
-
-            CustomerProjectPartDto dto = filter.getProject();
-            QLog log = task.as(QLog.class);
-            bb.or(log.customer.id.eq(dto.getCustomerId()));
-
-            QWork work = task.as(QWork.class);
-            if (dto.getProjectId() != null) {
-                bb.or(work.part.project.id.eq(dto.getProjectId()));
-            } else if (dto.getCustomerId() != null) {
-                bb.or(work.part.project.customer.id.eq(dto.getCustomerId()));
-            }
-
-            list.add(bb);
+        p = createProjectListPredicate(filter.getProjects());
+        if (p != null) {
+            list.add(p);
         }
 
         if (filter.getFrom() != null) {
@@ -144,5 +134,56 @@ public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask,
         }
 
         return list;
+    }
+
+    private static Predicate createProjectListPredicate(List<CustomerProjectPartDto> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+
+        if (list.size() == 1) {
+            return createPredicate(list.get(0));
+        }
+
+        BooleanBuilder bb = new BooleanBuilder();
+        for (CustomerProjectPartDto dto : list) {
+            bb.or(createPredicate(dto));
+        }
+
+        return bb;
+    }
+
+    private static Predicate createPredicate(CustomerProjectPartDto dto) {
+        BooleanBuilder bb = new BooleanBuilder();
+
+        QAbstractTask task = QAbstractTask.abstractTask;
+        QLog log = task.as(QLog.class);
+        bb.or(log.customer.id.eq(dto.getCustomerId()));
+
+        QWork work = task.as(QWork.class);
+        if (dto.getProjectId() != null) {
+            bb.or(work.part.project.id.eq(dto.getProjectId()));
+        } else if (dto.getCustomerId() != null) {
+            bb.or(work.part.project.customer.id.eq(dto.getCustomerId()));
+        }
+
+        return bb;
+    }
+
+    private static <T> Predicate createListPredicate(List<T> list, EntityPathBase<T> base) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+
+        if (list.size() == 1) {
+            return base.eq(list.get(0));
+        }
+
+        BooleanExpression expr = base.eq(list.get(0));
+        for (int i = 1; i < list.size(); i++) {
+            expr = expr.or(base.eq(list.get(i)));
+        }
+
+        return expr;
     }
 }
