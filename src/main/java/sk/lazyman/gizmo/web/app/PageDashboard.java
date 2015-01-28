@@ -25,13 +25,17 @@ import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField
 import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
@@ -86,6 +90,11 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_TYPE = "type";
     private static final String ID_BTN_PREVIOUS = "previous";
     private static final String ID_BTN_NEXT = "next";
+    private static final String ID_PROJECT_COMBO = "projectCombo";
+    private static final String ID_REALIZATOR_COMBO = "realizatorCombo";
+    private static final String ID_PROJECT_MULTI = "projectMulti";
+    private static final String ID_REALIZATOR_MULTI = "realizatorMulti";
+    private static final String ID_ADVANCED = "advanced";
 
     private IModel<WorkFilterDto> filter;
     private IModel<List<CustomerProjectPartDto>> projects =
@@ -143,21 +152,29 @@ public class PageDashboard extends PageAppTemplate {
         to.setRequired(true);
         form.add(to);
 
-        form.add(new DropDownChoice<User>(ID_REALIZATOR, new PropertyModel<User>(filter, WorkFilterDto.F_REALIZATOR),
-                GizmoUtils.createUsersModel(this), GizmoUtils.createUserChoiceRenderer()) {
+        WebMarkupContainer realizator = new WebMarkupContainer(ID_REALIZATOR);
+        realizator.setOutputMarkupId(true);
+        form.add(realizator);
 
-            @Override
-            protected String getNullValidKey() {
-                return "PageDashboard.realizator";
-            }
-        });
+        initRealizatorInput(realizator);
 
-        AutoCompleteTextField project = new PartAutoCompleteText(ID_PROJECT,
-                new PropertyModel<CustomerProjectPartDto>(filter, WorkFilterDto.F_PROJECT), projects);
-        project.setLabel(createStringResource("PageDashboard.customerProjectPart"));
+        WebMarkupContainer project = new WebMarkupContainer(ID_PROJECT);
+        project.setOutputMarkupId(true);
         form.add(project);
 
+        initProjectInput(project);
+
         initButtons(form);
+
+        AjaxCheckBox advanced = new AjaxCheckBox(ID_ADVANCED,
+                new PropertyModel<Boolean>(filter, WorkFilterDto.F_MULTIPLE)) {
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                updateSearchForm(target);
+            }
+        };
+        form.add(advanced);
 
         SummaryDataProvider summaryProvider = new SummaryDataProvider(this);
         SummaryPanel summary = new SummaryPanel(ID_SUMMARY, summaryProvider, filter);
@@ -174,6 +191,68 @@ public class PageDashboard extends PageAppTemplate {
         TablePanel table = new TablePanel(ID_TABLE, provider, columns, 50);
         table.setOutputMarkupId(true);
         add(table);
+    }
+
+    private void initProjectInput(WebMarkupContainer project) {
+        AutoCompleteTextField projectCombo = new PartAutoCompleteText(ID_PROJECT_COMBO,
+                new PropertyModel<CustomerProjectPartDto>(filter, WorkFilterDto.F_PROJECT), projects);
+        projectCombo.setLabel(createStringResource("PageDashboard.customerProjectPart"));
+        projectCombo.add(createMultipleVisibilityBehaviour(false));
+        project.add(projectCombo);
+
+        ListMultipleChoice projectMulti = new ListMultipleChoice<CustomerProjectPartDto>(ID_PROJECT_MULTI,
+                new PropertyModel<List<CustomerProjectPartDto>>(filter, WorkFilterDto.F_PROJECTS), projects,
+                new IChoiceRenderer<CustomerProjectPartDto>() {
+
+                    @Override
+                    public Object getDisplayValue(CustomerProjectPartDto object) {
+                        return PartAutoCompleteConverter.convertToString(object);
+                    }
+
+                    @Override
+                    public String getIdValue(CustomerProjectPartDto object, int index) {
+                        return Integer.toString(index);
+                    }
+                });
+        projectMulti.add(createMultipleVisibilityBehaviour(true));
+        project.add(projectMulti);
+    }
+
+    private void initRealizatorInput(WebMarkupContainer realizator) {
+        DropDownChoice realizatorCombo = new DropDownChoice<User>(ID_REALIZATOR_COMBO,
+                new PropertyModel<User>(filter, WorkFilterDto.F_REALIZATOR),
+                GizmoUtils.createUsersModel(this), GizmoUtils.createUserChoiceRenderer()) {
+
+            @Override
+            protected String getNullValidKey() {
+                return "PageDashboard.everyone";
+            }
+        };
+        realizatorCombo.add(createMultipleVisibilityBehaviour(false));
+        realizatorCombo.setNullValid(true);
+        realizator.add(realizatorCombo);
+
+        ListMultipleChoice realizatorMulti = new ListMultipleChoice<User>(ID_REALIZATOR_MULTI,
+                new PropertyModel<List<User>>(filter, WorkFilterDto.F_REALIZATORS), GizmoUtils.createUsersModel(this),
+                GizmoUtils.createUserChoiceRenderer());
+        realizatorMulti.add(createMultipleVisibilityBehaviour(true));
+        realizator.add(realizatorMulti);
+    }
+
+    private VisibleEnableBehaviour createMultipleVisibilityBehaviour(final boolean visibleInAdvancedMode) {
+        return new VisibleEnableBehaviour() {
+
+            @Override
+            public boolean isVisible() {
+                WorkFilterDto dto = filter.getObject();
+
+                return visibleInAdvancedMode ? dto.isMultiple() : !dto.isMultiple();
+            }
+        };
+    }
+
+    private void updateSearchForm(AjaxRequestTarget target) {
+        target.add(get(ID_FORM + ":" + ID_PROJECT), get(ID_FORM + ":" + ID_REALIZATOR));
     }
 
     //date, length (invoice), realizator, project, description (WORK)

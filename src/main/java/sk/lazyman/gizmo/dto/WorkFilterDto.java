@@ -19,7 +19,9 @@ package sk.lazyman.gizmo.dto;
 import sk.lazyman.gizmo.data.User;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lazyman
@@ -28,14 +30,18 @@ public class WorkFilterDto implements Serializable {
 
     public static final String F_FROM = "from";
     public static final String F_TO = "to";
+    public static final String F_PROJECTS = "projects";
     public static final String F_PROJECT = "project";
     public static final String F_REALIZATOR = "realizator";
+    public static final String F_REALIZATORS = "realizators";
     public static final String F_TYPE = "type";
+    public static final String F_MULTIPLE = "multiple";
 
     private Date from;
     private Date to;
-    private CustomerProjectPartDto project;
-    private User realizator;
+    private boolean multiple;
+    private List<CustomerProjectPartDto> projects;
+    private List<User> realizators;
     private WorkType type = WorkType.ALL;
 
     public Date getFrom() {
@@ -54,20 +60,62 @@ public class WorkFilterDto implements Serializable {
         this.to = to;
     }
 
+    public List<CustomerProjectPartDto> getProjects() {
+        if (projects == null) {
+            projects = new ArrayList<>();
+        }
+        return projects;
+    }
+
+    public void setProjects(List<CustomerProjectPartDto> projects) {
+        this.projects = projects;
+    }
+
     public CustomerProjectPartDto getProject() {
-        return project;
+        List<CustomerProjectPartDto> projects = getProjects();
+        if (projects.isEmpty()) {
+            return null;
+        }
+
+        return projects.get(0);
     }
 
     public void setProject(CustomerProjectPartDto project) {
-        this.project = project;
+        List<CustomerProjectPartDto> projects = getProjects();
+        projects.clear();
+
+        if (project != null) {
+            projects.add(project);
+        }
+    }
+
+    public List<User> getRealizators() {
+        if (realizators == null) {
+            realizators = new ArrayList<>();
+        }
+        return realizators;
+    }
+
+    public void setRealizators(List<User> realizators) {
+        this.realizators = realizators;
     }
 
     public User getRealizator() {
-        return realizator;
+        List<User> realizators = getRealizators();
+        if (realizators.isEmpty()) {
+            return null;
+        }
+
+        return realizators.get(0);
     }
 
     public void setRealizator(User realizator) {
-        this.realizator = realizator;
+        List<User> realizators = getRealizators();
+        realizators.clear();
+
+        if (realizator != null) {
+            realizators.add(realizator);
+        }
     }
 
     public WorkType getType() {
@@ -79,5 +127,13 @@ public class WorkFilterDto implements Serializable {
             type = WorkType.ALL;
         }
         this.type = type;
+    }
+
+    public boolean isMultiple() {
+        return multiple;
+    }
+
+    public void setMultiple(boolean multiple) {
+        this.multiple = multiple;
     }
 }
