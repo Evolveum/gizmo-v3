@@ -353,14 +353,17 @@ public class PageEmail extends PageAppTemplate {
         String project = dto.getProject() == null ? "*" : dto.getProject().getDescription();
 
         StringBuilder subject = new StringBuilder();
-        subject.append("Report for ");
-        subject.append(project);
+        subject.append("Report");
+        if (dto.getProjects().size() == 1) {
+            subject.append("for ");
+            subject.append(project);
+        }
         subject.append(" (");
         subject.append(from);
         subject.append(" - ");
         subject.append(to);
         subject.append(")");
-        if (dto.getRealizator() != null) {
+        if (dto.getRealizators().size() == 1) {
             subject.append(" ");
             subject.append(dto.getRealizator().getFullName());
         }
