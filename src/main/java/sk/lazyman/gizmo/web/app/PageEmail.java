@@ -432,14 +432,4 @@ public class PageEmail extends PageAppTemplate {
 
         return retval;
     }
-
-    private IModel<ReportSearchSummaryDto> createSummaryModel() {
-        return new LoadableModel<ReportSearchSummaryDto>(false) {
-
-            @Override
-            protected ReportSearchSummaryDto load() {
-                return new ReportSearchSummaryDto();
-            }
-        };
-    }
 }

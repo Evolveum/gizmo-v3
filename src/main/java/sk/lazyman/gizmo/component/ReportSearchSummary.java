@@ -18,11 +18,12 @@ package sk.lazyman.gizmo.component;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.basic.MultiLineLabel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import sk.lazyman.gizmo.data.AbstractTask;
-import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.ReportSearchSummaryDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
@@ -39,6 +40,7 @@ import java.util.List;
  */
 public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
 
+    private static final String ID_REALIZATOR = "realizator";
     private static final String ID_PROJECT = "project";
     private static final String ID_FROM = "from";
     private static final String ID_TO = "to";
@@ -61,7 +63,8 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
                 ReportSearchSummaryDto dto = new ReportSearchSummaryDto();
 
                 WorkFilterDto filter = filterModel.getObject();
-                dto.setProject(filter.getProject());
+                dto.setRealizators(filter.getRealizators());
+                dto.setProjects(filter.getProjects());
                 dto.setFrom(filter.getFrom());
                 dto.setTo(filter.getTo());
 
@@ -74,7 +77,10 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
     }
 
     private void initPanelLayout() {
-        Label project = new Label(ID_PROJECT, createProjectModel());
+        MultiLineLabel realizator = new MultiLineLabel(ID_REALIZATOR, createRealizatorModel());
+        add(realizator);
+
+        MultiLineLabel project = new MultiLineLabel(ID_PROJECT, createProjectModel());
         add(project);
 
         Label from = new Label(ID_FROM,
@@ -112,14 +118,44 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
         };
     }
 
+    private IModel<String> createRealizatorModel() {
+        return new AbstractReadOnlyModel<String>() {
+
+            @Override
+            public String getObject() {
+                ReportSearchSummaryDto dto = getModelObject();
+                StringBuilder sb = new StringBuilder();
+
+                List<User> list = dto.getRealizators();
+                for (User user : list) {
+                    sb.append(user.getFullName());
+                    sb.append("\n");
+                }
+
+                sb.deleteCharAt(sb.length() - 1);
+
+                return sb.toString();
+            }
+        };
+    }
+
     private IModel<String> createProjectModel() {
         return new AbstractReadOnlyModel<String>() {
 
             @Override
             public String getObject() {
                 ReportSearchSummaryDto dto = getModelObject();
-                CustomerProjectPartDto cppDto = dto.getProject();
-                return PartAutoCompleteConverter.convertToString(cppDto);
+                StringBuilder sb = new StringBuilder();
+
+                List<CustomerProjectPartDto> list = dto.getProjects();
+                for (CustomerProjectPartDto cpp : list) {
+                    sb.append(PartAutoCompleteConverter.convertToString(cpp));
+                    sb.append("\n");
+                }
+
+                sb.deleteCharAt(sb.length() - 1);
+
+                return sb.toString();
             }
         };
     }

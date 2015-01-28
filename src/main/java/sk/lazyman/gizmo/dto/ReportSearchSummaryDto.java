@@ -16,32 +16,51 @@
 
 package sk.lazyman.gizmo.dto;
 
+import sk.lazyman.gizmo.data.User;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lazyman
  */
 public class ReportSearchSummaryDto implements Serializable {
 
-    public static final String F_PROJECT = "project";
+    public static final String F_PROJECTS = "projectS";
     public static final String F_FROM = "from";
     public static final String F_TO = "to";
     public static final String F_WORK = "work";
     public static final String F_INVOICE = "invoice";
 
-    private CustomerProjectPartDto project;
+    private List<User> realizators;
+    private List<CustomerProjectPartDto> projects;
     private Date from;
     private Date to;
     private double work;
     private double invoice;
 
-    public CustomerProjectPartDto getProject() {
-        return project;
+    public List<CustomerProjectPartDto> getProjects() {
+        if (projects == null) {
+            projects = new ArrayList<>();
+        }
+        return projects;
     }
 
-    public void setProject(CustomerProjectPartDto project) {
-        this.project = project;
+    public void setProjects(List<CustomerProjectPartDto> projects) {
+        this.projects = projects;
+    }
+
+    public List<User> getRealizators() {
+        if (realizators == null) {
+            realizators = new ArrayList<>();
+        }
+        return realizators;
+    }
+
+    public void setRealizators(List<User> realizators) {
+        this.realizators = realizators;
     }
 
     public Date getFrom() {
