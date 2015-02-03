@@ -161,7 +161,7 @@ public class GizmoAuthProvider implements AuthenticationProvider {
         user.setGivenName(ctx.getStringAttribute("givenName"));
         user.setName(name);
         user.setLdapDn(ctx.getNameInNamespace());
-        user.setEnabled(false);
+        user.setEnabled(true);
 
         return userRepository.save(user);
     }
