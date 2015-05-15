@@ -192,13 +192,15 @@ public class PageLog extends PageAppTemplate {
 
             @Override
             public void setObject(CustomerProjectPartDto object) {
-                if (object == null) {
+                if (object == null || object.getCustomerId() == null) {
                     model.setObject(null);
+                    return;
                 }
 
                 Integer id = object.getCustomerId();
                 if (customer != null && id.equals(customer.getId())) {
                     model.setObject(customer);
+                    return;
                 }
 
                 CustomerRepository repository = getCustomerRepository();

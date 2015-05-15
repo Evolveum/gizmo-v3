@@ -253,6 +253,7 @@ public class PageProject extends PageAppProjects {
 
         if (customer == null || customer.getId() == null) {
             setResponsePage(PageProjects.class);
+            return;
         }
 
         PageParameters params = createPageParams(PageCustomer.CUSTOMER_ID, customer.getId());

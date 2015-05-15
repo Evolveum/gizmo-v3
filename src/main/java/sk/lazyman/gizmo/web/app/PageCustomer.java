@@ -157,6 +157,7 @@ public class PageCustomer extends PageAppCustomers {
             }
         });
         partner.setRenderer(GizmoUtils.createCustomerChoiceRenderer());
+        partner.setNullValid(true);
         form.add(partner);
 
         List<ITab> tabList = new ArrayList<>();

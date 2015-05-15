@@ -68,6 +68,9 @@ public class ClassPathUtil {
             return classes;
         }
         File[] files = directory.listFiles();
+        if (files == null) {
+            return classes;
+        }
         for (File file : files) {
             if (file.isDirectory()) {
                 if (file.getName().contains(".")) {
