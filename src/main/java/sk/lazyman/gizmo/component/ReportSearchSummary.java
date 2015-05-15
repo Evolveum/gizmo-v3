@@ -22,6 +22,8 @@ import org.apache.wicket.markup.html.basic.MultiLineLabel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sk.lazyman.gizmo.data.AbstractTask;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
@@ -39,6 +41,8 @@ import java.util.List;
  * @author lazyman
  */
 public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ReportSearchSummary.class);
 
     private static final String ID_REALIZATOR = "realizator";
     private static final String ID_PROJECT = "project";
@@ -132,7 +136,9 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
                     sb.append("\n");
                 }
 
-                sb.deleteCharAt(sb.length() - 1);
+                if (sb.length() != 0) {
+                    sb.deleteCharAt(sb.length() - 1);
+                }
 
                 return sb.toString();
             }
@@ -153,7 +159,9 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
                     sb.append("\n");
                 }
 
-                sb.deleteCharAt(sb.length() - 1);
+                if (sb.length() != 0) {
+                    sb.deleteCharAt(sb.length() - 1);
+                }
 
                 return sb.toString();
             }
