@@ -223,11 +223,13 @@ public class PageWork extends PageAppTemplate {
             public CustomerProjectPartDto getObject() {
                 part = model.getObject();
 
-                if (part != null) {
-                    for (CustomerProjectPartDto dto : projects.getObject()) {
-                        if (part.getId().equals(dto.getPartId())) {
-                            return dto;
-                        }
+                if (part == null) {
+                    return null;
+                }
+
+                for (CustomerProjectPartDto dto : projects.getObject()) {
+                    if (part.getId().equals(dto.getPartId())) {
+                        return dto;
                     }
                 }
 
@@ -236,13 +238,15 @@ public class PageWork extends PageAppTemplate {
 
             @Override
             public void setObject(CustomerProjectPartDto object) {
-                if (object == null) {
+                if (object == null || object.getPartId() == null) {
                     model.setObject(null);
+                    return;
                 }
 
                 Integer id = object.getPartId();
                 if (part != null && id.equals(part.getId())) {
                     model.setObject(part);
+                    return;
                 }
 
                 PartRepository repository = getProjectPartRepository();

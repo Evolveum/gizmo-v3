@@ -253,7 +253,6 @@ public class GizmoUtils {
                 List<CustomerProjectPartDto> list = null;
                 try {
                     if (showCustomers && showProjects && !showParts) {
-
                         List<CustomerProjectPartDto> dbList = listProjectsFromDb(page.getEntityManager());
                         list = listCustomersProjects(dbList);
                     } else if (showCustomers && showProjects && showParts) {
@@ -285,16 +284,8 @@ public class GizmoUtils {
 
         JPAQuery query = new JPAQuery(entityManager);
         query.from(customer).leftJoin(customer.projects, project).leftJoin(QProject.project.parts, part);
-        query.where(QProject.project.closed.eq(false));
+        query.where(QProject.project.closed.eq(false).and(part.id.isNotNull()));
         query.orderBy(customer.name.asc(), project.name.asc(), part.name.asc());
-
-//        QBean projection = Projections.bean(CustomerProjectPartDto.class,
-//                customer.id.as(CustomerProjectPartDto.F_CUSTOMER_ID),
-//                customer.name.as(CustomerProjectPartDto.F_CUSTOMER_NAME),
-//                project.id.as(CustomerProjectPartDto.F_PROJECT_ID),
-//                project.name.as(CustomerProjectPartDto.F_PROJECT_NAME),
-//                part.id.as(CustomerProjectPartDto.F_PART_ID),
-//                part.name.as(CustomerProjectPartDto.F_PART_NAME));
 
         Map<String, Expression<?>> bindings = new HashMap<>();
         bindings.put(CustomerProjectPartDto.F_CUSTOMER_ID, customer.id);
@@ -511,9 +502,7 @@ public class GizmoUtils {
             char[] array = Hex.encode(md.digest());
             return new String(array);
         } catch (NoSuchAlgorithmException e) {
-            new RuntimeException(e);
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 }
