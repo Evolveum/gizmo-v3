@@ -105,6 +105,9 @@ public class GizmoApplication extends AuthenticatedWebApplication {
 
             @Override
             public IRequestHandler onException(RequestCycle cycle, Exception ex) {
+                LOGGER.error("Error occurred during page rendering, reason: {} (more on DEBUG level)", ex.getMessage());
+                LOGGER.debug("Error occurred during page rendering", ex);
+
                 return new RenderPageRequestHandler(new PageProvider(new PageError(ex)));
             }
         });
