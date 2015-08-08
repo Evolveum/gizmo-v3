@@ -17,9 +17,11 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
-    <label wicket:id="label"/>
+    <wicket:enclosure child="inputWrapper">
+      <label wicket:id="label"/>
 
-    <div wicket:id="inputWrapper"/>
-    <span class="help-block" wicket:id="feedback"/>
+      <div wicket:id="inputWrapper"/>
+      <span class="help-block" wicket:id="feedback"/>
+    </wicket:enclosure>
 </wicket:panel>
 </html>

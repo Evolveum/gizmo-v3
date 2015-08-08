@@ -20,9 +20,11 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.tabs.AjaxBootstrapTabbed
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.EnumChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.AbstractReadOnlyModel;
@@ -31,9 +33,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.*;
-import sk.lazyman.gizmo.component.form.AreaFormGroup;
-import sk.lazyman.gizmo.component.form.DropDownFormGroup;
-import sk.lazyman.gizmo.component.form.FormGroup;
+import sk.lazyman.gizmo.component.form.*;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.CustomerType;
 import sk.lazyman.gizmo.repository.CustomerRepository;
@@ -139,11 +139,13 @@ public class PageCustomer extends PageAppCustomers {
                 createStringResource("Customer.type"), true);
         type.setChoices(GizmoUtils.createReadonlyModelFromEnum(CustomerType.class));
         type.setRenderer(new EnumChoiceRenderer(this));
+        DropDownChoice choice = (DropDownChoice) type.getFormComponent();
         form.add(type);
 
-        DropDownFormGroup partner = new DropDownFormGroup(ID_PARTNER,
+        final DropDownFormGroup partner = new DropDownFormGroup(ID_PARTNER,
                 new PropertyModel<Customer>(model, Customer.F_PARTNER),
                 createStringResource("Customer.partner"), false);
+        partner.setOutputMarkupId(true);
         partner.setChoices(new LoadableModel<List<Customer>>(false) {
 
             @Override
@@ -158,7 +160,27 @@ public class PageCustomer extends PageAppCustomers {
         });
         partner.setRenderer(GizmoUtils.createCustomerChoiceRenderer());
         partner.setNullValid(true);
+        partner.getFormInput().add(new VisibleEnableBehaviour() {
+
+            @Override
+            public boolean isVisible() {
+                Customer customer = model.getObject();
+                return !CustomerType.PARTNER.equals(customer.getType());
+            }
+        });
         form.add(partner);
+
+        choice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                Customer customer = model.getObject();
+                if (CustomerType.PARTNER.equals(customer.getType())) {
+                    customer.setPartner(null);
+                }
+                target.add(partner);
+            }
+        });
 
         List<ITab> tabList = new ArrayList<>();
         tabList.add(new AbstractTab(createStringResource("PageCustomer.projects")) {

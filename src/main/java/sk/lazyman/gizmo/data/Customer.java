@@ -132,7 +132,9 @@ public class Customer implements Serializable {
         sb.append("id=").append(id);
         sb.append(", name='").append(name).append('\'');
         sb.append(", type=").append(type);
-        sb.append(", partner=").append(partner);
+        if (partner != null) {
+            sb.append(", partner=(").append(partner.getId()).append(',').append(partner.getName());
+        }
         sb.append('}');
         return sb.toString();
     }
