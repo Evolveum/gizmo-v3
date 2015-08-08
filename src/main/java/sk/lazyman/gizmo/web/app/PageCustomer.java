@@ -160,6 +160,7 @@ public class PageCustomer extends PageAppCustomers {
         });
         partner.setRenderer(GizmoUtils.createCustomerChoiceRenderer());
         partner.setNullValid(true);
+        partner.setDefaultChoice(null);
         partner.getFormInput().add(new VisibleEnableBehaviour() {
 
             @Override
