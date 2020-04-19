@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.component.data;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;

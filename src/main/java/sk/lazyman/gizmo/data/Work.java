@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.data;
 
-import com.mysema.query.annotations.QueryInit;
+import com.querydsl.core.annotations.QueryInit;
 
 import javax.persistence.*;
 

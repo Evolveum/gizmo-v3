@@ -16,11 +16,11 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.types.Predicate;
 import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxButton;
 import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -84,8 +84,8 @@ public class PageProjects extends PageAppProjects {
                 return null;
             }
         };
-        provider.setSort(new Sort(new Sort.Order(Sort.Direction.ASC, Project.F_NAME),
-                new Sort.Order(Sort.Direction.DESC, Project.F_COMMERCIAL)));
+        provider.setSort(Sort.by(Sort.Order.asc(Project.F_NAME),
+                Sort.Order.desc(Project.F_COMMERCIAL)));
 
         List<IColumn> columns = new ArrayList<>();
 
@@ -111,12 +111,12 @@ public class PageProjects extends PageAppProjects {
                 createStringResource("PageProjects.search"), Buttons.Type.Primary) {
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(getFeedbackPanel());
             }
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 searchPerformed(target);
             }
         };
@@ -126,12 +126,12 @@ public class PageProjects extends PageAppProjects {
         BootstrapAjaxButton clear = new BootstrapAjaxButton(ID_CLEAR, Buttons.Type.Danger) {
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(getFeedbackPanel());
             }
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 clearPerformed(target);
             }
         };

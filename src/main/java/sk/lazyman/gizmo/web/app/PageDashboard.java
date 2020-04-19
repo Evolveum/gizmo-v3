@@ -23,6 +23,7 @@ import de.agilecoders.wicket.core.markup.html.bootstrap.button.dropdown.SplitBut
 import de.agilecoders.wicket.core.markup.html.bootstrap.image.IconType;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
 import de.agilecoders.wicket.less.LessResourceReference;
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
@@ -32,12 +33,8 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColu
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.IChoiceRenderer;
-import org.apache.wicket.markup.html.form.ListMultipleChoice;
+import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.link.AbstractLink;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -137,16 +134,16 @@ public class PageDashboard extends PageAppTemplate {
         form.setOutputMarkupId(true);
         add(form);
 
-        form.add(new DropDownChoice<>(ID_TYPE, new PropertyModel<WorkType>(filter, WorkFilterDto.F_TYPE),
+        form.add(new DropDownChoice<>(ID_TYPE, new PropertyModel<>(filter, WorkFilterDto.F_TYPE),
                 GizmoUtils.createReadonlyModelFromEnum(WorkType.class), GizmoUtils.createEnumRenderer(this)));
 
-        DateTextField from = new DateTextField(ID_FROM, new PropertyModel<Date>(filter, WorkFilterDto.F_FROM),
+        DateTextField from = new DateTextField(ID_FROM, new PropertyModel<>(filter, WorkFilterDto.F_FROM),
                 GizmoUtils.DATE_FIELD_FORMAT);
         from.setLabel(createStringResource("PageDashboard.dateFrom"));
         from.setRequired(true);
         form.add(from);
 
-        DateTextField to = new DateTextField(ID_TO, new PropertyModel<Date>(filter, WorkFilterDto.F_TO),
+        DateTextField to = new DateTextField(ID_TO, new PropertyModel<>(filter, WorkFilterDto.F_TO),
                 GizmoUtils.DATE_FIELD_FORMAT);
         to.setLabel(createStringResource("PageDashboard.dateTo"));
         to.setRequired(true);
@@ -167,7 +164,7 @@ public class PageDashboard extends PageAppTemplate {
         initButtons(form);
 
         AjaxCheckBox advanced = new AjaxCheckBox(ID_ADVANCED,
-                new PropertyModel<Boolean>(filter, WorkFilterDto.F_MULTIPLE)) {
+                new PropertyModel<>(filter, WorkFilterDto.F_MULTIPLE)) {
 
             @Override
             protected void onUpdate(AjaxRequestTarget target) {
@@ -195,14 +192,14 @@ public class PageDashboard extends PageAppTemplate {
 
     private void initProjectInput(WebMarkupContainer project) {
         AutoCompleteTextField projectCombo = new PartAutoCompleteText(ID_PROJECT_COMBO,
-                new PropertyModel<CustomerProjectPartDto>(filter, WorkFilterDto.F_PROJECT), projects);
+                new PropertyModel<>(filter, WorkFilterDto.F_PROJECT), projects);
         projectCombo.setLabel(createStringResource("PageDashboard.customerProjectPart"));
         projectCombo.add(createMultipleVisibilityBehaviour(false));
         project.add(projectCombo);
 
-        ListMultipleChoice projectMulti = new ListMultipleChoice<CustomerProjectPartDto>(ID_PROJECT_MULTI,
+        ListMultipleChoice projectMulti = new ListMultipleChoice<>(ID_PROJECT_MULTI,
                 new PropertyModel<List<CustomerProjectPartDto>>(filter, WorkFilterDto.F_PROJECTS), projects,
-                new IChoiceRenderer<CustomerProjectPartDto>() {
+                new ChoiceRenderer<>() {
 
                     @Override
                     public Object getDisplayValue(CustomerProjectPartDto object) {
@@ -264,7 +261,7 @@ public class PageDashboard extends PageAppTemplate {
 
             @Override
             protected IModel<String> createLinkModel(final IModel<AbstractTask> rowModel) {
-                return new AbstractReadOnlyModel<String>() {
+                return new IModel<String>() {
                     @Override
                     public String getObject() {
                         PropertyModel<Date> propertyModel = new PropertyModel<>(rowModel, getPropertyExpression());
@@ -317,12 +314,12 @@ public class PageDashboard extends PageAppTemplate {
         AjaxSubmitButton previous = new AjaxSubmitButton(ID_BTN_PREVIOUS) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 moveMonth(target, -1);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(getFeedbackPanel());
             }
         };
@@ -331,12 +328,12 @@ public class PageDashboard extends PageAppTemplate {
         AjaxSubmitButton next = new AjaxSubmitButton(ID_BTN_NEXT) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 moveMonth(target, 1);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(getFeedbackPanel());
             }
         };
@@ -346,12 +343,12 @@ public class PageDashboard extends PageAppTemplate {
                 createStringResource("PageDashboard.display")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 displayPerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(getFeedbackPanel());
             }
         };
@@ -360,12 +357,12 @@ public class PageDashboard extends PageAppTemplate {
         AjaxSubmitButton email = new AjaxSubmitButton(ID_BTN_EMAIL, createStringResource("PageDashboard.email")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 emailPerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(getFeedbackPanel());
             }
         };
@@ -374,12 +371,12 @@ public class PageDashboard extends PageAppTemplate {
         AjaxSubmitButton print = new AjaxSubmitButton(ID_BTN_PRINT, createStringResource("PageDashboard.print")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 printPerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(getFeedbackPanel());
             }
         };
@@ -390,7 +387,8 @@ public class PageDashboard extends PageAppTemplate {
             @Override
             protected AbstractLink newBaseButton(String markupId, IModel<String> labelModel,
                                                  IModel<IconType> iconTypeModel) {
-                return new BootstrapAjaxLink(markupId, labelModel, Buttons.Type.Success) {
+
+                return new BootstrapAjaxLink<>(markupId, labelModel, Buttons.Type.Success, labelModel) {
 
                     @Override
                     public void onClick(AjaxRequestTarget target) {
@@ -502,7 +500,7 @@ public class PageDashboard extends PageAppTemplate {
         //todo add confirmation
         try {
             AbstractTaskRepository repository = getAbstractTaskRepository();
-            repository.delete(task.getId());
+            repository.deleteById(task.getId());
 
             success(createStringResource("Message.successfullyDeleted").getString());
             target.add(getFeedbackPanel(), get(ID_TABLE), get(ID_SUMMARY), get(ID_SUMMARY_PARTS));

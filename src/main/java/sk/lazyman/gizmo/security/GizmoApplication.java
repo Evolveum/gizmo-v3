@@ -19,23 +19,30 @@ package sk.lazyman.gizmo.security;
 import de.agilecoders.wicket.core.Bootstrap;
 import de.agilecoders.wicket.core.settings.BootstrapSettings;
 import de.agilecoders.wicket.core.settings.IBootstrapSettings;
+import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
 import de.agilecoders.wicket.less.BootstrapLess;
+import de.agilecoders.wicket.webjars.WicketWebjars;
 import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication;
 import org.apache.wicket.core.request.handler.PageProvider;
 import org.apache.wicket.core.request.handler.RenderPageRequestHandler;
 import org.apache.wicket.core.request.mapper.MountedMapper;
+import org.apache.wicket.core.request.mapper.ResourceMapper;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.protocol.http.CsrfPreventionRequestCycleListener;
 import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.UrlPathPageParametersEncoder;
-import org.apache.wicket.settings.IApplicationSettings;
-import org.apache.wicket.settings.IResourceSettings;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.settings.ApplicationSettings;
+import org.apache.wicket.settings.ResourceSettings;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.wicketstuff.annotation.scan.AnnotatedMountScanner;
 import sk.lazyman.gizmo.theme.GizmoThemeProvider;
@@ -49,6 +56,7 @@ import sk.lazyman.gizmo.web.error.PageError403;
 import sk.lazyman.gizmo.web.error.PageError404;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -68,20 +76,27 @@ public class GizmoApplication extends AuthenticatedWebApplication {
     public void init() {
         super.init();
 
+//        Map<String, GizmoApplicationConfiguration> map =
+//                applicationContext.getBeansOfType(GizmoApplicationConfiguration.class);
+//        if (map != null) {
+//            map.forEach((key, value) -> value.init(this));
+//        }
+
         IBootstrapSettings settings = new BootstrapSettings();
         settings.setAutoAppendResources(false);
+        settings.useCdnResources(false);
         settings.setThemeProvider(new GizmoThemeProvider());
         Bootstrap.install(this, settings);
         BootstrapLess.install(this);
 
         getComponentInstantiationListeners().add(new SpringComponentInjector(this));
 
-        IResourceSettings resourceSettings = getResourceSettings();
+        ResourceSettings resourceSettings = getResourceSettings();
 
         resourceSettings.setThrowExceptionOnMissingResource(false);
         getMarkupSettings().setStripWicketTags(true);
-        getMarkupSettings().setDefaultBeforeDisabledLink("");
-        getMarkupSettings().setDefaultAfterDisabledLink("");
+//        getMarkupSettings().setDefaultBeforeDisabledLink("");
+//        getMarkupSettings().setDefaultAfterDisabledLink("");
 
         if (RuntimeConfigurationType.DEVELOPMENT.equals(getConfigurationType())) {
             getDebugSettings().setAjaxDebugModeEnabled(true);
@@ -89,18 +104,20 @@ public class GizmoApplication extends AuthenticatedWebApplication {
         }
 
         //exception handling an error pages
-        IApplicationSettings appSettings = getApplicationSettings();
+        ApplicationSettings appSettings = getApplicationSettings();
         appSettings.setAccessDeniedPage(PageError401.class);
         appSettings.setInternalErrorPage(PageError.class);
         appSettings.setPageExpiredErrorPage(PageError.class);
 
         new AnnotatedMountScanner().scanPackage(PageTemplate.class.getPackage().getName()).mount(this);
+//        mountResource("css/font-awesome.css", FontAwesomeCssReference.instance());
 
         mount(new MountedMapper("/error", PageError.class, new UrlPathPageParametersEncoder()));
         mount(new MountedMapper("/error/401", PageError401.class, new UrlPathPageParametersEncoder()));
         mount(new MountedMapper("/error/403", PageError403.class, new UrlPathPageParametersEncoder()));
         mount(new MountedMapper("/error/404", PageError404.class, new UrlPathPageParametersEncoder()));
 
+//        getRequestCycleListeners().add(new CsrfPreventionRequestCycleListener());
         getRequestCycleListeners().add(new AbstractRequestCycleListener() {
 
             @Override

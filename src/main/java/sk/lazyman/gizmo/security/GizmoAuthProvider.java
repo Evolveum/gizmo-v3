@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.security;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +67,7 @@ public class GizmoAuthProvider implements AuthenticationProvider {
 
     private SimpleBindAunthenticator ldapBindAuthenticator;
 
-    public void init() throws Exception {
+    public void init() {
         if (!useLdapAuth()) {
             return;
         }
@@ -101,7 +101,7 @@ public class GizmoAuthProvider implements AuthenticationProvider {
 
     private Authentication authenticateUsingDb(Authentication authentication) throws AuthenticationException {
         String principal = (String) authentication.getPrincipal();
-        String password = (String) ((UsernamePasswordAuthenticationToken) authentication).getCredentials();
+        String password = (String) authentication.getCredentials();
         User user = userRepository.findUserByName(principal);
         if (user == null) {
             throw new BadCredentialsException("web.security.provider.invalid");

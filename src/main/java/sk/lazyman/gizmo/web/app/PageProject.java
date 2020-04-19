@@ -16,10 +16,8 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import com.github.sommeri.less4j.core.ast.Page;
-import de.agilecoders.wicket.core.markup.html.bootstrap.dialog.Modal;
 import de.agilecoders.wicket.core.markup.html.bootstrap.tabs.AjaxBootstrapTabbedPanel;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
@@ -28,7 +26,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
@@ -54,6 +51,7 @@ import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author lazyman
@@ -132,13 +130,13 @@ public class PageProject extends PageAppProjects {
         }
 
         ProjectRepository repository = getProjectRepository();
-        Project project = repository.findOne(Integer.parseInt(projectId));
-        if (project == null) {
+        Optional<Project> project = repository.findById(Integer.parseInt(projectId));
+        if (!project.isPresent()) {
             getSession().error(translateString("Message.couldntFindProject", projectId));
             throw new RestartResponseException(PageProject.class);
         }
 
-        return project;
+        return project.get();
     }
 
     @Override
@@ -226,12 +224,12 @@ public class PageProject extends PageAppProjects {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 savePerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(form);
             }
         };

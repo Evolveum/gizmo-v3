@@ -16,10 +16,10 @@
 
 package sk.lazyman.gizmo.data.provider;
 
-import com.mysema.query.BooleanBuilder;
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sk.lazyman.gizmo.data.*;
@@ -58,9 +58,9 @@ public class SummaryPartsDataProvider implements Serializable {
             query.where(bb);
         }
         query.groupBy(work.part.id, log.customer.id);
+        query.select(work.part.id, log.customer.id, task.workLength.sum(), work.invoiceLength.sum());
 
-        List<Tuple> tuples = query.list(work.part.id, log.customer.id,
-                task.workLength.sum(), work.invoiceLength.sum());
+        List<Tuple> tuples = query.fetch();
         List<PartSummary> result = new ArrayList<>();
         if (tuples != null) {
             LOG.debug("Found {} parts for summary.", tuples.size());
@@ -126,10 +126,11 @@ public class SummaryPartsDataProvider implements Serializable {
 
         QCustomer customer = QCustomer.customer;
         JPAQuery query = new JPAQuery(page.getEntityManager());
-        query.from(customer);
-        query.where(customer.id.in(ids));
+        query.select(customer)
+                .from(customer)
+                .where(customer.id.in(ids));
 
-        List<Customer> customers = query.list(customer);
+        List<Customer> customers = query.fetch();
         if (customers == null) {
             return map;
         }
@@ -149,10 +150,11 @@ public class SummaryPartsDataProvider implements Serializable {
 
         QPart part = QPart.part;
         JPAQuery query = new JPAQuery(page.getEntityManager());
-        query.from(part);
-        query.where(part.id.in(ids));
+        query.select(part)
+                .from(part)
+                .where(part.id.in(ids));
 
-        List<Part> parts = query.list(part);
+        List<Part> parts = query.fetch();
         if (parts == null) {
             return map;
         }

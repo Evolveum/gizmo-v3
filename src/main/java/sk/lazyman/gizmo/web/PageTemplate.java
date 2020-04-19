@@ -18,8 +18,8 @@ package sk.lazyman.gizmo.web;
 
 import de.agilecoders.wicket.core.Bootstrap;
 import de.agilecoders.wicket.less.LessResourceReference;
-import org.apache.commons.lang.Validate;
-import org.apache.wicket.Component;
+import org.apache.commons.lang3.Validate;
+import org.apache.wicket.Application;
 import org.apache.wicket.devutils.debugbar.DebugBar;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.head.CssHeaderItem;
@@ -27,7 +27,6 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -90,7 +89,9 @@ public class PageTemplate extends WebPage {
     }
 
     public StringResourceModel createStringResource(String resourceKey, Object... objects) {
-        return new StringResourceModel(resourceKey, this, new Model<String>(), resourceKey, objects);
+        return new StringResourceModel(resourceKey, this)
+            .setDefaultValue(resourceKey)
+            .setParameters(objects);
     }
 
     public StringResourceModel createStringResource(Enum e) {
@@ -98,19 +99,22 @@ public class PageTemplate extends WebPage {
         return createStringResource(resourceKey);
     }
 
-    public static StringResourceModel createStringResourceStatic(Component component, String resourceKey, Object... objects) {
-        return new StringResourceModel(resourceKey, component, new Model<String>(), resourceKey, objects);
+    public static StringResourceModel createStringResourceStatic(String resourceKey, Object... objects) {
+        return new StringResourceModel(resourceKey)
+                .setDefaultValue(resourceKey)
+                .setParameters(objects);
     }
 
-    public static StringResourceModel createStringResourceStatic(Component component, Enum e) {
+    public static StringResourceModel createStringResourceStatic(Enum e) {
         String resourceKey = e.getDeclaringClass().getSimpleName() + "." + e.name();
-        return createStringResourceStatic(component, resourceKey);
+        return createStringResourceStatic(resourceKey);
     }
 
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
 
+//        Bootstrap.install(Application.get());
         Bootstrap.renderHead(response);
         response.render(CssHeaderItem.forReference(
                 new LessResourceReference(PageTemplate.class, "PageTemplate.less")));

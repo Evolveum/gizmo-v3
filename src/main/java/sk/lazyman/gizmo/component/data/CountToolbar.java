@@ -92,8 +92,8 @@ public class CountToolbar extends AbstractToolbar {
                 }
 
                 if (count > 0) {
-                    return new StringResourceModel("CountToolbar.label", CountToolbar.this, null,
-                            new Object[]{from, to, count}).getString();
+                    return new StringResourceModel("CountToolbar.label", CountToolbar.this)
+                    .setParameters(new Object[]{from, to, count}).getString();
                 }
 
                 return new StringResourceModel("CountToolbar.noFound", CountToolbar.this, null).getString();

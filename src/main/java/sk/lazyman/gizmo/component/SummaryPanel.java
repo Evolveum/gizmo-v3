@@ -18,8 +18,7 @@ package sk.lazyman.gizmo.component;
 
 import de.agilecoders.wicket.core.markup.html.bootstrap.behavior.CssClassNameModifier;
 import de.agilecoders.wicket.less.LessResourceReference;
-import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.AttributeModifier;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;

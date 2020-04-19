@@ -18,7 +18,7 @@ package sk.lazyman.gizmo.component;
 
 import de.agilecoders.wicket.core.markup.html.bootstrap.button.Activatable;
 import de.agilecoders.wicket.core.markup.html.bootstrap.navbar.NavbarAjaxLink;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -29,7 +29,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 /**
  * @author lazyman
  */
-public class TopMenuItem extends NavbarAjaxLink implements Activatable {
+public class TopMenuItem<T> extends NavbarAjaxLink<T> implements Activatable {
 
     private Class<? extends WebPage> page;
     private PageParameters params;

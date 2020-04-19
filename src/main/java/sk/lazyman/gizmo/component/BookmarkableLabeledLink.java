@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.component;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.MarkupStream;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -26,7 +26,7 @@ import org.apache.wicket.model.IModel;
 /**
  * @author lazyman
  */
-public class BookmarkableLabeledLink extends BookmarkablePageLink {
+public class BookmarkableLabeledLink<T> extends BookmarkablePageLink<T> {
 
     private IModel<String> model;
 

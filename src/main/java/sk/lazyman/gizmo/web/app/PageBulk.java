@@ -42,6 +42,7 @@ import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author lazyman
@@ -139,12 +140,12 @@ public class PageBulk extends PageAppTemplate {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 saveWorkPerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(form);
             }
         };
@@ -171,7 +172,11 @@ public class PageBulk extends PageAppTemplate {
 
             PartRepository parts = getProjectPartRepository();
             CustomerProjectPartDto partDto = bulk.getPart();
-            Part part = parts.getOne(partDto.getPartId());
+            Optional<Part> optionalPart = parts.findById(partDto.getPartId());
+            Part part = null;
+            if (optionalPart != null && optionalPart.isPresent()) {
+                part = optionalPart.get();
+            }
 
             Date date = GizmoUtils.clearTime(bulk.getFrom());
             Date to = GizmoUtils.clearTime(bulk.getTo());

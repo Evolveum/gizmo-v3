@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.AttributeAppender;
@@ -43,6 +43,7 @@ import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author lazyman
@@ -114,13 +115,13 @@ public class PageLog extends PageAppTemplate {
         }
 
         LogRepository repository = getLogRepository();
-        Log log = repository.findOne(logId);
-        if (log == null) {
+        Optional<Log> log = repository.findById(logId);
+        if (log == null || !log.isPresent()) {
             getSession().error(translateString("Message.couldntFindLog", logId));
             throw new RestartResponseException(PageLog.class);
         }
 
-        return log;
+        return log.get();
     }
 
     private <T extends FormInput> void initLayout() {
@@ -204,8 +205,11 @@ public class PageLog extends PageAppTemplate {
                 }
 
                 CustomerRepository repository = getCustomerRepository();
-                customer = repository.findOne(id);
-                model.setObject(customer);
+                Optional<Customer> optionalCustomer = repository.findById(id);
+                if (optionalCustomer != null && optionalCustomer.isPresent()) {
+                    customer = optionalCustomer.get();
+                    model.setObject(customer);
+                }
             }
 
             @Override
@@ -218,12 +222,12 @@ public class PageLog extends PageAppTemplate {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 saveLogPerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(form);
             }
         };

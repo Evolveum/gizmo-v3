@@ -16,11 +16,11 @@
 
 package sk.lazyman.gizmo.data.provider;
 
-import com.mysema.query.BooleanBuilder;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.Predicate;
-import com.mysema.query.types.expr.BooleanExpression;
-import com.mysema.query.types.path.EntityPathBase;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -62,7 +62,7 @@ public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask,
         query.offset(first);
         query.limit(count);
 
-        List<AbstractTask> found = query.list(task);
+        List<AbstractTask> found = query.select(task).fetch();
         if (found != null) {
             return found.iterator();
         }
@@ -78,7 +78,7 @@ public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask,
         query.from(QAbstractTask.abstractTask).leftJoin(work.part.project);
         query.where(createPredicate());
 
-        return query.count();
+        return query.select(task).fetchCount();
     }
 
     @Override

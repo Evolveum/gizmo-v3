@@ -16,8 +16,8 @@
 
 package sk.lazyman.gizmo.data.provider;
 
-import com.mysema.query.BooleanBuilder;
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import sk.lazyman.gizmo.data.EmailLog;
 import sk.lazyman.gizmo.data.QEmailLog;

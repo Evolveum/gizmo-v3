@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.component.form;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.feedback.ComponentFeedbackMessageFilter;

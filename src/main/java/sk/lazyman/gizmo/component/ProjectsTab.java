@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.component;
 
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.types.Predicate;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -38,6 +38,7 @@ import sk.lazyman.gizmo.web.app.PageProject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author lazyman
@@ -72,8 +73,8 @@ public class ProjectsTab extends SimplePanel {
                 return QProject.project.customer.id.eq(customerId);
             }
         };
-        provider.setSort(new Sort(new Sort.Order(Sort.Direction.ASC, Project.F_NAME),
-                new Sort.Order(Sort.Direction.DESC, Project.F_COMMERCIAL)));
+        provider.setSort(Sort.by( Sort.Order.asc(Project.F_NAME),
+                Sort.Order.desc(Project.F_COMMERCIAL)));
 
         List<IColumn> columns = new ArrayList<>();
 
@@ -118,8 +119,10 @@ public class ProjectsTab extends SimplePanel {
             Integer customerId = page.getIntegerParam(PageCustomer.CUSTOMER_ID);
             if (customerId != null) {
                 CustomerRepository repository = page.getCustomerRepository();
-                Customer customer = repository.findOne(customerId);
-                project.setCustomer(customer);
+                Optional<Customer> customer = repository.findById(customerId);
+                if (customer != null && customer.isPresent()) {
+                    project.setCustomer(customer.get());
+                }
             }
 
             PageProject next = new PageProject(null, new Model<>(project));

@@ -18,7 +18,8 @@ package sk.lazyman.gizmo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.stereotype.Repository;
 import sk.lazyman.gizmo.data.Customer;
 
 import java.util.List;
@@ -26,14 +27,15 @@ import java.util.List;
 /**
  * @author lazyman
  */
-public interface CustomerRepository extends JpaRepository<Customer, Integer>, QueryDslPredicateExecutor<Customer> {
+@Repository
+public interface CustomerRepository extends JpaRepository<Customer, Integer>, QuerydslPredicateExecutor<Customer> {
 
     @Query("from Customer c order by c.name")
-    public List<Customer> listCustomers();
+    List<Customer> listCustomers();
 
     @Query("from Customer c where c.type = 2 order by c.name")
-    public List<Customer> listPartners();
+    List<Customer> listPartners();
 
-    @Query("select distinct c from Customer c left join c.projects p where p.closed != false")
-    public List<Customer> listCustomersWithOpenProjects();
+    @Query("select distinct c from Customer c left join c.projects p where p.closed = false")
+    List<Customer> listCustomersWithOpenProjects();
 }

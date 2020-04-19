@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -45,6 +45,7 @@ import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author lazyman
@@ -117,13 +118,13 @@ public class PageWork extends PageAppTemplate {
         }
 
         WorkRepository repository = getWorkRepository();
-        Work work = repository.findOne(workId);
-        if (work == null) {
+        Optional<Work> work = repository.findById(workId);
+        if (work == null || !work.isPresent()) {
             getSession().error(translateString("Message.couldntFindWork", workId));
             throw new RestartResponseException(PageWork.class);
         }
 
-        return work;
+        return work.get();
     }
 
     private <T extends FormInput> void initLayout() {
@@ -250,7 +251,7 @@ public class PageWork extends PageAppTemplate {
                 }
 
                 PartRepository repository = getProjectPartRepository();
-                part = repository.findOne(id);
+                part = repository.findById(id).get();
                 model.setObject(part);
             }
 
@@ -264,12 +265,12 @@ public class PageWork extends PageAppTemplate {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 saveWorkPerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(form);
             }
         };

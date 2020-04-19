@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.data.provider;
 
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.types.Predicate;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -26,7 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -60,13 +60,13 @@ public class BasicDataProvider<T extends Serializable> extends SortableDataProvi
         LOG.debug("Setting page request: page {}, size {}", pageIndex, itemsPerPage);
 
         Predicate predicate = getPredicate();
-        PageRequest page = new PageRequest(pageIndex, itemsPerPage, sort);
+        PageRequest page = PageRequest.of(pageIndex, itemsPerPage, sort);
 
         Page<T> found;
         if (predicate == null) {
             found = repository.findAll(page);
         } else {
-            QueryDslPredicateExecutor executor = (QueryDslPredicateExecutor) repository;
+            QuerydslPredicateExecutor executor = (QuerydslPredicateExecutor) repository;
             found = executor.findAll(predicate, page);
         }
 
@@ -88,7 +88,7 @@ public class BasicDataProvider<T extends Serializable> extends SortableDataProvi
             return repository.count();
         }
 
-        QueryDslPredicateExecutor executor = (QueryDslPredicateExecutor) repository;
+        QuerydslPredicateExecutor executor = (QuerydslPredicateExecutor) repository;
         return executor.count(predicate);
     }
 

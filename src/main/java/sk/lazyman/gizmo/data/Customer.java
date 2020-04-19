@@ -16,6 +16,7 @@
 
 package sk.lazyman.gizmo.data;
 
+import org.springframework.transaction.annotation.Transactional;
 import sk.lazyman.gizmo.util.GizmoUtils;
 
 import javax.persistence.*;
@@ -65,7 +66,7 @@ public class Customer implements Serializable {
         return type;
     }
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_customer_customer"))
     public Customer getPartner() {
         return partner;

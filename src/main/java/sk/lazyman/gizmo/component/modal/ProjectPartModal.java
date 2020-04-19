@@ -81,12 +81,12 @@ public class ProjectPartModal extends Modal<Part> {
                 createStringResource("GizmoApplication.button.cancel"), Buttons.Type.Default) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 cancelPerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 cancelPerformed(target);
             }
         };
@@ -96,12 +96,12 @@ public class ProjectPartModal extends Modal<Part> {
                 createStringResource("GizmoApplication.button.save"), Buttons.Type.Primary) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 savePerformed(target, partModel);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(name, description);
             }
         };

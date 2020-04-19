@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.dto;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +90,30 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
 
     public Integer getProjectId() {
         return projectId;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public void setPartName(String partName) {
+        this.partName = partName;
+    }
+
+    public void setCustomerId(Integer customerId) {
+        this.customerId = customerId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+
+    public void setPartId(Integer partId) {
+        this.partId = partId;
     }
 
     @Override

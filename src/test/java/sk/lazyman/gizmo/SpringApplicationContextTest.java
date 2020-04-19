@@ -16,8 +16,13 @@
 
 package sk.lazyman.gizmo;
 
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.hibernate.tool.schema.TargetType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -29,10 +34,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.SystemPropertyUtils;
 import org.testng.annotations.Test;
-import sk.lazyman.gizmo.util.GizmoNamingStrategy;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
 
@@ -43,7 +48,7 @@ import static org.testng.AssertJUnit.assertNotNull;
  */
 @ContextConfiguration(locations = {
         "file:src/main/webapp/WEB-INF/ctx-web.xml",
-        "../../../ctx-test.xml"})
+        "classpath:ctx-test.xml"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class SpringApplicationContextTest extends BaseTest {
 
@@ -59,16 +64,29 @@ public class SpringApplicationContextTest extends BaseTest {
         Properties properties = new Properties();
         properties.putAll(sessionFactoryBean.getJpaPropertyMap());
         configuration.setProperties(properties);
-        configuration.setNamingStrategy(new GizmoNamingStrategy());
+
+
+
+        StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+                .applySettings(properties).build();
+        MetadataSources sources = new MetadataSources(registry);
+        List<Class> classes = listClasses("sk.lazyman.gizmo.data");
+        classes.forEach(clazz -> sources.addAnnotatedClass(clazz));
+
+
+
+        Metadata metadata = sources.getMetadataBuilder().build();
 
         System.out.println("Dialect: " + properties.getProperty("hibernate.dialect"));
+        System.out.println("naming strategy: " + properties.getProperty("hibernate.ejb.naming_strategy"));
 
         addAnnotatedClasses("sk.lazyman.gizmo.data", configuration);
 
-        SchemaExport export = new SchemaExport(configuration);
+        SchemaExport export = new SchemaExport();
         export.setOutputFile(fileName);
         export.setDelimiter(";");
-        export.execute(true, false, false, true);
+        export.create(EnumSet.of(TargetType.SCRIPT, TargetType.STDOUT), metadata);
+
     }
 
     private void addAnnotatedClasses(String packageName, Configuration configuration) throws Exception {

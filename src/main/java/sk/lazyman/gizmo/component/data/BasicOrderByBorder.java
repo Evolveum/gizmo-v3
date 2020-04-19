@@ -26,30 +26,30 @@ import org.apache.wicket.extensions.markup.html.repeater.data.sort.OrderByLink;
 public abstract class BasicOrderByBorder extends OrderByBorder {
 
     protected BasicOrderByBorder(String id, Object property, ISortStateLocator stateLocator) {
-        super(id, property, stateLocator, BasicCssProvider.getInstance());
+        super(id, property, stateLocator);
     }
 
     @Override
     protected OrderByLink newOrderByLink(String id, Object property, ISortStateLocator stateLocator) {
-        return new OrderByLink(id, property, stateLocator, new OrderByLink.VoidCssProvider()) {
-
-            @Override
-            protected void onSortChanged() {
-                BasicOrderByBorder.this.onSortChanged();
-            }
-        };
+        return new OrderByLink(id, property, stateLocator);
     }
 
-    public static class BasicCssProvider extends OrderByLink.CssProvider {
-
-        private static BasicCssProvider instance = new BasicCssProvider();
-
-        private BasicCssProvider() {
-            super("sortable asc", "sortable desc", "sortable");
-        }
-
-        public static BasicCssProvider getInstance() {
-            return instance;
-        }
-    }
+    //TODO override messages if neede:
+    /*
+    OrderByLink.CSS.ascending=wicket_orderUp
+OrderByLink.CSS.descending=wicket_orderDown
+OrderByLink.CSS.none=wicket_orderNone
+     */
+//    public static class BasicCssProvider extends OrderByLink.CssProvider {
+//
+//        private static BasicCssProvider instance = new BasicCssProvider();
+//
+//        private BasicCssProvider() {
+//            super("sortable asc", "sortable desc", "sortable");
+//        }
+//
+//        public static BasicCssProvider getInstance() {
+//            return instance;
+//        }
+//    }
 }

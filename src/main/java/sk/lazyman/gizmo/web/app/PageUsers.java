@@ -27,7 +27,6 @@ import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.data.IconColumn;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
-import sk.lazyman.gizmo.data.EmailLog;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.provider.BasicDataProvider;
 
@@ -48,7 +47,7 @@ public class PageUsers extends PageAppUsers {
 
     private void initLayout() {
         BasicDataProvider provider = new BasicDataProvider(getUserRepository());
-        provider.setSort(new Sort(Sort.Direction.ASC, User.F_GIVEN_NAME, User.F_FAMILY_NAME));
+        provider.setSort(Sort.by(Sort.Direction.ASC, User.F_GIVEN_NAME, User.F_FAMILY_NAME));
 
         List<IColumn> columns = new ArrayList<>();
         columns.add(new PropertyColumn(createStringResource("User.givenName"), User.F_GIVEN_NAME));

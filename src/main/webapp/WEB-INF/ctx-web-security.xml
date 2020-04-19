@@ -23,35 +23,35 @@
     http://www.springframework.org/schema/security
     http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
-    <global-method-security secured-annotations="enabled"/>
+<!--    <global-method-security secured-annotations="enabled"/>-->
 
-    <http pattern="/wicket/resource/**" security="none"/>
+<!--    <http pattern="/wicket/resource/**" security="none"/>-->
 
-    <http create-session="never" auto-config="true" use-expressions="false">
+<!--    <http create-session="never" auto-config="true" use-expressions="false">-->
 
-        <intercept-url pattern="/j_spring_security_check"/>
-        <intercept-url pattern="/spring_security_login"/>
+<!--        <intercept-url pattern="/j_spring_security_check"/>-->
+<!--        <intercept-url pattern="/spring_security_login"/>-->
 
-        <intercept-url pattern="/login" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+<!--        <intercept-url pattern="/login" access="IS_AUTHENTICATED_ANONYMOUSLY"/>-->
 
-        <intercept-url pattern="/app/**" access="IS_AUTHENTICATED_FULLY"/>
+<!--        <intercept-url pattern="/app/**" access="IS_AUTHENTICATED_FULLY"/>-->
 
-        <logout logout-url="/j_spring_security_logout" invalidate-session="true"
-                logout-success-url="/app/dashboard"/>
+<!--        <logout logout-url="/j_spring_security_logout" invalidate-session="true"-->
+<!--                logout-success-url="/app/dashboard"/>-->
 
-        <session-management>
-            <concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>
-        </session-management>
+<!--        <session-management>-->
+<!--            <concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>-->
+<!--        </session-management>-->
 
-        <form-login login-page="/login" default-target-url="/app"/>
-    </http>
+<!--        <form-login login-page="/login" default-target-url="/app"/>-->
+<!--    </http>-->
 
-    <authentication-manager alias="authenticationManager">
-        <authentication-provider ref="authProvider"/>
-    </authentication-manager>
+<!--    <authentication-manager alias="authenticationManager">-->
+<!--        <authentication-provider ref="authProvider"/>-->
+<!--    </authentication-manager>-->
 
-    <beans:bean id="authProvider"
-                class="sk.lazyman.gizmo.security.GizmoAuthProvider"
-                init-method="init"/>
+<!--    <beans:bean id="authProvider"-->
+<!--                class="sk.lazyman.gizmo.security.GizmoAuthProvider"-->
+<!--                init-method="init"/>-->
 
 </beans:beans>

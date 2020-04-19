@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.component;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.StringResourceModel;
@@ -60,7 +60,9 @@ public class SimplePanel<T> extends Panel {
     }
 
     public StringResourceModel createStringResource(String resourceKey, Object... objects) {
-        return new StringResourceModel(resourceKey, this, null, resourceKey, objects);
+        return new StringResourceModel(resourceKey, this)
+                .setParameters(objects)
+                .setDefaultValue(resourceKey);
     }
 
     public StringResourceModel createStringResource(Enum e) {

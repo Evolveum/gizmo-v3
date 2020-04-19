@@ -17,7 +17,7 @@
 package sk.lazyman.gizmo.web.app;
 
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -25,11 +25,10 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.basic.MultiLineLabel;
+import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.repeater.Item;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.springframework.data.domain.Sort;
@@ -91,7 +90,7 @@ public class PageEmails extends PageAppTemplate {
                 GizmoUtils.DATE_FIELD_FORMAT));
 
         form.add(new DropDownChoice<User>(ID_SENDER, new PropertyModel<User>(filter, EmailFilterDto.F_SENDER),
-                GizmoUtils.createUsersModel(this), new IChoiceRenderer<User>() {
+                GizmoUtils.createUsersModel(this), new ChoiceRenderer<>() {
 
             @Override
             public Object getDisplayValue(User object) {
@@ -113,18 +112,18 @@ public class PageEmails extends PageAppTemplate {
         form.add(new AjaxSubmitButton(ID_FILTER, createStringResource("PageEmails.filter")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 filterLogs(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(getFeedbackPanel());
             }
         });
 
         BasicDataProvider provider = new EmailDataProvider(getEmailLogRepository(), 15);
-        provider.setSort(new Sort(Sort.Direction.DESC, EmailLog.F_SENT_DATE));
+        provider.setSort(Sort.by(Sort.Direction.DESC, EmailLog.F_SENT_DATE));
 
         List<IColumn> columns = new ArrayList<>();
         columns.add(new DateColumn(createStringResource("EmailLog.sentDate"),
@@ -134,7 +133,7 @@ public class PageEmails extends PageAppTemplate {
             @Override
             public void populateItem(Item<ICellPopulator<EmailLog>> item, String componentId,
                                      final IModel<EmailLog> rowModel) {
-                item.add(new Label(componentId, new AbstractReadOnlyModel<String>() {
+                item.add(new Label(componentId, new IModel<Object>() {
 
                     @Override
                     public String getObject() {
@@ -155,7 +154,7 @@ public class PageEmails extends PageAppTemplate {
 
             @Override
             protected IModel<String> createIconModel(final IModel<EmailLog> rowModel) {
-                return new AbstractReadOnlyModel<String>() {
+                return new IModel<String>() {
 
                     @Override
                     public String getObject() {
@@ -206,7 +205,7 @@ public class PageEmails extends PageAppTemplate {
     }
 
     private IModel<String> createRealizators(final IModel<EmailLog> rowModel) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -228,7 +227,7 @@ public class PageEmails extends PageAppTemplate {
     }
 
     private IModel<String> createCustomers(final IModel<EmailLog> rowModel) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -250,7 +249,7 @@ public class PageEmails extends PageAppTemplate {
     }
 
     private IModel<String> createProjects(final IModel<EmailLog> rowModel) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {

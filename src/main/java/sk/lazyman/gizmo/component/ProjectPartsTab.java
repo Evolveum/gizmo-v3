@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.component;
 
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.types.Predicate;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -91,7 +91,7 @@ public class ProjectPartsTab extends SimplePanel {
                 return QPart.part.project.id.eq(projectId);
             }
         };
-        provider.setSort(new Sort(new Sort.Order(Sort.Direction.ASC, Project.F_NAME)));
+        provider.setSort(Sort.by(Sort.Order.asc(Project.F_NAME)));
 
         List<IColumn> columns = new ArrayList<>();
         columns.add(new LinkColumn<Part>(createStringResource("Part.name"), Part.F_NAME) {

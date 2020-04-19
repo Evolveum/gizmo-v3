@@ -16,37 +16,89 @@
 
 package sk.lazyman.gizmo.util;
 
+import org.hibernate.boot.model.naming.EntityNaming;
+import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.cfg.EJB3NamingStrategy;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author lazyman
  */
-public class GizmoNamingStrategy extends EJB3NamingStrategy {
+public class GizmoNamingStrategy implements PhysicalNamingStrategy {
 
     private static final Logger LOG = LoggerFactory.getLogger(GizmoNamingStrategy.class);
 
+//    protected String transformName(EntityNaming entityNaming) {
+//        String className = super.transformEntityName(entityNaming);
+//        String result = "g_" + className.toLowerCase();
+//        LOG.trace("classToTableName {} to {}", new Object[]{className, result});
+//
+//        return result;
+//    }
+
     @Override
-    public String classToTableName(String className) {
+    public Identifier toPhysicalCatalogName(Identifier identifier, JdbcEnvironment jdbcEnvironment) {
+        return identifier;
+//        return transformIdentifier(identifier);
+    }
+
+    @Override
+    public Identifier toPhysicalSchemaName(Identifier identifier, JdbcEnvironment jdbcEnvironment) {
+        return identifier;
+//        return transformIdentifier(identifier);
+    }
+
+    @Override
+    public Identifier toPhysicalTableName(Identifier identifier, JdbcEnvironment jdbcEnvironment) {
+        return transformIdentifier(identifier);
+    }
+
+    @Override
+    public Identifier toPhysicalSequenceName(Identifier identifier, JdbcEnvironment jdbcEnvironment) {
+        return identifier;
+//        return transformIdentifier(identifier);
+    }
+
+    @Override
+    public Identifier toPhysicalColumnName(Identifier identifier, JdbcEnvironment jdbcEnvironment) {
+        return identifier;
+//        return transformIdentifier(identifier);
+    }
+//
+//    @Override
+    public Identifier transformIdentifier(Identifier identifier) {
+        if (identifier == null) {
+            return identifier;
+        }
+        String className = identifier.getText();
         //change camel case to underscore delimited
-        className = className.replaceAll(String.format("%s|%s|%s",
-                "(?<=[A-Z])(?=[A-Z][a-z])",
-                "(?<=[^A-Z])(?=[A-Z])",
-                "(?<=[A-Za-z])(?=[^A-Za-z])"
-        ), "_");
+        final String regex = "([a-z])([A-Z])";
+        final String replacement = "$1_$2";
+        className = className.replaceAll(regex, replacement)
+                .toLowerCase();
+//        className = className.replaceAll(String.format("%s|%s|%s",
+//                "(?<=[A-Z])(?=[A-Z][a-z])",
+//                "(?<=[^A-Z])(?=[A-Z])",
+//                "(?<=[A-Za-z])(?=[^A-Za-z])"
+//        ), "_");
 
         String result = "g_" + className.toLowerCase();
         LOG.trace("classToTableName {} to {}", new Object[]{className, result});
 
-        return result;
+        return Identifier.toIdentifier(result);
     }
 
-    @Override
-    public String tableName(String tableName) {
-        String result = "g_" + super.tableName(tableName);
-        LOG.trace("tableName {} to {}", new Object[]{tableName, result});
-
-        return result;
-    }
+//    tran
+//
+//    @Override
+//    public String tableName(String tableName) {
+//        String result = "g_" + super.tableName(tableName);
+//        LOG.trace("tableName {} to {}", new Object[]{tableName, result});
+//
+//        return result;
+//    }
 }

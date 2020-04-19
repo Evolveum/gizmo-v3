@@ -16,11 +16,12 @@
 
 package sk.lazyman.gizmo.security;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.Session;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebSession;
 import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.injection.Injector;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -42,7 +43,7 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GizmoAuthWebSession.class);
 
-    @SpringBean(name = "authProvider")
+    @SpringBean(name = "authenticationProvider")
     private AuthenticationProvider authenticationProvider;
 
     private WorkFilterDto dashboardFilter;
@@ -82,7 +83,7 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
             LOGGER.debug("Couldn't authenticate user.", ex);
             authenticated = false;
 
-            String msg = new StringResourceModel(ex.getMessage(),null, ex.getMessage()).getString();
+            String msg = new StringResourceModel(ex.getMessage(),null, Model.of(ex.getMessage())).getString();
             error(msg);
         }
 

@@ -17,7 +17,7 @@
 package sk.lazyman.gizmo.web.app;
 
 import de.agilecoders.wicket.core.markup.html.bootstrap.tabs.AjaxBootstrapTabbedPanel;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -32,8 +32,13 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
-import sk.lazyman.gizmo.component.*;
-import sk.lazyman.gizmo.component.form.*;
+import sk.lazyman.gizmo.component.AjaxButton;
+import sk.lazyman.gizmo.component.AjaxSubmitButton;
+import sk.lazyman.gizmo.component.ProjectsTab;
+import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
+import sk.lazyman.gizmo.component.form.AreaFormGroup;
+import sk.lazyman.gizmo.component.form.DropDownFormGroup;
+import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.CustomerType;
 import sk.lazyman.gizmo.repository.CustomerRepository;
@@ -42,6 +47,7 @@ import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author lazyman
@@ -109,13 +115,13 @@ public class PageCustomer extends PageAppCustomers {
         }
 
         CustomerRepository repository = getCustomerRepository();
-        Customer customer = repository.findOne(customerId);
-        if (customer == null) {
+        Optional<Customer> customer = repository.findById(customerId);
+        if (customer == null || !customer.isPresent()) {
             getSession().error(translateString("Message.couldntFindCustomer", customerId));
             throw new RestartResponseException(PageCustomers.class);
         }
 
-        return customer;
+        return customer.get();
     }
 
     private void initLayout() {
@@ -216,12 +222,12 @@ public class PageCustomer extends PageAppCustomers {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 savePerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(form);
             }
         };

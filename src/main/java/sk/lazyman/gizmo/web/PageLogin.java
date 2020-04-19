@@ -64,7 +64,18 @@ public class PageLogin extends PageTemplate {
         feedback.setOutputMarkupId(true);
         add(feedback);
 
-        Form form = new Form(ID_FORM);
+        Form<?> form = new Form<>(ID_FORM) {
+
+            @Override
+            protected void onSubmit() {
+                GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
+
+                LoginDto dto = model.getObject();
+                if (session.authenticate(dto.getUsername(), dto.getPassword())) {
+                    setResponsePage(PageDashboard.class);
+                }
+            }
+        };
         add(form);
 
         RequiredTextField username = new RequiredTextField(ID_USERNAME, new PropertyModel(model, LoginDto.F_USERNAME));
@@ -75,23 +86,25 @@ public class PageLogin extends PageTemplate {
         FormUtils.addPlaceholderAndLabel(password, createStringResource("PageLogin.password"));
         form.add(FormUtils.createFormGroup(ID_PASSWORD_GROUP, password));
 
+
+
         AjaxSubmitLink signin = new AjaxSubmitLink(ID_BTN_SIGNIN) {
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
-                target.add(form, PageLogin.this.get(ID_FEEDBACK));
+            protected void onError(AjaxRequestTarget target) {
+                target.add(PageLogin.this.get(ID_FEEDBACK));
             }
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                loginPerformed(target, form);
+            protected void onSubmit(AjaxRequestTarget target) {
+                loginPerformed(target);
             }
         };
         form.add(signin);
     }
 
-    private void loginPerformed(AjaxRequestTarget target, Form<?> form) {
-        target.add(form, PageLogin.this.get(ID_FEEDBACK));
+    private void loginPerformed(AjaxRequestTarget target) {
+        target.add(PageLogin.this.get(ID_FEEDBACK));
 
         GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
 

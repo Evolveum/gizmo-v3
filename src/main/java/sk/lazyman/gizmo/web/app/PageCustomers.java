@@ -16,15 +16,11 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.types.Predicate;
 import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxButton;
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapButton;
 import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons;
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.DefaultBootstrapButton;
-import de.agilecoders.wicket.core.markup.html.bootstrap.image.IconType;
-import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconType;
 import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
@@ -36,7 +32,6 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.springframework.data.domain.Sort;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
-import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.data.Customer;
@@ -88,7 +83,7 @@ public class PageCustomers extends PageAppCustomers {
                 return null;
             }
         };
-        provider.setSort(new Sort(Sort.Direction.ASC, Customer.F_NAME, Customer.F_TYPE));
+        provider.setSort(Sort.by(Sort.Direction.ASC, Customer.F_NAME, Customer.F_TYPE));
 
         List<IColumn> columns = new ArrayList<>();
 
@@ -113,14 +108,15 @@ public class PageCustomers extends PageAppCustomers {
                 createStringResource("PageCustomers.search"), Buttons.Type.Primary) {
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(getFeedbackPanel());
             }
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 searchPerformed(target);
             }
+
         };
         search.setSize(Buttons.Size.Small);
         form.add(search);
@@ -128,12 +124,12 @@ public class PageCustomers extends PageAppCustomers {
         BootstrapAjaxButton clear = new BootstrapAjaxButton(ID_CLEAR, Buttons.Type.Danger) {
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(getFeedbackPanel());
             }
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 clearPerformed(target);
             }
         };

@@ -16,12 +16,13 @@
 
 package sk.lazyman.gizmo.util;
 
-import com.mysema.query.BooleanBuilder;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.Expression;
-import com.mysema.query.types.Predicate;
-import com.mysema.query.types.QBean;
-import org.apache.commons.lang.StringUtils;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.QBean;
+import com.querydsl.jpa.impl.JPAQuery;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -29,6 +30,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColu
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
@@ -163,7 +165,8 @@ public class GizmoUtils {
     }
 
     public static <T extends Enum> IChoiceRenderer<T> createEnumRenderer(final Component component) {
-        return new IChoiceRenderer<T>() {
+        return new ChoiceRenderer<>() {
+
             @Override
             public Object getDisplayValue(T object) {
                 return createLocalizedModelForEnum(object, component).getObject();
@@ -182,7 +185,7 @@ public class GizmoUtils {
     }
 
     public static <T extends Enum> IModel<List<T>> createReadonlyModelFromEnum(final Class<T> type) {
-        return new AbstractReadOnlyModel<List<T>>() {
+        return new IModel<List<T>>() {
 
             @Override
             public List<T> getObject() {
@@ -195,7 +198,7 @@ public class GizmoUtils {
     }
 
     public static IChoiceRenderer<User> createUserChoiceRenderer() {
-        return new IChoiceRenderer<User>() {
+        return new ChoiceRenderer<>() {
 
             @Override
             public Object getDisplayValue(User object) {
@@ -210,7 +213,7 @@ public class GizmoUtils {
     }
 
     public static IChoiceRenderer<Customer> createCustomerChoiceRenderer() {
-        return new IChoiceRenderer<Customer>() {
+        return new ChoiceRenderer<>() {
 
             @Override
             public Object getDisplayValue(Customer object) {
@@ -225,7 +228,7 @@ public class GizmoUtils {
     }
 
     public static IModel<List<User>> createUsersModel(final PageTemplate page) {
-        return new LoadableModel<List<User>>(false) {
+        return new LoadableModel<>(false) {
 
             @Override
             protected List<User> load() {
@@ -246,7 +249,7 @@ public class GizmoUtils {
                                                                                      final boolean showCustomers,
                                                                                      final boolean showProjects,
                                                                                      final boolean showParts) {
-        return new LoadableModel<List<CustomerProjectPartDto>>(false) {
+        return new LoadableModel<>(false) {
 
             @Override
             protected List<CustomerProjectPartDto> load() {
@@ -294,9 +297,10 @@ public class GizmoUtils {
         bindings.put(CustomerProjectPartDto.F_PROJECT_NAME, project.name);
         bindings.put(CustomerProjectPartDto.F_PART_ID, part.id);
         bindings.put(CustomerProjectPartDto.F_PART_NAME, part.name);
-        QBean projection = new QBean(CustomerProjectPartDto.class, true, bindings);
+        QBean projection = Projections.bean(CustomerProjectPartDto.class, bindings);
 
-        return query.list(projection);
+        return query.select(projection).fetch();
+
     }
 
     private static void handleModelException(PageTemplate page, String message, Exception ex) {
@@ -398,7 +402,8 @@ public class GizmoUtils {
         }
         query.orderBy(task.date.asc());
 
-        return query.list(task);
+        return query.fetch();
+//        return query.list(task);
     }
 
     public static IColumn createAbstractTaskRealizatorColumn(PageTemplate page) {
@@ -418,7 +423,7 @@ public class GizmoUtils {
     }
 
     private static IModel<String> createInvoiceModel(final IModel<AbstractTask> rowModel) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -448,7 +453,7 @@ public class GizmoUtils {
     }
 
     private static IModel<String> createProjectModel(final IModel<AbstractTask> rowModel) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -474,7 +479,7 @@ public class GizmoUtils {
     }
 
     private static IModel<String> createCustomerModel(final IModel<AbstractTask> rowModel) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {

@@ -18,8 +18,8 @@ package sk.lazyman.gizmo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.stereotype.Repository;
 import sk.lazyman.gizmo.data.Project;
 
 import java.util.List;
@@ -27,7 +27,8 @@ import java.util.List;
 /**
  * @author lazyman
  */
-public interface ProjectRepository extends JpaRepository<Project, Integer>, QueryDslPredicateExecutor<Project> {
+@Repository
+public interface ProjectRepository extends JpaRepository<Project, Integer>, QuerydslPredicateExecutor<Project> {
 
     @Query("from Project p where p.closed = false order by p.name")
     public List<Project> findOpenedProjects();

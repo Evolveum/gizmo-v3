@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.util;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;

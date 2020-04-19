@@ -16,12 +16,10 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.util.string.StringValue;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
@@ -32,6 +30,8 @@ import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
+
+import java.util.Optional;
 
 /**
  * @author lazyman
@@ -73,7 +73,8 @@ public class PageUser extends PageAppUsers {
         }
 
         UserRepository repo = getUserRepository();
-        return repo.findOne(userId);
+        Optional<User> user = repo.findById(userId);
+        return user.get();
     }
 
     private void initLayout() {
@@ -107,12 +108,12 @@ public class PageUser extends PageAppUsers {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 userSavePerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(form);
             }
         };

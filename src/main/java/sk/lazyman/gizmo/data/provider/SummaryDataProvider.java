@@ -16,12 +16,14 @@
 
 package sk.lazyman.gizmo.data.provider;
 
-import com.mysema.query.BooleanBuilder;
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.Predicate;
-import com.mysema.query.types.expr.DateTimeExpression;
-import com.mysema.query.types.template.DateTimeTemplate;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.TemplateExpressionImpl;
+import com.querydsl.core.types.dsl.DateTimeExpression;
+import com.querydsl.core.types.dsl.DateTimeTemplate;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import sk.lazyman.gizmo.data.QAbstractTask;
 import sk.lazyman.gizmo.data.QWork;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
@@ -67,9 +69,11 @@ public class SummaryDataProvider implements Serializable {
             query.where(bb);
         }
         query.groupBy(createDateTruncExpression(work));
+        query.select(createDateTruncExpression(work), task.workLength.sum(), work.invoiceLength.sum());
 
-        List<Tuple> tuples = query.list(createDateTruncExpression(work),
-                task.workLength.sum(), work.invoiceLength.sum());
+        List<Tuple> tuples = query.fetch();
+//        List<Tuple> tuples = query.list(createDateTruncExpression(work),
+//                task.workLength.sum(), work.invoiceLength.sum());
         if (tuples != null) {
             for (Tuple tuple : tuples) {
                 TaskLength taskLength = new TaskLength(tuple.get(1, Double.class), tuple.get(2, Double.class));
@@ -81,6 +85,6 @@ public class SummaryDataProvider implements Serializable {
     }
 
     private DateTimeExpression createDateTruncExpression(QWork work) {
-        return DateTimeTemplate.create(Date.class, "date_trunc('day',{0})", work.date);
+        return Expressions.dateTimeTemplate(Date.class, "date_trunc('day',{0})", work.date);
     }
 }

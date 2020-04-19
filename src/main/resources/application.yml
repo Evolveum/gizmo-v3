@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: Gizmo
+  main:
+    # needed to override springSecurityFilterChain from Spring Security
+    allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      file-size-threshold: 256KB
+  thymeleaf:
+    cache: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gizmo3
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: sk.lazyman.gizmo.util.GizmoPostgreSQLDialect
+    hibernate:
+      naming:
+        physical-strategy: sk.lazyman.gizmo.util.GizmoNamingStrategy
+      ddl-auto: update
+      use-new-id-generator-mappings: true
+    show-sql: true
+server:
+  tomcat:
+    max-http-form-post-size: 104857600
+  ## Enable and configuration ajp connector for mp
+  #    ajp:
+  #      enabled: true
+  #      port: 9090
+  servlet:
+    application-display-name: Gizmo
+    session:
+      timeout: 15  # in minutes. By default spring uses seconds, but tomcat/container (not embedded) uses this value
+      # as minutes - so we end up with never expiring session.
+
+

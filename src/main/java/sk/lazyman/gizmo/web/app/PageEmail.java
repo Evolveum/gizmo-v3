@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.core.util.string.ComponentRenderer;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -37,7 +37,6 @@ import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.data.provider.ListDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.EmailDto;
-import sk.lazyman.gizmo.dto.ReportSearchSummaryDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.EmailLogRepository;
@@ -158,12 +157,12 @@ public class PageEmail extends PageAppTemplate {
         AjaxSubmitButton send = new AjaxSubmitButton(ID_SEND, createStringResource("GizmoApplication.button.send")) {
 
             @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 sendPerformed(target);
             }
 
             @Override
-            protected void onError(AjaxRequestTarget target, Form<?> form) {
+            protected void onError(AjaxRequestTarget target) {
                 target.add(form);
             }
         };
@@ -255,9 +254,9 @@ public class PageEmail extends PageAppTemplate {
         }
 
         ProjectRepository repository = getProjectRepository();
-        Project project = repository.findOne(cppDto.getProjectId());
-        if (project != null) {
-            set.add(project);
+        Optional<Project> project = repository.findById(cppDto.getProjectId());
+        if (project != null && project.isPresent()) {
+            set.add(project.get());
         }
 
         return set.isEmpty() ? null : set;
@@ -277,9 +276,9 @@ public class PageEmail extends PageAppTemplate {
         }
 
         CustomerRepository repository = getCustomerRepository();
-        Customer customer = repository.findOne(cppDto.getCustomerId());
-        if (customer != null) {
-            set.add(customer);
+        Optional<Customer> customer = repository.findById(cppDto.getCustomerId());
+        if (customer != null && customer.isPresent()) {
+            set.add(customer.get());
         }
 
         return set.isEmpty() ? null : set;
