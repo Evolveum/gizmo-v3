@@ -19,6 +19,7 @@ package sk.lazyman.gizmo.dto;
 import sk.lazyman.gizmo.data.User;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -33,16 +34,16 @@ public class BulkDto implements Serializable {
     public static final String F_DESCRIPTION = "description";
 
     private User realizator;
-    private Date from;
-    private Date to;
+    private LocalDate from;
+    private LocalDate to;
     private String description;
     private CustomerProjectPartDto part;
 
-    public Date getFrom() {
+    public LocalDate getFrom() {
         return from;
     }
 
-    public void setFrom(Date from) {
+    public void setFrom(LocalDate from) {
         this.from = from;
     }
 
@@ -62,11 +63,11 @@ public class BulkDto implements Serializable {
         this.realizator = realizator;
     }
 
-    public Date getTo() {
+    public LocalDate getTo() {
         return to;
     }
 
-    public void setTo(Date to) {
+    public void setTo(LocalDate to) {
         this.to = to;
     }
 

@@ -16,9 +16,9 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.extensions.markup.html.form.DateTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;

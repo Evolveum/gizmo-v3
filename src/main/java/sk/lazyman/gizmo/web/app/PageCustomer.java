@@ -16,11 +16,11 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.tabs.AjaxBootstrapTabbedPanel;
 import org.apache.commons.lang3.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.extensions.ajax.markup.html.tabs.AjaxTabbedPanel;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -214,7 +214,8 @@ public class PageCustomer extends PageAppCustomers {
 //            }
 //        });
 
-        AjaxBootstrapTabbedPanel tabs = new AjaxBootstrapTabbedPanel(ID_TABS, tabList);
+        AjaxTabbedPanel tabs = new AjaxTabbedPanel(ID_TABS, tabList);
+//        AjaxBootstrapTabbedPanel tabs = new AjaxBootstrapTabbedPanel(ID_TABS, tabList);
         add(tabs);
     }
 

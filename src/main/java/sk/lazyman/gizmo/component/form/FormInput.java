@@ -16,8 +16,8 @@
 
 package sk.lazyman.gizmo.component.form;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.behavior.CssClassNameModifier;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
 import sk.lazyman.gizmo.component.SimplePanel;
@@ -39,7 +39,7 @@ public abstract class FormInput<T> extends SimplePanel<T> {
 
         FormComponent c = getFormComponent();
         if (StringUtils.isNotEmpty(getInputCssClass())) {
-            c.add(new CssClassNameModifier(getInputCssClass()));
+            c.add(AttributeAppender.append("class", getInputCssClass()));
         }
     }
 

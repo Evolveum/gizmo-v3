@@ -16,49 +16,34 @@
 
 package sk.lazyman.gizmo.theme;
 
-import de.agilecoders.wicket.core.settings.ITheme;
-import de.agilecoders.wicket.core.settings.Theme;
-import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeCssReference;
-import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReference;
-import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.HeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.request.resource.PackageResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
 /**
  * @author lazyman
  */
-public class GizmoTheme implements ITheme {
-
-
-    @Override
-    public String name() {
-        return "Gizmo";
-    }
-
-    @Override
-    public List<HeaderItem> getDependencies() {
-        return Arrays.asList(CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap.css")),
-                JavaScriptHeaderItem.forReference(
-                        new WebjarsJavaScriptResourceReference("bootstrap.js")));
-    }
-
-        @Override
-    public void renderHead(IHeaderResponse response) {
-        response.render(CssHeaderItem.forReference(
-                new PackageResourceReference(GizmoTheme.class, "bootstrap.css")));
-        response.render(CssHeaderItem.forReference(FontAwesomeCssReference.instance()));
-    }
-
-    @Override
-    public Iterable<String> getCdnUrls() {
-        return null;
-    }
+public class GizmoTheme {
+//    implements ITheme {
+//
+//
+//    @Override
+//    public String name() {
+//        return "Gizmo";
+//    }
+//
+//    @Override
+//    public List<HeaderItem> getDependencies() {
+//        return Arrays.asList(CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap.css")),
+//                JavaScriptHeaderItem.forReference(
+//                        new WebjarsJavaScriptResourceReference("bootstrap.js")));
+//    }
+//
+//        @Override
+//    public void renderHead(IHeaderResponse response) {
+//        response.render(CssHeaderItem.forReference(
+//                new PackageResourceReference(GizmoTheme.class, "bootstrap.css")));
+//        response.render(CssHeaderItem.forReference(FontAwesomeCssReference.instance()));
+//    }
+//
+//    @Override
+//    public Iterable<String> getCdnUrls() {
+//        return null;
+//    }
 }

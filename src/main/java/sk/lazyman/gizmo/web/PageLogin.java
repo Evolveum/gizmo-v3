@@ -16,10 +16,8 @@
 
 package sk.lazyman.gizmo.web;
 
-import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
-import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.PasswordTextField;
@@ -56,7 +54,7 @@ public class PageLogin extends PageTemplate {
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
-        response.render(CssHeaderItem.forReference(new LessResourceReference(PageLogin.class, "PageLogin.less")));
+//        response.render(CssHeaderItem.forReference(new LessResourceReference(PageLogin.class, "PageLogin.less")));
     }
 
     private void initLayout() {
@@ -80,11 +78,11 @@ public class PageLogin extends PageTemplate {
 
         RequiredTextField username = new RequiredTextField(ID_USERNAME, new PropertyModel(model, LoginDto.F_USERNAME));
         FormUtils.addPlaceholderAndLabel(username, createStringResource("PageLogin.username"));
-        form.add(FormUtils.createFormGroup(ID_USERNAME_GROUP, username));
+        form.add(username);//FormUtils.createFormGroup(ID_USERNAME_GROUP, username));
 
         PasswordTextField password = new PasswordTextField(ID_PASSWORD, new PropertyModel(model, LoginDto.F_PASSWORD));
         FormUtils.addPlaceholderAndLabel(password, createStringResource("PageLogin.password"));
-        form.add(FormUtils.createFormGroup(ID_PASSWORD_GROUP, password));
+        form.add(password);//FormUtils.createFormGroup(ID_PASSWORD_GROUP, password));
 
 
 

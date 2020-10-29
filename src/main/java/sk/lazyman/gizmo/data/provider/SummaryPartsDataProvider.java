@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.dto.PartSummary;
+import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.web.PageTemplate;
@@ -44,7 +45,7 @@ public class SummaryPartsDataProvider implements Serializable {
         this.page = page;
     }
 
-    public List<PartSummary> createSummary(WorkFilterDto filter) {
+    public List<PartSummary> createSummary(ReportFilterDto filter) {
         List<Predicate> list = AbstractTaskDataProvider.createPredicates(filter);
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);

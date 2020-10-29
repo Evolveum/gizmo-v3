@@ -38,9 +38,32 @@
         <testng.version>6.8.8</testng.version>
         <wicket.version>8.7.0</wicket.version>
         <wicket.bootstrap.version>2.0.13</wicket.bootstrap.version>
+        <apache.poi.version>4.1.2</apache.poi.version>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>AdminLTE</artifactId>
+            <version>3.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>font-awesome</artifactId>
+            <version>4.7.0</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.webjars.bower</groupId>-->
+<!--            <artifactId>bootstrap-multiselect</artifactId>-->
+<!--            <version>0.9.15</version>-->
+<!--        </dependency>-->
         <!-- SPRING -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -164,27 +187,27 @@
             <artifactId>wicketstuff-annotation</artifactId>
             <version>${wicket.version}</version>
         </dependency>
-        <dependency>
-            <groupId>de.agilecoders.wicket</groupId>
-            <artifactId>wicket-bootstrap-core</artifactId>
-            <version>${wicket.bootstrap.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>de.agilecoders.wicket</groupId>
-            <artifactId>wicket-bootstrap-extensions</artifactId>
-            <version>${wicket.bootstrap.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>de.agilecoders.wicket</groupId>
-            <artifactId>wicket-bootstrap-less</artifactId>
-            <version>${wicket.bootstrap.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>de.agilecoders.wicket</groupId>-->
+<!--            <artifactId>wicket-bootstrap-core</artifactId>-->
+<!--            <version>${wicket.bootstrap.version}</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>javassist</groupId>-->
+<!--                    <artifactId>javassist</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>de.agilecoders.wicket</groupId>-->
+<!--            <artifactId>wicket-bootstrap-extensions</artifactId>-->
+<!--            <version>${wicket.bootstrap.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>de.agilecoders.wicket</groupId>-->
+<!--            <artifactId>wicket-bootstrap-less</artifactId>-->
+<!--            <version>${wicket.bootstrap.version}</version>-->
+<!--        </dependency>-->
 
         <!-- HIBERNATE -->
         <dependency>
@@ -205,6 +228,14 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
+
+        <!-- EXCEL -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${apache.poi.version}</version>
+        </dependency>
+
 
         <!-- UTILS -->
         <dependency>

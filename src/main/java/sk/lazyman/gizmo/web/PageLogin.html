@@ -18,22 +18,68 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
-    <div class="container">
-        <div wicket:id="feedback"/>
-
-        <form class="form-signin" role="form" wicket:id="form">
-            <h2 class="form-signin-heading"><wicket:message key="PageLogin.heading"/></h2>
-            <div class="form-group" wicket:id="usernameGroup">
-                <input type="text" class="form-control" wicket:id="username" required autofocus>
+    <div wicket:id="feedback"/>
+    <div class="login-page" style="min-height: 513.390625px;">
+        <div class="login-box">
+            <div class="login-logo">
+                <b>Gizmo</b>
             </div>
-            <div class="form-group" wicket:id="passwordGroup">
-                <input type="password" class="form-control" wicket:id="password" required>
-            </div>
+            <div class="card">
+                <div class="card-body login-card-body">
+                    <p class="login-box-msg"><wicket:message key="PageLogin.heading"/></p>
 
-            <button class="btn btn-lg btn-primary btn-block" type="submit" wicket:id="signin">
-                <wicket:message key="PageLogin.btn.signIn"/></button>
-        </form>
+                    <form class="form-signin" role="form" wicket:id="form">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" wicket:id="username">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fa fa-user"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input type="password" class="form-control" wicket:id="password">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fa fa-lock"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <!-- /.col -->
+                            <div class="col-4">
+                                <button type="submit" class="btn btn-primary btn-block"  wicket:id="signin">
+                                    <wicket:message key="PageLogin.btn.signIn"/></button>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                    </form>
+
+
+                </div>
+                <!-- /.login-card-body -->
+            </div>
+        </div>
     </div>
+
+
+<!--    <div class="container">-->
+<!--        <div wicket:id="feedback"/>-->
+
+<!--        <form class="form-signin" role="form" wicket:id="form">-->
+<!--            <h2 class="form-signin-heading"><wicket:message key="PageLogin.heading"/></h2>-->
+<!--            <div class="form-group" wicket:id="usernameGroup">-->
+<!--                <input type="text" class="form-control" wicket:id="username" required autofocus>-->
+<!--            </div>-->
+<!--            <div class="form-group" wicket:id="passwordGroup">-->
+<!--                <input type="password" class="form-control" wicket:id="password" required>-->
+<!--            </div>-->
+
+<!--            <button class="btn btn-lg btn-primary btn-block" type="submit" wicket:id="signin">-->
+<!--                <wicket:message key="PageLogin.btn.signIn"/></button>-->
+<!--        </form>-->
+<!--    </div>-->
 </wicket:extend>
 </body>
 </html>

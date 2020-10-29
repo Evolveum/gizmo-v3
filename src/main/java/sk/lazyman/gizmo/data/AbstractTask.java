@@ -20,6 +20,7 @@ import sk.lazyman.gizmo.util.GizmoUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -44,7 +45,7 @@ public class AbstractTask implements Serializable {
     private User realizator;
     private double workLength;
 
-    private Date date;
+    private LocalDate date;
     private String description;
     private String trackId;
 
@@ -66,7 +67,7 @@ public class AbstractTask implements Serializable {
     }
 
     @Column(nullable = false)
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
@@ -105,7 +106,7 @@ public class AbstractTask implements Serializable {
         this.workLength = workLength;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

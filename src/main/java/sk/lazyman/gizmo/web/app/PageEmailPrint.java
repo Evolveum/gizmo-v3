@@ -21,6 +21,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import sk.lazyman.gizmo.component.DataPrintPanel;
 import sk.lazyman.gizmo.data.AbstractTask;
+import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 
 import java.util.List;
@@ -32,11 +33,11 @@ public class PageEmailPrint extends WebPage {
 
     private static final String ID_DATA_PRINT = "dataPrint";
 
-    public PageEmailPrint(IModel<WorkFilterDto> filter, IModel<List<AbstractTask>> dataModel) {
-        initLayout(filter != null ? filter : new Model<>(new WorkFilterDto()), dataModel);
+    public PageEmailPrint(IModel<ReportFilterDto> filter, IModel<List<AbstractTask>> dataModel) {
+        initLayout(filter != null ? filter : new Model<>(new ReportFilterDto()), dataModel);
     }
 
-    private void initLayout(IModel<WorkFilterDto> filter, IModel<List<AbstractTask>> dataModel) {
+    private void initLayout(IModel<ReportFilterDto> filter, IModel<List<AbstractTask>> dataModel) {
         DataPrintPanel dataPrint = new DataPrintPanel(ID_DATA_PRINT, filter, dataModel);
         add(dataPrint);
     }

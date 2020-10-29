@@ -16,22 +16,48 @@
 
 package sk.lazyman.gizmo.component;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.behavior.CssClassNameModifier;
-import de.agilecoders.wicket.less.LessResourceReference;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.Loop;
 import org.apache.wicket.markup.html.list.LoopItem;
-import org.apache.wicket.model.AbstractReadOnlyModel;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.LoadableDetachableModel;
-import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.*;
+import org.apache.wicket.model.util.ListModel;
+import sk.lazyman.gizmo.data.QAbstractTask;
+import sk.lazyman.gizmo.data.QWork;
+import sk.lazyman.gizmo.data.Work;
+import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
 import sk.lazyman.gizmo.dto.TaskLength;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
+import sk.lazyman.gizmo.security.SecurityUtils;
+import sk.lazyman.gizmo.util.GizmoUtils;
+import sk.lazyman.gizmo.web.app.PageWork;
+
+import javax.swing.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.chrono.ChronoLocalDate;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author lazyman
@@ -39,74 +65,87 @@ import sk.lazyman.gizmo.dto.WorkFilterDto;
 public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
 
     private static final String ID_MONTH_REPEATER = "monthRepeater";
+    private static final String ID_WEEK_REPEATER = "weekRepeater";
     private static final String ID_DAY_REPEATER = "dayRepeater";
     private static final String ID_LABEL = "label";
+    private static final String ID_DAY_NUMBER = "dayNumber";
 
     private static final int TABLE_DAY_SIZE = 32;
 
-    public SummaryPanel(String id, final SummaryDataProvider provider, final IModel<WorkFilterDto> model) {
-        super(id);
+    private IModel<SummaryPanelDto> model;
 
-        add(new CssClassNameModifier("table-responsive"));
-
-        setModel(new LoadableDetachableModel<SummaryPanelDto>() {
-
-            @Override
-            protected SummaryPanelDto load() {
-                return provider.createSummary(model.getObject());
-            }
-        });
+    public SummaryPanel(String id, final IModel<SummaryPanelDto> model) {
+        super(id, model);
 
         setOutputMarkupId(true);
         initPanelLayout();
     }
 
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-        response.render(CssHeaderItem.forReference(new LessResourceReference(SummaryPanel.class, "SummaryPanel.less")));
-    }
-
     private void initPanelLayout() {
-        Loop monthRepeater = new Loop(ID_MONTH_REPEATER,
-                new PropertyModel<Integer>(getModel(), SummaryPanelDto.F_MONTH_COUNT)) {
+
+        Loop monthRepeater = new Loop(ID_WEEK_REPEATER, 5) {
 
             @Override
             protected void populateItem(final LoopItem item) {
-                Loop dayRepeater = new Loop(ID_DAY_REPEATER, TABLE_DAY_SIZE) {
+
+                Loop dayRepeater = new Loop(ID_DAY_REPEATER, 7) {
 
                     @Override
                     protected void populateItem(final LoopItem dayItem) {
-                        final int dayIndex = dayItem.getIndex() - 1;
+                        final int dayIndex = dayItem.getIndex();
+                        int weekIndex = item.getIndex();
+//                        List<LocalDate> week = list.get(item.getIndex());
 
-                        Label label = new Label(ID_LABEL, createDayModel(item.getIndex(), dayIndex));
-                        label.setRenderBodyOnly(true);
-                        dayItem.add(label);
 
-                        final SummaryPanelDto dto = getModelObject();
-                        dayItem.add(new CssClassNameModifier(new AbstractReadOnlyModel<String>() {
+
+                        Label dayNumber = new Label(ID_DAY_NUMBER, new IModel<Integer>() {
+
+                            @Override
+                            public Integer getObject() {
+                                LocalDate day = getModelObject().getDayModel(weekIndex, dayIndex);
+                                return day.getDayOfMonth();
+                            }
+                        });
+//                        dayNumber.setRenderBodyOnly(true);
+                        dayItem.add(dayNumber);
+
+                        AjaxLink<Void> link = new AjaxLink<>(ID_LABEL) {
+
+                            @Override
+                            public void onClick(AjaxRequestTarget target) {
+                                Work work = new Work();
+                                work.setDate(SummaryPanel.this.getModelObject().getDayModel(weekIndex, dayIndex));
+                                work.setRealizator(SecurityUtils.getPrincipalUser().getUser());
+                                setResponsePage(new PageWork(new Model(work)));
+                            }
+                        };
+                        link.setBody(createDayModel(weekIndex, dayIndex));
+                        dayItem.add(link);
+
+                        dayItem.add(AttributeAppender.append("class", new AbstractReadOnlyModel<String>() {
 
                             @Override
                             public String getObject() {
+                                SummaryPanelDto dto = getModelObject();
                                 // month year column
                                 if (dayIndex == -1) {
                                     return null;
                                 }
 
-                                if (dto.isToday(item.getIndex(), dayIndex)) {
+                                if (dto.isToday(weekIndex, dayIndex)) {
                                     return "info";
                                 }
 
-                                if (!dto.isWithinFilter(item.getIndex(), dayIndex)) {
-                                    return "active";
+                                if (!dto.isWithinFilter(weekIndex, dayIndex)) {
+                                    return "table-active";
                                 }
 
-                                if (dto.isWeekend(item.getIndex(), dayIndex)) {
-                                    return "success";
+                                if (dto.isWeekend(weekIndex, dayIndex)) {
+                                    return "table-success";
                                 }
 
-                                if (!dto.isFullDayDone(item.getIndex(), dayIndex)) {
-                                    return "text-danger";
+                                if (!dto.isFullDayDone(weekIndex, dayIndex)) {
+                                    return "table-danger";
                                 }
 
                                 return null;
@@ -127,11 +166,11 @@ public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
             public String getObject() {
                 SummaryPanelDto dto = getModelObject();
 
-                if (dayIndex == -1) {
-                    return dto.getMonthYear(monthIndex);
-                }
+//                if (dayIndex == -1) {
+//                    return dto.getMonthYear(monthIndex);
+//                }
 
-                if (dto.getDayForIndex(monthIndex, dayIndex) == null) {
+                if (dto.getDayModel(monthIndex, dayIndex) == null) {
                     //not "existing" date like 31. september
                     return null;
                 }

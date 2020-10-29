@@ -17,9 +17,6 @@
 package sk.lazyman.gizmo.web.app;
 
 import com.querydsl.core.types.Predicate;
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.BootstrapAjaxButton;
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.Buttons;
-import de.agilecoders.wicket.extensions.markup.html.bootstrap.icon.FontAwesomeIconTypeBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -31,9 +28,9 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.springframework.data.domain.Sort;
 import org.wicketstuff.annotation.mount.MountPath;
-import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
+import sk.lazyman.gizmo.component.form.IconButton;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.QCustomer;
 import sk.lazyman.gizmo.data.provider.BasicDataProvider;
@@ -104,48 +101,72 @@ public class PageCustomers extends PageAppCustomers {
     }
 
     private void initButtons(Form form) {
-        BootstrapAjaxButton search = new BootstrapAjaxButton(ID_SEARCH,
-                createStringResource("PageCustomers.search"), Buttons.Type.Primary) {
+        IconButton search = new IconButton(ID_SEARCH, createStringResource("fa-search")) {
 
             @Override
-            protected void onError(AjaxRequestTarget target) {
-                target.add(getFeedbackPanel());
-            }
-
-            @Override
-            protected void onSubmit(AjaxRequestTarget target) {
+            protected void submitPerformed(AjaxRequestTarget target) {
                 searchPerformed(target);
             }
-
         };
-        search.setSize(Buttons.Size.Small);
+
+//
+//        BootstrapAjaxButton search = new BootstrapAjaxButton(ID_SEARCH,
+//                createStringResource("PageCustomers.search"), Buttons.Type.Primary) {
+//
+//            @Override
+//            protected void onError(AjaxRequestTarget target) {
+//                target.add(getFeedbackPanel());
+//            }
+//
+//            @Override
+//            protected void onSubmit(AjaxRequestTarget target) {
+//                searchPerformed(target);
+//            }
+//
+//        };
+//        search.setSize(Buttons.Size.Small);
         form.add(search);
 
-        BootstrapAjaxButton clear = new BootstrapAjaxButton(ID_CLEAR, Buttons.Type.Danger) {
+//        BootstrapAjaxButton clear = new BootstrapAjaxButton(ID_CLEAR, Buttons.Type.Danger) {
+//
+//            @Override
+//            protected void onError(AjaxRequestTarget target) {
+//                target.add(getFeedbackPanel());
+//            }
+//
+//            @Override
+//            protected void onSubmit(AjaxRequestTarget target) {
+//                clearPerformed(target);
+//            }
+//        };
+//        clear.setSize(Buttons.Size.Small);
+//        clear.setIconType(
+//                FontAwesomeIconTypeBuilder.on(FontAwesomeIconTypeBuilder.FontAwesomeGraphic.trash_o)
+//                        .size(FontAwesomeIconTypeBuilder.Size.large).build());
+        IconButton clear = new IconButton(ID_CLEAR, createStringResource("fa-trash")) {
 
             @Override
-            protected void onError(AjaxRequestTarget target) {
-                target.add(getFeedbackPanel());
-            }
-
-            @Override
-            protected void onSubmit(AjaxRequestTarget target) {
+            protected void submitPerformed(AjaxRequestTarget target) {
                 clearPerformed(target);
             }
         };
-        clear.setSize(Buttons.Size.Small);
-        clear.setIconType(
-                FontAwesomeIconTypeBuilder.on(FontAwesomeIconTypeBuilder.FontAwesomeGraphic.trash_o)
-                        .size(FontAwesomeIconTypeBuilder.Size.large).build());
         form.add(clear);
 
-        AjaxButton newCustomer = new AjaxButton(ID_NEW_CUSTOMER, createStringResource("PageCustomers.newCustomer")) {
+        IconButton newCustomer = new IconButton(ID_NEW_CUSTOMER, createStringResource("fa-plus")) {
 
             @Override
-            public void onClick(AjaxRequestTarget target) {
+            protected void submitPerformed(AjaxRequestTarget target) {
                 newCustomerPerformed(target);
             }
         };
+
+//        AjaxButton newCustomer = new AjaxButton(ID_NEW_CUSTOMER, createStringResource("PageCustomers.newCustomer")) {
+//
+//            @Override
+//            public void onClick(AjaxRequestTarget target) {
+//                newCustomerPerformed(target);
+//            }
+//        };
         form.add(newCustomer);
     }
 

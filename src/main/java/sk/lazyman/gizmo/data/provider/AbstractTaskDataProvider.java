@@ -29,11 +29,13 @@ import sk.lazyman.gizmo.data.QAbstractTask;
 import sk.lazyman.gizmo.data.QLog;
 import sk.lazyman.gizmo.data.QWork;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
+import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.dto.WorkType;
 import sk.lazyman.gizmo.web.PageTemplate;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +45,7 @@ import java.util.List;
 public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask, String> {
 
     private PageTemplate page;
-    private WorkFilterDto filter;
+    private ReportFilterDto filter;
 
     public AbstractTaskDataProvider(PageTemplate page) {
         this.page = page;
@@ -86,7 +88,7 @@ public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask,
         return new Model<>(object);
     }
 
-    public void setFilter(WorkFilterDto filter) {
+    public void setFilter(ReportFilterDto filter) {
         this.filter = filter;
     }
 
@@ -104,33 +106,34 @@ public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask,
         return bb.orAllOf(list.toArray(new Predicate[list.size()]));
     }
 
-    public static List<Predicate> createPredicates(WorkFilterDto filter) {
+    public static List<Predicate> createPredicates(ReportFilterDto filter) {
         QAbstractTask task = QAbstractTask.abstractTask;
         if (filter == null) {
             return null;
         }
 
         List<Predicate> list = new ArrayList<>();
+//        list.add(task.realizator.eq(filter.getRealizator()));
         Predicate p = createListPredicate(filter.getRealizators(), task.realizator);
         if (p != null) {
             list.add(p);
         }
+//
+//        if (!WorkType.ALL.equals(filter.getType())) {
+//            list.add(task.type.eq(filter.getType().getType()));
+//        }
+//
+//        p = createProjectListPredicate(filter.getProjects());
+//        if (p != null) {
+//            list.add(p);
+//        }
 
-        if (!WorkType.ALL.equals(filter.getType())) {
-            list.add(task.type.eq(filter.getType().getType()));
+        if (filter.getDateFrom() != null) {
+            list.add(task.date.goe(filter.getDateFrom()));
         }
 
-        p = createProjectListPredicate(filter.getProjects());
-        if (p != null) {
-            list.add(p);
-        }
-
-        if (filter.getFrom() != null) {
-            list.add(task.date.goe(filter.getFrom()));
-        }
-
-        if (filter.getTo() != null) {
-            list.add(task.date.loe(filter.getTo()));
+        if (filter.getDateTo() != null) {
+            list.add(task.date.loe(filter.getDateTo()));
         }
 
         return list;
@@ -153,7 +156,7 @@ public class AbstractTaskDataProvider extends SortableDataProvider<AbstractTask,
         return bb;
     }
 
-    private static Predicate createPredicate(CustomerProjectPartDto dto) {
+    public static Predicate createPredicate(CustomerProjectPartDto dto) {
         BooleanBuilder bb = new BooleanBuilder();
 
         QAbstractTask task = QAbstractTask.abstractTask;

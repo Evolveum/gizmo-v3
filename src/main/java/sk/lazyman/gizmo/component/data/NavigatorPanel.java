@@ -16,12 +16,10 @@
 
 package sk.lazyman.gizmo.component.data;
 
-import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.list.Loop;
@@ -73,8 +71,8 @@ public class NavigatorPanel extends Panel {
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
-        response.render(CssHeaderItem.forReference(
-                new LessResourceReference(NavigatorPanel.class, "NavigatorPanel.less")));
+//        response.render(CssHeaderItem.forReference(
+//                new LessResourceReference(NavigatorPanel.class, "NavigatorPanel.less")));
     }
 
     private void initLayout() {

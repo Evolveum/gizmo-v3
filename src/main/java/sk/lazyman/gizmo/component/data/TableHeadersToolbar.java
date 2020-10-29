@@ -16,6 +16,7 @@
 
 package sk.lazyman.gizmo.component.data;
 
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
@@ -28,6 +29,7 @@ public class TableHeadersToolbar<T> extends HeadersToolbar {
 
     public TableHeadersToolbar(DataTable<T, String> table, ISortStateLocator stateLocator) {
         super(table, stateLocator);
+        add(AttributeAppender.append("class", "thead-dark"));
     }
 
     @Override

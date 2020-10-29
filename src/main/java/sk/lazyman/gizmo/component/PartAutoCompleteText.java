@@ -18,6 +18,8 @@ package sk.lazyman.gizmo.component;
 
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteSettings;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.convert.IConverter;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
@@ -56,4 +58,23 @@ public class PartAutoCompleteText extends AutoCompleteTextField<CustomerProjectP
     public <C> IConverter<C> getConverter(Class<C> type) {
         return (IConverter<C>) new PartAutoCompleteConverter(allChoices);
     }
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+
+        StringBuilder componentSb = new StringBuilder("$('#").append(getMarkupId()).append("')");
+        String componentSelector = componentSb.toString();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("if (typeof ");
+        sb.append(componentSelector);
+        sb.append(".select2 === \"function\") {\n");
+
+        sb.append(componentSelector);
+        sb.append(".select2({").append("multiple: true").append("});");
+        sb.append("}");
+        response.render(OnDomReadyHeaderItem.forScript(sb.toString()));
+    }
+
 }

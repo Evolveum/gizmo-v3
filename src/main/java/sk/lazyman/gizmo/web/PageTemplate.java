@@ -16,13 +16,9 @@
 
 package sk.lazyman.gizmo.web;
 
-import de.agilecoders.wicket.core.Bootstrap;
-import de.agilecoders.wicket.less.LessResourceReference;
 import org.apache.commons.lang3.Validate;
-import org.apache.wicket.Application;
 import org.apache.wicket.devutils.debugbar.DebugBar;
 import org.apache.wicket.injection.Injector;
-import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -115,9 +111,9 @@ public class PageTemplate extends WebPage {
         super.renderHead(response);
 
 //        Bootstrap.install(Application.get());
-        Bootstrap.renderHead(response);
-        response.render(CssHeaderItem.forReference(
-                new LessResourceReference(PageTemplate.class, "PageTemplate.less")));
+//        Bootstrap.renderHead(response);
+//        response.render(CssHeaderItem.forReference(
+//                new LessResourceReference(PageTemplate.class, "PageTemplate.less")));
     }
 
     protected IModel<String> createPageTitleModel() {

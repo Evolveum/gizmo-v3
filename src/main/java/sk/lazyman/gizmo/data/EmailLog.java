@@ -20,6 +20,7 @@ import sk.lazyman.gizmo.util.GizmoUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -49,14 +50,14 @@ public class EmailLog implements Serializable {
 
     // about mail
     private User sender;
-    private Date sentDate;
+    private LocalDate sentDate;
     private String mailTo;
     private String mailCc;
     private String mailBcc;
     private boolean successful;
     // about selection filter, data in mail
-    private Date fromDate;
-    private Date toDate;
+    private LocalDate fromDate;
+    private LocalDate toDate;
     private Set<User> realizatorList;
     private Set<Project> projectList;
     private Set<Customer> customerList;
@@ -83,7 +84,7 @@ public class EmailLog implements Serializable {
     }
 
     @Column(nullable = false)
-    public Date getSentDate() {
+    public LocalDate getSentDate() {
         return sentDate;
     }
 
@@ -114,11 +115,11 @@ public class EmailLog implements Serializable {
         return customerList;
     }
 
-    public Date getFromDate() {
+    public LocalDate getFromDate() {
         return fromDate;
     }
 
-    public Date getToDate() {
+    public LocalDate getToDate() {
         return toDate;
     }
 
@@ -150,7 +151,7 @@ public class EmailLog implements Serializable {
         this.sender = sender;
     }
 
-    public void setSentDate(Date sentDate) {
+    public void setSentDate(LocalDate sentDate) {
         this.sentDate = sentDate;
     }
 
@@ -170,11 +171,11 @@ public class EmailLog implements Serializable {
         this.successful = successful;
     }
 
-    public void setFromDate(Date fromDate) {
+    public void setFromDate(LocalDate fromDate) {
         this.fromDate = fromDate;
     }
 
-    public void setToDate(Date toDate) {
+    public void setToDate(LocalDate toDate) {
         this.toDate = toDate;
     }
 

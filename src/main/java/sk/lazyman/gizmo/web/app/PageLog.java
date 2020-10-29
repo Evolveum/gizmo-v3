@@ -41,6 +41,7 @@ import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -109,7 +110,7 @@ public class PageLog extends PageAppTemplate {
 
             Log log = new Log();
             log.setRealizator(user);
-            log.setDate(new Date());
+            log.setDate(LocalDate.now());
 
             return log;
         }

@@ -16,31 +16,27 @@
 
 package sk.lazyman.gizmo.theme;
 
-import de.agilecoders.wicket.core.settings.ITheme;
-import de.agilecoders.wicket.core.settings.ThemeProvider;
-
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author lazyman
  */
-public class GizmoThemeProvider implements ThemeProvider {
-
-    private ITheme theme = new GizmoTheme();
-
-    @Override
-    public ITheme byName(String name) {
-        return theme;
-    }
-
-    @Override
-    public List<ITheme> available() {
-        return Collections.singletonList(theme);
-    }
-
-    @Override
-    public ITheme defaultTheme() {
-        return theme;
-    }
+public class GizmoThemeProvider {
+//    implements
+//} ThemeProvider {
+//
+//    private ITheme theme = new GizmoTheme();
+//
+//    @Override
+//    public ITheme byName(String name) {
+//        return theme;
+//    }
+//
+//    @Override
+//    public List<ITheme> available() {
+//        return Collections.singletonList(theme);
+//    }
+//
+//    @Override
+//    public ITheme defaultTheme() {
+//        return theme;
+//    }
 }

@@ -16,11 +16,7 @@
 
 package sk.lazyman.gizmo.component;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.behavior.CssClassNameAppender;
-import de.agilecoders.wicket.core.markup.html.bootstrap.button.ButtonList;
-import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 
 /**
  * @author lazyman

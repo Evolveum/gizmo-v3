@@ -16,13 +16,12 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import de.agilecoders.wicket.less.LessResourceReference;
-import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.DataPrintPanel;
+import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 
 /**
@@ -37,17 +36,17 @@ public class PagePrint extends PageAppTemplate {
         this(null);
     }
 
-    public PagePrint(IModel<WorkFilterDto> filter) {
-        initLayout(filter != null ? filter : new Model<>(new WorkFilterDto()));
+    public PagePrint(IModel<ReportFilterDto> filter) {
+        initLayout(filter != null ? filter : new Model<>(new ReportFilterDto()));
     }
 
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
-        response.render(CssHeaderItem.forReference(new LessResourceReference(PagePrint.class, "PagePrint.less")));
+//        response.render(CssHeaderItem.forReference(new LessResourceReference(PagePrint.class, "PagePrint.less")));
     }
 
-    private void initLayout(IModel<WorkFilterDto> filter) {
+    private void initLayout(IModel<ReportFilterDto> filter) {
         DataPrintPanel dataPrint = new DataPrintPanel(ID_DATA_PRINT, filter, getEntityManager());
         add(dataPrint);
     }

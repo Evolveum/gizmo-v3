@@ -16,10 +16,10 @@
 
 package sk.lazyman.gizmo.web.app;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.tabs.AjaxBootstrapTabbedPanel;
 import org.apache.commons.lang3.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.extensions.ajax.markup.html.tabs.AjaxTabbedPanel;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -39,7 +39,6 @@ import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.CheckFormGroup;
 import sk.lazyman.gizmo.component.form.DropDownFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
-import sk.lazyman.gizmo.component.modal.ProjectPartModal;
 import sk.lazyman.gizmo.data.Customer;
 import sk.lazyman.gizmo.data.Part;
 import sk.lazyman.gizmo.data.Project;
@@ -108,16 +107,16 @@ public class PageProject extends PageAppProjects {
         Form dialogForm = new Form(ID_DIALOG_FORM);
         add(dialogForm);
 
-        ProjectPartModal modal = new ProjectPartModal(ID_PROJECT_PART) {
-
-            @Override
-            protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {
-                super.savePerformed(target, model);
-
-                savePartPerformed(target, model);
-            }
-        };
-        dialogForm.add(modal);
+//        ProjectPartModal modal = new ProjectPartModal(ID_PROJECT_PART) {
+//
+//            @Override
+//            protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {
+//                super.savePerformed(target, model);
+//
+//                savePartPerformed(target, model);
+//            }
+//        };
+//        dialogForm.add(modal);
     }
 
     private Project loadProject() {
@@ -215,7 +214,8 @@ public class PageProject extends PageAppProjects {
             }
         });
 
-        AjaxBootstrapTabbedPanel tabs = new AjaxBootstrapTabbedPanel(ID_TABS, tabList);
+        AjaxTabbedPanel tabs = new AjaxTabbedPanel(ID_TABS, tabList);
+//        AjaxBootstrapTabbedPanel tabs = new AjaxBootstrapTabbedPanel(ID_TABS, tabList);
         tabs.setOutputMarkupId(true);
         add(tabs);
     }
@@ -284,11 +284,11 @@ public class PageProject extends PageAppProjects {
     }
 
     private void editPartPerformed(AjaxRequestTarget target, Part part) {
-        ProjectPartModal modal = (ProjectPartModal) get(ID_DIALOG_FORM + ":" + ID_PROJECT_PART);
-        target.add(modal);
-        modal.show(target);
-
-        modal.setPart(part);
+//        ProjectPartModal modal = (ProjectPartModal) get(ID_DIALOG_FORM + ":" + ID_PROJECT_PART);
+//        target.add(modal);
+//        modal.show(target);
+//
+//        modal.setPart(part);
     }
 
     private void savePartPerformed(AjaxRequestTarget target, IModel<Part> model) {

@@ -26,12 +26,15 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import sk.lazyman.gizmo.data.QAbstractTask;
 import sk.lazyman.gizmo.data.QWork;
+import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
 import sk.lazyman.gizmo.dto.TaskLength;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.web.PageTemplate;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -54,7 +57,7 @@ public class SummaryDataProvider implements Serializable {
      * @param filter
      * @return
      */
-    public SummaryPanelDto createSummary(WorkFilterDto filter) {
+    public SummaryPanelDto createSummary(ReportFilterDto filter) {
         SummaryPanelDto dto = new SummaryPanelDto(filter);
 
         List<Predicate> list = AbstractTaskDataProvider.createPredicates(filter);
@@ -77,7 +80,9 @@ public class SummaryDataProvider implements Serializable {
         if (tuples != null) {
             for (Tuple tuple : tuples) {
                 TaskLength taskLength = new TaskLength(tuple.get(1, Double.class), tuple.get(2, Double.class));
-                dto.getDates().put(tuple.get(0, Date.class), taskLength);
+                Date day = tuple.get(0, Date.class);
+                LocalDate date = day.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                dto.getDates().put(date, taskLength);
             }
         }
 
@@ -85,6 +90,6 @@ public class SummaryDataProvider implements Serializable {
     }
 
     private DateTimeExpression createDateTruncExpression(QWork work) {
-        return Expressions.dateTimeTemplate(Date.class, "date_trunc('day',{0})", work.date);
+        return Expressions.dateTimeTemplate(LocalDate.class, "date_trunc('day',{0})", work.date);
     }
 }

@@ -16,7 +16,7 @@
 
 package sk.lazyman.gizmo.component.form;
 
-import de.agilecoders.wicket.extensions.markup.html.bootstrap.form.DateTextField;
+import org.apache.wicket.extensions.markup.html.form.DateTextField;
 import org.apache.wicket.model.IModel;
 import sk.lazyman.gizmo.util.GizmoUtils;
 

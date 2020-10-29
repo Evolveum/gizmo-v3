@@ -19,9 +19,11 @@ package sk.lazyman.gizmo.component.data;
 import org.apache.commons.lang3.Validate;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
@@ -59,6 +61,8 @@ public class TablePanel<T> extends Panel {
 
         TableHeadersToolbar headers = new TableHeadersToolbar(table, provider);
         headers.setOutputMarkupId(true);
+        WebMarkupContainer toolbars = table.getTopToolbars();
+        toolbars.add(AttributeAppender.append("class", "thead-dark"));
         table.addTopToolbar(headers);
 
         CountToolbar count = new CountToolbar(table);

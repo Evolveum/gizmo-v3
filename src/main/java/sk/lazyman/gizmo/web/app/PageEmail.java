@@ -37,6 +37,7 @@ import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.data.provider.ListDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.EmailDto;
+import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.EmailLogRepository;
@@ -52,6 +53,7 @@ import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -75,26 +77,26 @@ public class PageEmail extends PageAppTemplate {
     private static final String ID_TABLE = "table";
 
     private IModel<EmailDto> model = new Model<>(new EmailDto());
-    private IModel<WorkFilterDto> filter;
+    private IModel<ReportFilterDto> filter;
     private IModel<List<AbstractTask>> dataModel;
 
     public PageEmail() {
-        this(new LoadableModel<WorkFilterDto>(false) {
+        this(new LoadableModel<ReportFilterDto>(false) {
 
             @Override
-            protected WorkFilterDto load() {
-                WorkFilterDto dto = new WorkFilterDto();
-                dto.setFrom(GizmoUtils.createWorkDefaultFrom());
-                dto.setTo(GizmoUtils.createWorkDefaultTo());
+            protected ReportFilterDto load() {
+                ReportFilterDto dto = new ReportFilterDto();
+                dto.setDateFrom(GizmoUtils.createWorkDefaultFrom());
+                dto.setDateTo(GizmoUtils.createWorkDefaultTo());
 
                 GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
-                dto.setRealizator(principal.getUser());
+                dto.getRealizators().add(principal.getUser());
                 return dto;
             }
         });
     }
 
-    public PageEmail(final IModel<WorkFilterDto> filter) {
+    public PageEmail(final IModel<ReportFilterDto> filter) {
         this.filter = filter;
         this.dataModel = new LoadableModel<List<AbstractTask>>(false) {
 
@@ -213,7 +215,7 @@ public class PageEmail extends PageAppTemplate {
             log.setSuccessful(success);
             GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
             log.setSender(principal.getUser());
-            log.setSentDate(new Date());
+            log.setSentDate(LocalDate.now());
 
             EmailDto dto = model.getObject();
             log.setMailTo(dto.getTo());
@@ -222,9 +224,9 @@ public class PageEmail extends PageAppTemplate {
 
             log.setDescription(dto.getBody());
 
-            WorkFilterDto filter = this.filter.getObject();
-            log.setFromDate(filter.getFrom());
-            log.setToDate(filter.getTo());
+            ReportFilterDto filter = this.filter.getObject();
+            log.setFromDate(filter.getDateFrom());
+            log.setToDate(filter.getDateTo());
 
             Set<User> realizators = createRealizators(filter);
             log.setRealizatorList(realizators);
@@ -247,17 +249,17 @@ public class PageEmail extends PageAppTemplate {
     private Set<Project> createProjects() {
         Set<Project> set = new HashSet<>();
 
-        WorkFilterDto dto = filter.getObject();
-        CustomerProjectPartDto cppDto = dto.getProject();
-        if (cppDto == null || cppDto.getProjectId() == null) {
-            return null;
-        }
-
-        ProjectRepository repository = getProjectRepository();
-        Optional<Project> project = repository.findById(cppDto.getProjectId());
-        if (project != null && project.isPresent()) {
-            set.add(project.get());
-        }
+//        WorkFilterDto dto = filter.getObject();
+//        CustomerProjectPartDto cppDto = dto.getProject();
+//        if (cppDto == null || cppDto.getProjectId() == null) {
+//            return null;
+//        }
+//
+//        ProjectRepository repository = getProjectRepository();
+//        Optional<Project> project = repository.findById(cppDto.getProjectId());
+//        if (project != null && project.isPresent()) {
+//            set.add(project.get());
+//        }
 
         return set.isEmpty() ? null : set;
     }
@@ -265,28 +267,27 @@ public class PageEmail extends PageAppTemplate {
     private Set<Customer> createCustomers() {
         Set<Customer> set = new HashSet<>();
 
-        WorkFilterDto dto = filter.getObject();
-        CustomerProjectPartDto cppDto = dto.getProject();
-        if (cppDto == null) {
-            return null;
-        }
-
-        if (cppDto.getCustomerId() == null || cppDto.getProjectId() != null) {
-            return null;
-        }
-
-        CustomerRepository repository = getCustomerRepository();
-        Optional<Customer> customer = repository.findById(cppDto.getCustomerId());
-        if (customer != null && customer.isPresent()) {
-            set.add(customer.get());
-        }
+//        WorkFilterDto dto = filter.getObject();
+//        CustomerProjectPartDto cppDto = dto.getProject();
+//        if (cppDto == null) {
+//            return null;
+//        }
+//
+//        if (cppDto.getCustomerId() == null || cppDto.getProjectId() != null) {
+//            return null;
+//        }
+//
+//        CustomerRepository repository = getCustomerRepository();
+//        Optional<Customer> customer = repository.findById(cppDto.getCustomerId());
+//        if (customer != null && customer.isPresent()) {
+//            set.add(customer.get());
+//        }
 
         return set.isEmpty() ? null : set;
     }
 
-    private Set<User> createRealizators(WorkFilterDto filter) {
-        Set<User> realizators = new HashSet<>();
-        realizators.add(filter.getRealizator());
+    private Set<User> createRealizators(ReportFilterDto filter) {
+        Set<User> realizators = new HashSet<>(filter.getRealizators());
 
         return realizators;
     }
@@ -343,29 +344,29 @@ public class PageEmail extends PageAppTemplate {
     }
 
     private String createSubject() {
-        WorkFilterDto dto = filter.getObject();
+        ReportFilterDto dto = filter.getObject();
 
         String format = "dd. MMM. yyyy";
-        String from = GizmoUtils.formatDate(dto.getFrom(), format);
-        String to = GizmoUtils.formatDate(dto.getTo(), format);
+        String from = dto.getDateFrom().toString(); //GizmoUtils.formatDate(dto.getFrom(), format);
+        String to = dto.getDateTo().toString(); //GizmoUtils.formatDate(dto.getTo(), format);
 
-        String project = dto.getProject() == null ? "*" : dto.getProject().getDescription();
-
+//        String project = dto.getProject() == null ? "*" : dto.getProject().getDescription();
+//
         StringBuilder subject = new StringBuilder();
-        subject.append("Report");
-        if (dto.getProjects().size() == 1) {
-            subject.append("for ");
-            subject.append(project);
-        }
-        subject.append(" (");
-        subject.append(from);
-        subject.append(" - ");
-        subject.append(to);
-        subject.append(")");
-        if (dto.getRealizators().size() == 1) {
-            subject.append(" ");
-            subject.append(dto.getRealizator().getFullName());
-        }
+//        subject.append("Report");
+//        if (dto.getProjects().size() == 1) {
+//            subject.append("for ");
+//            subject.append(project);
+//        }
+//        subject.append(" (");
+//        subject.append(from);
+//        subject.append(" - ");
+//        subject.append(to);
+//        subject.append(")");
+//        if (dto.getRealizators().size() == 1) {
+//            subject.append(" ");
+            subject.append(dto.getRealizators().iterator().next().getFullName());
+//        }
 
         return subject.toString();
     }

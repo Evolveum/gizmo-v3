@@ -26,6 +26,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import sk.lazyman.gizmo.data.*;
+import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
@@ -37,7 +38,7 @@ import java.util.List;
 /**
  * @author lazyman
  */
-public class DataPrintPanel extends SimplePanel<WorkFilterDto> {
+public class DataPrintPanel extends SimplePanel<ReportFilterDto> {
 
     private static final String ID_REPORT_SUMMARY = "reportSummary";
     private static final String ID_DATA = "data";
@@ -52,7 +53,7 @@ public class DataPrintPanel extends SimplePanel<WorkFilterDto> {
 
     private IModel<List<AbstractTask>> dataModel;
 
-    public DataPrintPanel(String id, IModel<WorkFilterDto> filter, IModel<List<AbstractTask>> dataModel) {
+    public DataPrintPanel(String id, IModel<ReportFilterDto> filter, IModel<List<AbstractTask>> dataModel) {
         super(id, filter);
         setRenderBodyOnly(true);
 
@@ -60,8 +61,8 @@ public class DataPrintPanel extends SimplePanel<WorkFilterDto> {
         initPanelLayout();
     }
 
-    public DataPrintPanel(String id, IModel<WorkFilterDto> filter, EntityManager entityManager) {
-        super(id, filter != null ? filter : new Model<>(new WorkFilterDto()));
+    public DataPrintPanel(String id, IModel<ReportFilterDto> filter, EntityManager entityManager) {
+        super(id, filter != null ? filter : new Model<>(new ReportFilterDto()));
         setRenderBodyOnly(true);
 
         dataModel = createDataModel(entityManager);
@@ -238,7 +239,7 @@ public class DataPrintPanel extends SimplePanel<WorkFilterDto> {
     }
 
     private List<AbstractTask> loadData(EntityManager entityManager) {
-        WorkFilterDto filter = getModel().getObject();
+        ReportFilterDto filter = getModel().getObject();
         return GizmoUtils.loadData(filter, entityManager);
     }
 }

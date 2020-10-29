@@ -33,7 +33,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.repeater.Item;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.slf4j.Logger;
@@ -42,6 +41,7 @@ import org.springframework.security.crypto.codec.Hex;
 import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
+import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.UserRepository;
@@ -54,6 +54,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 /**
@@ -107,6 +109,7 @@ public class GizmoUtils {
         cal.set(Calendar.MILLISECOND, 0);
 
         return cal.getTime();
+
     }
 
     public static String describeProject(Project project) {
@@ -146,23 +149,31 @@ public class GizmoUtils {
         return sb.toString();
     }
 
-    public static Date createWorkDefaultFrom() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(GizmoUtils.clearTime(new Date()));
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-
-        return cal.getTime();
+    public static LocalDate createWorkDefaultFrom() {
+        return LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
     }
 
-    public static Date createWorkDefaultTo() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(createWorkDefaultFrom());
-
-        cal.add(Calendar.MONTH, 1);
-        cal.add(Calendar.MILLISECOND, -1);
-
-        return cal.getTime();
+    public static LocalDate createWorkDefaultTo() {
+        return LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
     }
+
+//    public static LocalDate createWorkDefaultFrom() {
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(GizmoUtils.clearTime(new Date()));
+//        cal.set(Calendar.DAY_OF_MONTH, 1);
+//
+//        return cal.getTime();
+//    }
+//
+//    public static Date createWorkDefaultTo() {
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(createWorkDefaultFrom());
+//
+//        cal.add(Calendar.MONTH, 1);
+//        cal.add(Calendar.MILLISECOND, -1);
+//
+//        return cal.getTime();
+//    }
 
     public static <T extends Enum> IChoiceRenderer<T> createEnumRenderer(final Component component) {
         return new ChoiceRenderer<>() {
@@ -222,6 +233,21 @@ public class GizmoUtils {
 
             @Override
             public String getIdValue(Customer object, int index) {
+                return Integer.toString(index);
+            }
+        };
+    }
+
+    public static IChoiceRenderer<CustomerProjectPartDto> createCustomerProjectPartRenderer() {
+        return new ChoiceRenderer<>() {
+
+            @Override
+            public Object getDisplayValue(CustomerProjectPartDto object) {
+                return object != null ? object.getCustomerName() + " - " + object.getProjectName() + " - " + object.getPartName() : null;
+            }
+
+            @Override
+            public String getIdValue(CustomerProjectPartDto object, int index) {
                 return Integer.toString(index);
             }
         };
@@ -382,7 +408,7 @@ public class GizmoUtils {
         return sum;
     }
 
-    public static List<AbstractTask> loadData(WorkFilterDto filter, EntityManager entityManager) {
+    public static List<AbstractTask> loadData(ReportFilterDto filter, EntityManager entityManager) {
         List<AbstractTask> data = new ArrayList<>();
         if (filter == null) {
             return data;
@@ -510,4 +536,13 @@ public class GizmoUtils {
             throw new RuntimeException(e);
         }
     }
+
+    public static JPAQuery createWorkQuery(EntityManager entityManager) {
+        JPAQuery query = new JPAQuery(entityManager);
+        QAbstractTask task = QAbstractTask.abstractTask;
+        QWork work = task.as(QWork.class);
+        query.from(QAbstractTask.abstractTask).leftJoin(work.part.project);
+        return query;
+    }
+
 }

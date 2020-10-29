@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import sk.lazyman.gizmo.data.AbstractTask;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
+import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.ReportSearchSummaryDto;
 import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.util.GizmoUtils;
@@ -58,7 +59,7 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
         initPanelLayout();
     }
 
-    public ReportSearchSummary(String id, final IModel<WorkFilterDto> filterModel,
+    public ReportSearchSummary(String id, final IModel<ReportFilterDto> filterModel,
                                final IModel<List<AbstractTask>> dataModel) {
         this(id, new LoadableModel<ReportSearchSummaryDto>(false) {
 
@@ -66,11 +67,11 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
             protected ReportSearchSummaryDto load() {
                 ReportSearchSummaryDto dto = new ReportSearchSummaryDto();
 
-                WorkFilterDto filter = filterModel.getObject();
-                dto.setRealizators(filter.getRealizators());
-                dto.setProjects(filter.getProjects());
-                dto.setFrom(filter.getFrom());
-                dto.setTo(filter.getTo());
+                ReportFilterDto filter = filterModel.getObject();
+//                dto.setRealizators(filter.getRealizators());
+//                dto.setProjects(filter.getProjects());
+//                dto.setFrom(filter.getFrom());
+//                dto.setTo(filter.getTo());
 
                 dto.setInvoice(GizmoUtils.sumInvoiceLength(dataModel));
                 dto.setWork(GizmoUtils.sumWorkLength(dataModel));

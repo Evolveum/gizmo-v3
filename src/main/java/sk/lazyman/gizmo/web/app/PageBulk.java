@@ -40,6 +40,7 @@ import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -75,7 +76,7 @@ public class PageBulk extends PageAppTemplate {
                 BulkDto dto = new BulkDto();
                 GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
                 dto.setRealizator(principal.getUser());
-                dto.setFrom(new Date());
+                dto.setFrom(LocalDate.now());
 
                 return dto;
             }
@@ -178,17 +179,17 @@ public class PageBulk extends PageAppTemplate {
                 part = optionalPart.get();
             }
 
-            Date date = GizmoUtils.clearTime(bulk.getFrom());
-            Date to = GizmoUtils.clearTime(bulk.getTo());
-            to = GizmoUtils.removeOneMilis(GizmoUtils.addOneDay(to));
+            LocalDate date = bulk.getFrom(); //GizmoUtils.clearTime(bulk.getFrom());
+            LocalDate to = bulk.getTo(); //GizmoUtils.clearTime(bulk.getTo());
+//            to = GizmoUtils.removeOneMilis(GizmoUtils.addOneDay(to));
 
             int count = 0;
-            while (date.before(to)) {
+            while (date.isBefore(to)) {
                 Work work = createWork(bulk, part, date);
                 repository.save(work);
 
                 count++;
-                date = GizmoUtils.addOneDay(date);
+                date = date.plusDays(1);
 
                 if (count > MAX_BULK_CREATE) {
                     break;
@@ -205,7 +206,7 @@ public class PageBulk extends PageAppTemplate {
         }
     }
 
-    private Work createWork(BulkDto bulk, Part part, Date date) {
+    private Work createWork(BulkDto bulk, Part part, LocalDate date) {
         Work work = new Work();
         work.setRealizator(bulk.getRealizator());
         work.setPart(part);

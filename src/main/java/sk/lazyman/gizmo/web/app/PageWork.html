@@ -20,15 +20,63 @@
 <wicket:extend>
     <div class="container">
         <form class="form-horizontal" role="form" wicket:id="form">
-            <div wicket:id="realizator"/>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><wicket:message key="PageWork.realizator"/></label>
+                <div class="col-sm-4">
+                    <input type="text" readonly class="form-control-plaintext" wicket:id="realizator"/>&nbsp;
+                </div>
+            </div>
 
-            <div wicket:id="part"/>
 
-            <div wicket:id="date"/>
-            <div wicket:id="length"/>
-            <div wicket:id="invoice"/>
-            <div wicket:id="trackId"/>
-            <div wicket:id="description"/>
+<!--            <div class="form-group row">-->
+<!--                <label class="col-sm-2 col-form-label"><wicket:message key="PageWork.part"/></label>-->
+<!--                <div class="col-sm-4">-->
+<!--                    <input type="text" wicket:id="part"/>&nbsp;-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><wicket:message key="PageWork.date"/></label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="fa fa-calendar"></i>
+                      </span>
+                        </div>
+                        <input type="text" class="form-control float-right"
+                               wicket:id="date"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><wicket:message key="PageWork.length"/></label>
+                <div class="col-sm-4">
+                    <input type="text" wicket:id="length"/>&nbsp;
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><wicket:message key="PageWork.invoice"/></label>
+                <div class="col-sm-4">
+                    <input type="text" wicket:id="invoice"/>&nbsp;
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><wicket:message key="PageWork.trackId"/></label>
+                <div class="col-sm-4">
+                    <input type="text" wicket:id="trackId"/>&nbsp;
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label"><wicket:message key="PageWork.description"/></label>
+                <div class="col-sm-4">
+                    <textarea rows="5" wicket:id="description"/>&nbsp;
+                </div>
+            </div>
 
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9 col-md-offset-2 col-md-10">

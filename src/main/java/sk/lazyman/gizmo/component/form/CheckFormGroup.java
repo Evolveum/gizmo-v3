@@ -16,7 +16,6 @@
 
 package sk.lazyman.gizmo.component.form;
 
-import de.agilecoders.wicket.core.markup.html.bootstrap.behavior.CssClassNameRemover;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
@@ -44,7 +43,7 @@ public class CheckFormGroup extends FormGroup<CheckInput, Boolean> {
                 return null;
             }
         };
-        formInput.getFormComponent().add(new CssClassNameRemover("form-group", "input-sm"));
+//        formInput.getFormComponent().add(new CssClassNameRemover("form-group", "input-sm"));
         formInput.setRenderBodyOnly(true);
 
         return formInput;
