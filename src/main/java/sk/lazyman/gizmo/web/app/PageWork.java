@@ -20,30 +20,24 @@ import org.apache.commons.lang3.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.behavior.AttributeAppender;
-import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxButton;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
-import sk.lazyman.gizmo.component.PartAutoCompleteConverter;
 import sk.lazyman.gizmo.component.PartAutoCompleteText;
 import sk.lazyman.gizmo.component.behavior.DateRangePickerBehavior;
-import sk.lazyman.gizmo.component.form.*;
 import sk.lazyman.gizmo.data.Part;
 import sk.lazyman.gizmo.data.Project;
 import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
-import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.repository.PartRepository;
 import sk.lazyman.gizmo.repository.WorkRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
@@ -52,7 +46,6 @@ import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,14 +68,13 @@ public class PageWork extends PageAppTemplate {
     private static final String ID_SAVE = "save";
     private static final String ID_PART = "part";
 
-    private IModel<List<User>> users = GizmoUtils.createUsersModel(this);
     private IModel<List<CustomerProjectPartDto>> projects =
             GizmoUtils.createCustomerProjectPartList(this, true, true, true);
 
     private IModel<Work> model;
 
     public PageWork() {
-        model = new LoadableModel<Work>(false) {
+        model = new LoadableModel<>(false) {
 
             @Override
             protected Work load() {
@@ -102,14 +94,10 @@ public class PageWork extends PageAppTemplate {
 
     @Override
     protected IModel<String> createPageTitleModel() {
-        return new AbstractReadOnlyModel<String>() {
-
-            @Override
-            public String getObject() {
-                Integer workId = getIntegerParam(WORK_ID);
-                String key = workId != null ? "page.title.edit" : "page.title";
-                return createStringResource(key).getString();
-            }
+        return (IModel<String>) () -> {
+            Integer workId = getIntegerParam(WORK_ID);
+            String key = workId != null ? "page.title.edit" : "page.title";
+            return createStringResource(key).getString();
         };
     }
 
@@ -128,7 +116,7 @@ public class PageWork extends PageAppTemplate {
 
         WorkRepository repository = getWorkRepository();
         Optional<Work> work = repository.findById(workId);
-        if (work == null || !work.isPresent()) {
+        if (work.isEmpty()) {
             getSession().error(translateString("Message.couldntFindWork", workId));
             throw new RestartResponseException(PageWork.class);
         }
@@ -136,72 +124,34 @@ public class PageWork extends PageAppTemplate {
         return work.get();
     }
 
-    private <T extends FormInput> void initLayout() {
-        Form form = new Form(ID_FORM);
+    private void initLayout() {
+        Label realizator = new Label(ID_REALIZATOR, new PropertyModel<>(model, (Work.F_REALIZATOR + ".fullName")));
+        realizator.setRenderBodyOnly(true);
+        add(realizator);
+
+        Form<Work> form = new Form<>(ID_FORM);
         add(form);
 
-        TextField<String> realizator = new TextField<>(ID_REALIZATOR, new PropertyModel<>(model, (Work.F_REALIZATOR + ".fullName")));
-//        HDropDownFormGroup<User> realizator = new HDropDownFormGroup<>(ID_REALIZATOR,
-//                new PropertyModel<User>(model, Work.F_REALIZATOR),
-//                createStringResource("AbstractTask.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-//        realizator.setRenderer(GizmoUtils.createUserChoiceRenderer());
-//        realizator.setChoices(users);
-        form.add(realizator);
-
-//        HFormGroup part = new HFormGroup<T, Part>(ID_PART, new PropertyModel<Part>(model, Work.F_PART),
-//                createStringResource("Work.part"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true) {
-//
-//            @Override
-//            protected FormInput createInput(String componentId, IModel<Part> model, IModel<String> placeholder) {
-//                AutoCompleteInput formInput = new AutoCompleteInput(componentId, createPartModel(model), projects);
-//                FormComponent input = formInput.getFormComponent();
-//                input.add(AttributeAppender.replace("placeholder", placeholder));
-//
-//                return formInput;
-//            }
-//        };
-//        AutoCompleteTextField part = new PartAutoCompleteText(ID_PART,
-//                new PropertyModel<>(model, Work.F_PART),
-//                GizmoUtils.createCustomerProjectPartList(this, true, true, true));
-//        form.add(part);
-////        FormComponent partText = part.getFormComponent();
-////        partText.add(new AjaxFormComponentUpdatingBehavior("blur") {
-////
-////            @Override
-////            protected void onUpdate(AjaxRequestTarget target) {
-////            }
-////        });
+        PartAutoCompleteText part = new PartAutoCompleteText(ID_PART,
+                createPartModel(new PropertyModel<>(model, Work.F_PART)),
+                GizmoUtils.createCustomerProjectPartList(this, true, true, true));
+        form.add(part);
 
         LocalDateTextField from = new LocalDateTextField(ID_DATE, new PropertyModel<>(model, Work.F_DATE), "dd/MM/yyyy");
         from.setOutputMarkupId(true);
         from.add(new DateRangePickerBehavior());
         form.add(from);
 
-//        HFormGroup date = new HDateFormGroup(ID_DATE, new PropertyModel<Date>(model, Work.F_DATE),
-//                createStringResource("AbstractTask.date"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-//        form.add(date);
-
-        TextField<Double> invoice = new TextField<>(ID_INVOICE, new PropertyModel<>(model, Work.F_INVOICE_LENGTH));
-        invoice.setType(Double.class);
+        TextField<Double> invoice = new TextField<>(ID_INVOICE, new PropertyModel<>(model, Work.F_INVOICE_LENGTH), Double.class);
         invoice.add(new RangeValidator<>(0.0, 2000.0));
         invoice.setOutputMarkupId(true);
-//
-//        final HFormGroup invoice = new HFormGroup(ID_INVOICE, new PropertyModel<Double>(model, Work.F_INVOICE_LENGTH),
-//                createStringResource("Work.invoiceLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-//        invoice.setOutputMarkupId(true);
-//        invoice.getFormComponent().add(new RangeValidator<>(0.0, 2000.0));
-//        invoice.getFormComponent().setType(Double.class);
-//        invoice.getFormComponent().setOutputMarkupId(true);
         form.add(invoice);
 
-        TextField<Double> length = new TextField<>(ID_LENGTH, new PropertyModel<>(model, Work.F_INVOICE_LENGTH));
-//        HFormGroup length = new HFormGroup(ID_LENGTH, new PropertyModel<Double>(model, Work.F_WORK_LENGTH),
-//                createStringResource("AbstractTask.workLength"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        TextField<Double> length = new TextField<>(ID_LENGTH, new PropertyModel<>(model, Work.F_WORK_LENGTH));
         length.add(new RangeValidator<>(0.0, 2000.0));
         length.setType(Double.class);
         form.add(length);
 
-//        FormComponent workLength = length.getFormComponent();
         length.add(new AjaxFormComponentUpdatingBehavior("blur") {
 
             @Override
@@ -217,14 +167,9 @@ public class PageWork extends PageAppTemplate {
         });
 
         TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(model, Work.F_DESCRIPTION));
-//        HAreaFormGroup description = new HAreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Work.F_DESCRIPTION),
-//                createStringResource("AbstractTask.description"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-//        description.setRows(5);
         form.add(description);
 
         TextField<String> trackId = new TextField<>(ID_TRACK_ID, new PropertyModel<>(model, Work.F_TRACK_ID));
-//        HFormGroup trackId = new HFormGroup(ID_TRACK_ID, new PropertyModel<String>(model, Work.F_TRACK_ID),
-//                createStringResource("AbstractTask.trackId"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, false);
         form.add(trackId);
 
         initButtons(form);
@@ -242,7 +187,7 @@ public class PageWork extends PageAppTemplate {
     }
 
     private IModel<CustomerProjectPartDto> createPartModel(final IModel<Part> model) {
-        return new IModel<CustomerProjectPartDto>() {
+        return new IModel<>() {
 
             private Part part;
 
@@ -277,8 +222,11 @@ public class PageWork extends PageAppTemplate {
                 }
 
                 PartRepository repository = getProjectPartRepository();
-                part = repository.findById(id).get();
-                model.setObject(part);
+                Optional<Part> optionalPart = repository.findById(id);
+                if (optionalPart.isPresent()) {
+                    part = optionalPart.get();
+                    model.setObject(part);
+                }
             }
 
             @Override
@@ -287,7 +235,7 @@ public class PageWork extends PageAppTemplate {
         };
     }
 
-    private void initButtons(Form form) {
+    private void initButtons(Form<Work> form) {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override
@@ -306,13 +254,13 @@ public class PageWork extends PageAppTemplate {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                cancelPerformed(target);
+                cancelPerformed();
             }
         };
         form.add(cancel);
     }
 
-    private void cancelPerformed(AjaxRequestTarget target) {
+    private void cancelPerformed() {
         setResponsePage(PageDashboard.class);
     }
 

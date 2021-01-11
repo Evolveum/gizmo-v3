@@ -18,104 +18,31 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
-    <form class="form-inline search" role="form" wicket:id="form">
-<!--        <div class="form-group">-->
-<!--            <label class="sr-only"><wicket:message key="PageDashboard.type"/></label>-->
-<!--            <select class="form-control input-sm" wicket:id="type"/>-->
-<!--        </div>-->
-<!--        <div class="form-group">-->
-<!--            <a class="btn btn-default btn-sm" wicket:id="previous">-->
-<!--                <i class="fa fa-chevron-left"></i>-->
-<!--            </a>-->
-<!--        </div>-->
-<!--        <div class="input-group">-->
-<!--            <div class="input-group-prepend">-->
-<!--                      <span class="input-group-text">-->
-<!--                        <i class="fa fa-calendar"></i>-->
-<!--                      </span>-->
-<!--            </div>-->
-<!--            <input type="text" class="form-control float-right" id="reservation"-->
-<!--                   wicket:id="from"-->
-<!--                   wicket:message="placeholder:PageDashboard.dateFrom">-->
-<!--        </div>-->
-<!--        <div class="form-group">-->
-<!--            <label class="sr-only"><wicket:message key="PageDashboard.dateFrom"/></label>-->
-<!--            <input type="date" class="form-control input-sm" wicket:id="from"-->
-<!--                   wicket:message="placeholder:PageDashboard.dateFrom">-->
-<!--        </div>-->
-<!--        <div class="form-group">-->
-<!--            <label class="sr-only"><wicket:message key="PageDashboard.dateTo"/></label>-->
-<!--            <input type="date" class="form-control input-sm" wicket:id="to"-->
-<!--                   wicket:message="placeholder:PageDashboard.dateTo">-->
-<!--        </div>-->
-<!--        <div class="form-group">-->
-<!--            <a class="btn btn-default btn-sm" wicket:id="next">-->
-<!--                <i class="fa fa-chevron-right"></i>-->
-<!--            </a>-->
-<!--        </div>-->
-<!--        <div class="form-group" wicket:id="project">-->
-<!--            <label class="sr-only"><wicket:message key="PageDashboard.customerProjectPart"/></label>-->
-
-<!--            <input class="form-control input-sm" wicket:id="projectCombo" size="40"-->
-<!--                   wicket:message="placeholder:PageDashboard.customerProjectPart">-->
-
-<!--            <select class="form-control input-sm" wicket:id="projectMulti" size="5" />-->
-<!--        </div>-->
-<!--        <div class="form-group" wicket:id="realizator">-->
-<!--            <label class="sr-only"><wicket:message key="AbstractTask.realizator"/></label>-->
-
-<!--            <select class="form-control input-sm" wicket:id="realizatorCombo"/>-->
-
-<!--            <select class="form-control input-sm" wicket:id="realizatorMulti" size="5" />-->
-<!--        </div>-->
-<!--        <div class="checkbox">-->
-<!--            <label>-->
-<!--                <input type="checkbox" wicket:id="advanced">&nbsp;<wicket:message key="PageDashboard.advanced"/>-->
-<!--            </label>-->
-<!--        </div>-->
-
-<!--        <a class="btn btn-primary btn-sm" wicket:id="display"/>-->
-<!--        <a class="btn btn-default btn-sm" wicket:id="print"/>-->
-<!--        <a class="btn btn-default btn-sm" wicket:id="email"/>-->
-<!--        <a class="btn btn-default btn-sm" wicket:id="excel"/>-->
-
-<!--        <div wicket:id="task"/>-->
-    </form>
-
-<!--    <div id="calendar1"></div>-->
-
-    <div class="clearfix"/>
 
     <div class="row">
-<!--        <div class="col-md-12">-->
-<!--            <div class="row">-->
-                <div class="col-md-6">
-                    <div class="card card-primary">
-                        <div class="card-body p-0">
-                            <div class="fc-toolbar fc-header-toolbar">
-                                <div class="fc-left">
-                                    <a wicket:id="previous"><i class="fa fa-chevron-left"/></a>
-                                </div>
-                                <div class="fc-center">
-                                    <h2 wicket:id="month"></h2>
-                                </div>
-                                <div class="fc-right">
-                                    <a wicket:id="next"><i class="fa fa-chevron-right"/></a>
-                                </div>
-                            </div>
-                            <div wicket:id="summary"/>
+        <div class="col-md-6">
+            <div class="card card-primary">
+                <div class="card-body p-0">
+                    <div class="fc-toolbar fc-header-toolbar">
+                        <div class="fc-left">
+                            <a wicket:id="previous"><i class="fa fa-chevron-left"/></a>
+                        </div>
+                        <div class="fc-center">
+                            <h2 wicket:id="month"></h2>
+                        </div>
+                        <div class="fc-right">
+                            <a wicket:id="next"><i class="fa fa-chevron-right"/></a>
                         </div>
                     </div>
+                    <div wicket:id="summary"/>
                 </div>
-<!--            </div>-->
-                    <div class="col-md-6 col-lg-5" >
-                        <canvas wicket:id="summaryParts" width="400" height="400"></canvas>
+            </div>
+        </div>
 
-                    </div>
-
-<!--        </div>-->
+        <div class="col-md-6 col-lg-5" >
+            <canvas wicket:id="summaryParts" width="400" height="400"></canvas>
+        </div>
     </div>
-
 
 
     <div class="row">

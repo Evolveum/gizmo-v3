@@ -15,27 +15,21 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
-import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
-import org.apache.wicket.extensions.markup.html.form.DateTextField;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
-import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTimeTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
-import org.apache.wicket.extensions.markup.html.tabs.TabbedPanel;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.IChoiceRenderer;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.time.Duration;
 import org.wicketstuff.annotation.mount.MountPath;
-import sk.lazyman.gizmo.component.*;
+import sk.lazyman.gizmo.component.AjaxSubmitButton;
+import sk.lazyman.gizmo.component.GizmoTabbedPanel;
+import sk.lazyman.gizmo.component.SummaryPartsPanel;
 import sk.lazyman.gizmo.component.behavior.DateRangePickerBehavior;
 import sk.lazyman.gizmo.component.data.TablePanel;
 import sk.lazyman.gizmo.component.form.MultiselectDropDownInput;
@@ -44,20 +38,14 @@ import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
 import sk.lazyman.gizmo.data.provider.ReportDataProvider;
 import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
+import sk.lazyman.gizmo.dto.PartSummary;
 import sk.lazyman.gizmo.dto.ReportFilterDto;
-import sk.lazyman.gizmo.dto.WorkFilterDto;
-import sk.lazyman.gizmo.dto.WorkType;
 import sk.lazyman.gizmo.security.GizmoAuthWebSession;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,7 +54,6 @@ import java.util.List;
 public class PageReports extends PageAppTemplate {
 
     private static final String ID_FORM = "form";
-    private static final String ID_TYPE = "type";
     private static final String ID_FROM = "from";
     private static final String ID_TO = "to";
     private static final String ID_REALIZATOR = "realizator";
@@ -75,7 +62,6 @@ public class PageReports extends PageAppTemplate {
     private static final String ID_PROJECT = "project";
 
     private static final String ID_DETAILS = "details";
-    private static final String ID_TABLE = "table";
 
     private static final String ID_PREVIEW = "preview";
 
@@ -109,7 +95,7 @@ public class PageReports extends PageAppTemplate {
     }
 
     private void initLayout() {
-        Form form = new Form(ID_FORM);
+        Form<ReportFilterDto> form = new Form<>(ID_FORM);
         form.setOutputMarkupId(true);
         add(form);
 
@@ -124,13 +110,6 @@ public class PageReports extends PageAppTemplate {
         form.add(to);
 
 
-//        form.add(new DropDownChoice<>(ID_TYPE, new PropertyModel<>(model, ReportFilterDto.F_WORK_TYPE),
-//                GizmoUtils.createReadonlyModelFromEnum(WorkType.class), GizmoUtils.createEnumRenderer(this)));
-
-//        BootstrapMultiSelect realizators = new BootstrapMultiSelect(ID_REALIZATOR, new PropertyModel<>(model, ReportFilterDto.F_REALIZATORS),
-//                GizmoUtils.createUsersModel(this),
-//                GizmoUtils.createUserChoiceRenderer());
-
         MultiselectDropDownInput<User> realizators = new
                 MultiselectDropDownInput<>(ID_REALIZATOR,
                 new PropertyModel<>(model, ReportFilterDto.F_REALIZATORS),
@@ -143,11 +122,6 @@ public class PageReports extends PageAppTemplate {
                 new PropertyModel<>(model, ReportFilterDto.F_CUSTOM_PROJECT_PART),
                 GizmoUtils.createCustomerProjectPartList(this, true, true, true),
                 GizmoUtils.createCustomerProjectPartRenderer());
-//        AutoCompleteTextField projectCombo = new PartAutoCompleteText(ID_PROJECT,
-//                new PropertyModel<>(model, ReportFilterDto.F_CUSTOM_PROJECT_PART),
-//                GizmoUtils.createCustomerProjectPartList(this, true, true, false),
-//                Cis);
-//        projectCombo.setLabel(createStringResource("PageReports.customerProjectPart"));
         form.add(projectCombo);
 
         AjaxCheckBox perUser = new AjaxCheckBox(ID_PER_USER, new PropertyModel<>(model, ReportFilterDto.F_PER_USER)) {
@@ -182,7 +156,7 @@ public class PageReports extends PageAppTemplate {
         };
         form.add(preview);
 
-        DownloadLink exportExcel = new DownloadLink("export", new IModel<File>()
+        DownloadLink exportExcel = new DownloadLink("export", new IModel<>()
         {
             private static final long serialVersionUID = 1L;
 
@@ -197,6 +171,10 @@ public class PageReports extends PageAppTemplate {
                     if (filterDto.isPerUser()) {
                         generateReportPerUser(workbook, filterDto);
                     } else {
+                        generateUsersReport(workbook, filterDto);
+                    }
+
+                    if (filterDto.isSummary()) {
                         generateSummaryReport(workbook, filterDto);
                     }
 
@@ -221,25 +199,6 @@ public class PageReports extends PageAppTemplate {
         GizmoTabbedPanel<ITab> tabbedPanel = new GizmoTabbedPanel<>(ID_DETAILS, tabs);
         tabbedPanel.setOutputMarkupId(true);
         add(tabbedPanel);
-//        TablePanel table = new TablePanel(ID_TABLE, provider, columns, 50);
-//        table.setOutputMarkupId(true);
-//        add(table);
-
-
-
-//
-//
-//        WebMarkupContainer realizator = new WebMarkupContainer(ID_REALIZATOR);
-//        realizator.setOutputMarkupId(true);
-//        form.add(realizator);
-//
-//        initRealizatorInput(realizator);
-//
-//        WebMarkupContainer project = new WebMarkupContainer(ID_PROJECT);
-//        project.setOutputMarkupId(true);
-//        form.add(project);
-//
-//        initProjectInput(project);
     }
 
     private List<ITab> createTabs() {
@@ -250,8 +209,8 @@ public class PageReports extends PageAppTemplate {
                 ReportDataProvider provider = new ReportDataProvider(PageReports.this);
                 provider.setFilter(model.getObject());
 
-                List<IColumn> columns = createColumns();
-                TablePanel table = new TablePanel(id, provider, columns, 50);
+                List<IColumn<AbstractTask, String>> columns = createColumns();
+                TablePanel<AbstractTask> table = new TablePanel<>(id, provider, columns, 50);
                 table.setOutputMarkupId(true);
                 return table;
             }
@@ -260,8 +219,7 @@ public class PageReports extends PageAppTemplate {
             @Override
             public WebMarkupContainer getPanel(String id) {
                 SummaryPartsDataProvider partsProvider = new SummaryPartsDataProvider(PageReports.this);
-                SummaryPartsPanel summaryPartsPanel = new SummaryPartsPanel(id, partsProvider, getFilterModel());
-                return summaryPartsPanel;
+                return new SummaryPartsPanel(id, partsProvider, getFilterModel());
             }
 
             @Override
@@ -359,7 +317,7 @@ public class PageReports extends PageAppTemplate {
         }
     }
 
-    private void generateSummaryReport(XSSFWorkbook workbook, ReportFilterDto filterDto) {
+    private void generateUsersReport(XSSFWorkbook workbook, ReportFilterDto filterDto) {
         CellStyle style = workbook.createCellStyle();
 
         CellStyle dateStype = workbook.createCellStyle();
@@ -403,6 +361,73 @@ public class PageReports extends PageAppTemplate {
             generateExcel(sheet, tasks, style, dateStype);
 
 
+    }
+
+    private void generateSummaryReport(XSSFWorkbook workbook, ReportFilterDto filterDto) {
+        CellStyle style = workbook.createCellStyle();
+
+        XSSFSheet sheet = workbook.createSheet("Summary");
+        sheet.setDefaultColumnWidth(30);
+
+        XSSFRow header = sheet.createRow(0);
+
+        XSSFCell partHeaderCell = header.createCell(0, CellType.STRING);
+        partHeaderCell.setCellValue("Part");
+        XSSFCell workHeaderCell = header.createCell(1, CellType.STRING);
+        workHeaderCell.setCellValue("Work length");
+        XSSFCell invoiceHeaderCell = header.createCell(2, CellType.STRING);
+        invoiceHeaderCell.setCellValue("Invoice");
+
+        SummaryPartsDataProvider partsProvider = new SummaryPartsDataProvider(PageReports.this);
+        List<PartSummary> partSummaries = partsProvider.createSummary(filterDto);
+
+        for (int i = 0; i < partSummaries.size(); i++) {
+            PartSummary partSummary = partSummaries.get(i);
+
+            XSSFRow row = sheet.createRow(i+1);
+            XSSFCell part = row.createCell(0, CellType.STRING);
+            part.setCellStyle(style);
+            part.setCellValue(partSummary.getName());
+
+            XSSFCell work = row.createCell(1, CellType.NUMERIC);
+            work.setCellStyle(style);
+            work.setCellValue(partSummary.getLength());
+
+            XSSFCell invoice = row.createCell(2, CellType.NUMERIC);
+            invoice.setCellStyle(style);
+            invoice.setCellValue(partSummary.getInvoice());
+        }
+
+        XSSFRow summaryRow = sheet.createRow(partSummaries.size()+2);
+        XSSFCell summary = summaryRow.createCell(0, CellType.STRING);
+        summary.setCellStyle(style);
+        summary.setCellValue("Summary");
+
+        XSSFCell work = summaryRow.createCell(1, CellType.NUMERIC);
+        work.setCellStyle(style);
+        work.setCellValue(countLength(partSummaries));
+
+        XSSFCell invoice = summaryRow.createCell(2, CellType.NUMERIC);
+        invoice.setCellStyle(style);
+        invoice.setCellValue(countInvoice(partSummaries));
+
+
+    }
+
+    private Double countLength(List<PartSummary> partSummaries) {
+        Double all = Double.valueOf(0);
+        for (PartSummary summary : partSummaries) {
+            all += summary.getLength();
+        }
+        return all;
+    }
+
+    private Double countInvoice(List<PartSummary> partSummaries) {
+        Double all = Double.valueOf(0);
+        for (PartSummary summary : partSummaries) {
+            all += summary.getInvoice();
+        }
+        return all;
     }
 
     private void generateExcel(XSSFSheet sheet, List<Work> tasks, CellStyle style, CellStyle dateStype) {
@@ -488,11 +513,6 @@ public class PageReports extends PageAppTemplate {
         target.add(getFeedbackPanel());
         ReportFilterDto reportFilter = model.getObject();
 
-//        TablePanel table = (TablePanel) get(ID);
-//        ReportDataProvider provider = (ReportDataProvider) table.getDataTable().getDataProvider();
-//        provider.setFilter(reportFilter);
-//        table.setCurrentPage(0L);
-
         GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
         session.setReportFilterDto(reportFilter);
 
@@ -500,16 +520,15 @@ public class PageReports extends PageAppTemplate {
         target.add(get(ID_DETAILS));
     }
 
-    private List<IColumn> createColumns() {
-        List<IColumn> columns = new ArrayList<>();
+    private List<IColumn<AbstractTask, String>> createColumns() {
+        List<IColumn<AbstractTask, String>> columns = new ArrayList<>();
 
-        columns.add(new PropertyColumn(createStringResource("AbstractTask.date"), AbstractTask.F_DATE));
+        columns.add(new PropertyColumn<>(createStringResource("AbstractTask.date"), AbstractTask.F_DATE));
         columns.add(GizmoUtils.createWorkInvoiceColumn(this));
         columns.add(GizmoUtils.createAbstractTaskRealizatorColumn(this));
         columns.add(GizmoUtils.createWorkProjectColumn(this));
-        columns.add(GizmoUtils.createLogCustomerColumn(this));
-        columns.add(new PropertyColumn(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));
-        columns.add(new PropertyColumn(createStringResource("PageReports.trackId"), AbstractTask.F_TRACK_ID));
+        columns.add(new PropertyColumn<>(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));
+        columns.add(new PropertyColumn<>(createStringResource("PageReports.trackId"), AbstractTask.F_TRACK_ID));
 
         return columns;
     }

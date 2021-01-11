@@ -18,16 +18,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
-    <div wicket:id="navbar"/>
+    <div class="wrapper" wicket:id="navbar"/>
 
-    <div class="container-fluid">
-        <h1 class="page-header" wicket:id="titleHeader"/>
-
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container">
+                <div class="row mb-2">
+                    <h1 class="m-0" wicket:id="titleHeader"/>
+                </div>
+            </div>
+        </div>
         <div class="container">
             <div wicket:id="feedback"/>
         </div>
-
-        <wicket:child/>
+        <div class="container">
+            <wicket:child/>
+        </div>
     </div>
 </wicket:extend>
 </body>

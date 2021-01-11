@@ -23,7 +23,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -40,7 +39,6 @@ import sk.lazyman.gizmo.data.Work;
 import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
 import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
-import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
 import sk.lazyman.gizmo.repository.AbstractTaskRepository;
@@ -61,32 +59,14 @@ import java.util.List;
 @MountPath(value = "/app/dashboard", alt = "/app")
 public class PageDashboard extends PageAppTemplate {
 
-    private static final String ID_FORM = "form";
-    private static final String ID_FROM = "from";
-    private static final String ID_TO = "to";
-    private static final String ID_TABLE = "table";
-    private static final String ID_PROJECT = "project";
-    private static final String ID_REALIZATOR = "realizator";
-    private static final String ID_BTN_DISPLAY = "display";
-    private static final String ID_BTN_EMAIL = "email";
-    private static final String ID_BTN_PRINT = "print";
-    private static final String ID_BTN_NEW_TASK = "task";
-    private static final String ID_SUMMARY = "summary";
-    private static final String ID_SUMMARY_PARTS = "summaryParts";
-    private static final String ID_TYPE = "type";
     private static final String ID_BTN_PREVIOUS = "previous";
     private static final String ID_BTN_NEXT = "next";
-    private static final String ID_PROJECT_COMBO = "projectCombo";
-    private static final String ID_REALIZATOR_COMBO = "realizatorCombo";
-    private static final String ID_PROJECT_MULTI = "projectMulti";
-    private static final String ID_REALIZATOR_MULTI = "realizatorMulti";
-    private static final String ID_ADVANCED = "advanced";
-
     private static final String ID_MONTH = "month";
+    private static final String ID_SUMMARY = "summary";
+    private static final String ID_SUMMARY_PARTS = "summaryParts";
+    private static final String ID_TABLE = "table";
 
     private IModel<ReportFilterDto> filter;
-    private IModel<List<CustomerProjectPartDto>> projects =
-            GizmoUtils.createCustomerProjectPartList(this, true, true, false);
 
     public PageDashboard() {
         filter = new LoadableModel<>(false) {
@@ -120,41 +100,9 @@ public class PageDashboard extends PageAppTemplate {
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
-//        String script = "if (typeof $('#bla').fullCalendar === \"function\") { " +
-//                "$(function() { " +
-//                "$('#bla').fullCalendar({ " +
-//                "plugins: [ 'bootstrap' ], themeSystem: 'bootstrap'}) " +
-//                "}); }";
-        // put your options and callbacks here
-
-//        String script = "$(function() {\n" +
-//                "\n" +
-//                "  $('#calendar1').fullCalendar({\n" +
-//                "    themeSystem: 'jquery-ui',\n" +
-//                "    header: {\n" +
-//                "      left: 'prev,next today',\n" +
-//                "      center: 'title',\n" +
-//                "      right: 'month,agendaWeek,agendaDay,listMonth'\n" +
-//                "    },\n" +
-//                "    weekNumbers: true,\n" +
-//                "    eventLimit: true, // allow \"more\" link when too many events\n" +
-//                "    events: 'https://fullcalendar.io/demo-events.json'\n" +
-//                "  });\n" +
-//                "  \n" +
-//                "});";
-//
-//
-//        response.render(OnDomReadyHeaderItem.forScript(script));
-
-
-//        response.render(CssHeaderItem.forReference(
-//                new LessResourceReference(PageDashboard.class, "PageDashboard.less")));
     }
 
     private void initLayout() {
-        Form form = new Form(ID_FORM);
-        form.setOutputMarkupId(true);
-        add(form);
 
         Label month = new Label(ID_MONTH, new PropertyModel<>(filter, "month"));
         month.setOutputMarkupId(true);
@@ -184,15 +132,11 @@ public class PageDashboard extends PageAppTemplate {
         SummaryPanel summary = new SummaryPanel(ID_SUMMARY, createSummaryModel());
         add(summary);
 
-
-//        SummaryPartsPanel summaryParts = new SummaryPartsPanel(ID_SUMMARY_PARTS, partsProvider, filter);
-//        add(summaryParts);
-
         AbstractTaskDataProvider provider = new AbstractTaskDataProvider(this);
         provider.setFilter(filter.getObject());
 
-        List<IColumn> columns = createColumns();
-        TablePanel table = new TablePanel(ID_TABLE, provider, columns, 50);
+        List<IColumn<AbstractTask, String>> columns = createColumns();
+        TablePanel<AbstractTask> table = new TablePanel<>(ID_TABLE, provider, columns, 50);
         table.setOutputMarkupId(true);
         add(table);
 
@@ -202,7 +146,7 @@ public class PageDashboard extends PageAppTemplate {
     }
 
     private IModel<SummaryPanelDto> createSummaryModel() {
-        return new LoadableModel<SummaryPanelDto>(false) {
+        return new LoadableModel<>(false) {
 
             @Override
             protected SummaryPanelDto load() {
@@ -241,26 +185,20 @@ public class PageDashboard extends PageAppTemplate {
         target.add(PageDashboard.this);
     }
 
-    private void updateSearchForm(AjaxRequestTarget target) {
-        target.add(get(ID_FORM + ":" + ID_PROJECT), get(ID_FORM + ":" + ID_REALIZATOR));
-    }
 
     //date, length (invoice), realizator, project, description (WORK)
     //date, length (0.0), realizator, customer, description, attachments(icon) (LOG)
-    private List<IColumn> createColumns() {
-        List<IColumn> columns = new ArrayList<>();
+    private List<IColumn<AbstractTask, String>> createColumns() {
+        List<IColumn<AbstractTask, String>> columns = new ArrayList<>();
 
-        columns.add(new LinkColumn<AbstractTask>(createStringResource("AbstractTask.date"), AbstractTask.F_DATE) {
+        columns.add(new LinkColumn<>(createStringResource("AbstractTask.date"), AbstractTask.F_DATE) {
 
             @Override
             protected IModel<String> createLinkModel(final IModel<AbstractTask> rowModel) {
-                return new IModel<String>() {
-                    @Override
-                    public String getObject() {
-                        PropertyModel<LocalDate> propertyModel = new PropertyModel<>(rowModel, getPropertyExpression());
-                        LocalDate date = propertyModel.getObject();
-                        return date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-                    }
+                return (IModel<String>) () -> {
+                    PropertyModel<LocalDate> propertyModel = new PropertyModel<>(rowModel, getPropertyExpression());
+                    LocalDate date = propertyModel.getObject();
+                    return date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
                 };
             }
 
@@ -269,10 +207,10 @@ public class PageDashboard extends PageAppTemplate {
                 AbstractTask task = rowModel.getObject();
                 switch (task.getType()) {
                     case LOG:
-                        logDetailsPerformed(target, (Log) task);
+                        logDetailsPerformed((Log) task);
                         break;
                     case WORK:
-                        workDetailsPerformed(target, (Work) task);
+                        workDetailsPerformed((Work) task);
                         break;
                 }
             }
@@ -280,17 +218,17 @@ public class PageDashboard extends PageAppTemplate {
         columns.add(GizmoUtils.createWorkInvoiceColumn(this));
         columns.add(GizmoUtils.createAbstractTaskRealizatorColumn(this));
         columns.add(GizmoUtils.createWorkProjectColumn(this));
-        columns.add(GizmoUtils.createLogCustomerColumn(this));
-        columns.add(new PropertyColumn(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));
-        columns.add(new LinkIconColumn<AbstractTask>(new Model<>("")) {
+        columns.add(new PropertyColumn<>(createStringResource("AbstractTask.trackId"), AbstractTask.F_TRACK_ID));
+        columns.add(new PropertyColumn<>(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));
+        columns.add(new LinkIconColumn<>(new Model<>("")) {
 
             @Override
-            protected IModel<String> createIconModel(IModel rowModel) {
+            protected IModel<String> createIconModel(IModel<AbstractTask> rowModel) {
                 return new Model<>("fa fa-lg fa-trash-o text-danger");
             }
 
             @Override
-            protected IModel<String> createTitleModel(IModel rowModel) {
+            protected IModel<String> createTitleModel(IModel<AbstractTask> rowModel) {
                 return PageDashboard.this.createStringResource("PageDashboard.delete");
             }
 
@@ -303,175 +241,14 @@ public class PageDashboard extends PageAppTemplate {
         return columns;
     }
 
-    private void initButtons(Form form) {
-
-//        AjaxSubmitButton display = new AjaxSubmitButton(ID_BTN_DISPLAY,
-//                createStringResource("PageDashboard.display")) {
-//
-//            @Override
-//            protected void onSubmit(AjaxRequestTarget target) {
-//                displayPerformed(target);
-//            }
-//
-//            @Override
-//            protected void onError(AjaxRequestTarget target) {
-//                target.add(getFeedbackPanel());
-//            }
-//        };
-//        form.add(display);
-//
-//        AjaxSubmitButton email = new AjaxSubmitButton(ID_BTN_EMAIL, createStringResource("PageDashboard.email")) {
-//
-//            @Override
-//            protected void onSubmit(AjaxRequestTarget target) {
-//                emailPerformed(target);
-//            }
-//
-//            @Override
-//            protected void onError(AjaxRequestTarget target) {
-//                target.add(getFeedbackPanel());
-//            }
-//        };
-//        form.add(email);
-//
-//        AjaxSubmitButton print = new AjaxSubmitButton(ID_BTN_PRINT, createStringResource("PageDashboard.print")) {
-//
-//            @Override
-//            protected void onSubmit(AjaxRequestTarget target) {
-//                printPerformed(target);
-//            }
-//
-//            @Override
-//            protected void onError(AjaxRequestTarget target) {
-//                target.add(getFeedbackPanel());
-//            }
-//        };
-//        form.add(print);
-
-//        SplitButton task = new SplitButton(ID_BTN_NEW_TASK, createStringResource("PageDashboard.newWork")) {
-//
-//            @Override
-//            protected AbstractLink newBaseButton(String markupId, IModel<String> labelModel,
-//                                                 IModel<IconType> iconTypeModel) {
-//
-//                return new BootstrapAjaxLink<>(markupId, labelModel, Buttons.Type.Success, labelModel) {
-//
-//                    @Override
-//                    public void onClick(AjaxRequestTarget target) {
-//                        newWorkPerformed(target);
-//                    }
-//                }.setIconType(iconTypeModel.getObject());
-//            }
-//
-//            @Override
-//            protected List<AbstractLink> newSubMenuButtons(String buttonMarkupId) {
-//                return createDropDownLinks(buttonMarkupId);
-//            }
-//        };
-//        task.setSize(Buttons.Size.Small).setType(Buttons.Type.Success);
-//
-//
-//        form.add(task);
-    }
-
-//    private String createFileName() {
-//        WorkFilterDto filterDto = filter.getObject();
-//        String timestamp = new Date(System.currentTimeMillis()).toString();
-//        List<User> realizators = filterDto.getRealizators();
-//        if (realizators.isEmpty()) {
-//            return "all_" + timestamp;
-//        }
-//
-//        if (realizators.size() == 1) {
-//            return realizators.iterator().next() + timestamp;
-//        }
-//
-//        return "Export_" + timestamp;
-//    }
-//
-//    private List<AbstractLink> createDropDownLinks(String id) {
-//        List<AbstractLink> list = new ArrayList<>();
-//        list.add(new LabeledLink(id, createStringResource("PageDashboard.newLog")) {
-//
-//            @Override
-//            public void onClick(AjaxRequestTarget target) {
-//                newLogPerformed(target);
-//            }
-//        });
-//        list.add(new LabeledLink(id, createStringResource("PageDashboard.newBulk")) {
-//
-//            @Override
-//            public void onClick(AjaxRequestTarget target) {
-//                newBulkPerformed(target);
-//            }
-//        });
-//
-//
-//        return list;
-//    }
-//
-//    private void moveMonth(AjaxRequestTarget target, int add) {
-//        WorkFilterDto dto = filter.getObject();
-//
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(GizmoUtils.clearTime(dto.getFrom()));
-//        cal.add(Calendar.MONTH, add);
-//        cal.set(Calendar.DAY_OF_MONTH, 1);
-//        dto.setFrom(cal.getTime());
-//
-//        cal = Calendar.getInstance();
-//        cal.setTime(dto.getFrom());
-//        cal.add(Calendar.MONTH, 1);
-//        cal.add(Calendar.MILLISECOND, -1);
-//        dto.setTo(cal.getTime());
-//
-//        displayPerformed(target);
-//        target.add(get(ID_FORM));
-//    }
-
-    private void displayPerformed(AjaxRequestTarget target) {
-        ReportFilterDto dto = filter.getObject();
-
-        TablePanel table = (TablePanel) get(ID_TABLE);
-        AbstractTaskDataProvider provider = (AbstractTaskDataProvider) table.getDataTable().getDataProvider();
-        provider.setFilter(dto);
-        table.setCurrentPage(0L);
-
-        GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
-        session.setDashboardFilter(dto);
-
-        target.add(get(ID_SUMMARY), get(ID_SUMMARY_PARTS), table);
-    }
-
-    private void emailPerformed(AjaxRequestTarget target) {
-//        PageEmail next = new PageEmail(filter);
-//        setResponsePage(next);
-    }
-
-//    private void printPerformed(AjaxRequestTarget target) {
-//        setResponsePage(new PagePrint(filter));
-//    }
-
-    private void newWorkPerformed(AjaxRequestTarget target) {
-        setResponsePage(PageWork.class);
-    }
-
-    private void newLogPerformed(AjaxRequestTarget target) {
-        setResponsePage(PageLog.class);
-    }
-
-    private void newBulkPerformed(AjaxRequestTarget target) {
-        setResponsePage(PageBulk.class);
-    }
-
-    private void workDetailsPerformed(AjaxRequestTarget target, Work work) {
+    private void workDetailsPerformed(Work work) {
         PageParameters params = new PageParameters();
         params.add(PageWork.WORK_ID, work.getId());
 
         setResponsePage(PageWork.class, params);
     }
 
-    private void logDetailsPerformed(AjaxRequestTarget target, Log log) {
+    private void logDetailsPerformed(Log log) {
         PageParameters params = new PageParameters();
         params.add(PageLog.LOG_ID, log.getId());
 

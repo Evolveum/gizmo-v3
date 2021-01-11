@@ -432,13 +432,13 @@ public class GizmoUtils {
 //        return query.list(task);
     }
 
-    public static IColumn createAbstractTaskRealizatorColumn(PageTemplate page) {
-        return new PropertyColumn(page.createStringResource("AbstractTask.realizator"),
+    public static IColumn<AbstractTask, String> createAbstractTaskRealizatorColumn(PageTemplate page) {
+        return new PropertyColumn<>(page.createStringResource("AbstractTask.realizator"),
                 StringUtils.join(new Object[]{AbstractTask.F_REALIZATOR, User.M_FULL_NAME}, '.'));
     }
 
-    public static IColumn createWorkInvoiceColumn(PageTemplate page) {
-        return new AbstractColumn<AbstractTask, String>(page.createStringResource("Task.length")) {
+    public static IColumn<AbstractTask, String> createWorkInvoiceColumn(PageTemplate page) {
+        return new AbstractColumn<>(page.createStringResource("Task.length")) {
 
             @Override
             public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId,
@@ -449,26 +449,22 @@ public class GizmoUtils {
     }
 
     private static IModel<String> createInvoiceModel(final IModel<AbstractTask> rowModel) {
-        return new IModel<String>() {
+        return (IModel<String>) () -> {
+            AbstractTask task = rowModel.getObject();
+            double length = task.getWorkLength();
+            double invoice = 0;
 
-            @Override
-            public String getObject() {
-                AbstractTask task = rowModel.getObject();
-                double length = task.getWorkLength();
-                double invoice = 0;
-
-                if (task instanceof Work) {
-                    Work work = (Work) task;
-                    invoice = work.getInvoiceLength();
-                }
-
-                return StringUtils.join(new Object[]{length, " (", invoice, ')'});
+            if (task instanceof Work) {
+                Work work = (Work) task;
+                invoice = work.getInvoiceLength();
             }
+
+            return StringUtils.join(new Object[]{length, " (", invoice, ')'});
         };
     }
 
-    public static IColumn createWorkProjectColumn(PageTemplate page) {
-        return new AbstractColumn<AbstractTask, String>(page.createStringResource("Work.part")) {
+    public static IColumn<AbstractTask, String> createWorkProjectColumn(PageTemplate page) {
+        return new AbstractColumn<>(page.createStringResource("Work.part")) {
 
             @Override
             public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId,
@@ -479,23 +475,19 @@ public class GizmoUtils {
     }
 
     private static IModel<String> createProjectModel(final IModel<AbstractTask> rowModel) {
-        return new IModel<String>() {
-
-            @Override
-            public String getObject() {
-                AbstractTask task = rowModel.getObject();
-                if (!(task instanceof Work)) {
-                    return null;
-                }
-
-                Work work = (Work) task;
-                return GizmoUtils.describeProjectPart(work.getPart(), " - ");
+        return (IModel<String>) () -> {
+            AbstractTask task = rowModel.getObject();
+            if (!(task instanceof Work)) {
+                return null;
             }
+
+            Work work = (Work) task;
+            return GizmoUtils.describeProjectPart(work.getPart(), " - ");
         };
     }
 
-    public static IColumn createLogCustomerColumn(PageTemplate page) {
-        return new AbstractColumn<AbstractTask, String>(page.createStringResource("Log.customer")) {
+    public static IColumn<AbstractTask, String> createLogCustomerColumn(PageTemplate page) {
+        return new AbstractColumn<>(page.createStringResource("Log.customer")) {
 
             @Override
             public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId, IModel<AbstractTask> rowModel) {

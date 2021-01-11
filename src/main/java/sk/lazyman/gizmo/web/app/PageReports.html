@@ -18,6 +18,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
+    <div class="container">
     <form wicket:id="form">
         <div class="form-group row">
             <label class="col-sm-2 col-form-label"><wicket:message key="PageReports.dateFrom"/></label>
@@ -81,82 +82,17 @@
             </div>
         </div>
 
-
-<!--    </form>-->
-
-
-<!--    <form class="form-inline search" role="form" wicket:id="form">-->
-<!--        <div class="input-group">-->
-<!--            <div class="input-group-prepend">-->
-<!--                      <span class="input-group-text">-->
-<!--                        <i class="fa fa-calendar"></i>-->
-<!--                      </span>-->
-<!--            </div>-->
-<!--            <input type="text" class="form-control float-right"-->
-<!--                   wicket:id="from">-->
-<!--        </div>-->
-<!--        <div class="input-group">-->
-<!--            <div class="input-group-prepend">-->
-<!--                      <span class="input-group-text">-->
-<!--                        <i class="fa fa-calendar"></i>-->
-<!--                      </span>-->
-<!--            </div>-->
-<!--            <input type="text" class="form-control float-right"-->
-<!--                   wicket:id="to"-->
-<!--                   wicket:message="placeholder:PageDashboard.dateTo">-->
-<!--        </div>-->
-<!--        <div class="form-group">-->
-<!--            <label class="sr-only"><wicket:message key="PageReports.type"/></label>-->
-<!--            <select class="form-control input-sm" wicket:id="type"/>-->
-<!--        </div>-->
-
-<!--        <div class="form-group">-->
-<!--            <label class="sr-only"><wicket:message key="PageReports.customerProjectPart"/></label>-->
-
-<!--            <input class="form-control input-sm" wicket:id="project" size="40"-->
-<!--                   wicket:message="placeholder:PageReports.customerProjectPart">-->
-
-<!--        </div>-->
-<!--        <select class="form-group" wicket:id="realizator">-->
-<!--&lt;!&ndash;            <label class="sr-only"><wicket:message key="AbstractTask.realizator"/></label>&ndash;&gt;-->
-
-<!--&lt;!&ndash;            <select class="form-control input-sm" wicket:id="realizatorCombo"/>&ndash;&gt;-->
-
-<!--&lt;!&ndash;            <select class="form-control input-sm" wicket:id="realizatorMulti" size="5" />&ndash;&gt;-->
-<!--        </select>-->
-<!--        <div class="checkbox">-->
-<!--            <label>-->
-<!--                <input type="checkbox" wicket:id="perUser">&nbsp;<wicket:message key="PageReports.perUser"/>-->
-<!--            </label>-->
-<!--        </div>-->
-
         <a class="btn btn-primary btn-sm" wicket:id="preview"/>
         <a class="btn btn-default btn-sm" wicket:id="export">Download</a>
-<!--        <a class="btn btn-default btn-sm" wicket:id="print"/>-->
-<!--        <a class="btn btn-default btn-sm" wicket:id="email"/>-->
-<!--        <a class="btn btn-default btn-sm" wicket:id="excel"/>-->
-
-<!--        <div wicket:id="task"/>-->
     </form>
 
     <div class="clearfix"/>
-
-<!--    <div class="row">-->
-<!--        <div class="col-md-6 col-lg-5" wicket:id="summaryParts"/>-->
-<!--    </div>-->
-
-<!--    <div class="row">-->
-<!--        <div class="col-md-12">-->
-<!--            <div wicket:id="summary"/>-->
-<!--        </div>-->
-<!--    </div>-->
-
-<!--    <hr/>-->
 
     <div class="row">
         <div class="col-md-12">
             <div wicket:id="details"/>
         </div>
+    </div>
     </div>
 </wicket:extend>
 </body>
