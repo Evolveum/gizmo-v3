@@ -81,6 +81,7 @@ public class PageAppTemplate extends PageTemplate {
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.users"), PageUsers.class));
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.emails"), PageEmails.class));
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.reports"), PageReports.class));
+                menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.vacations"), PageVacations.class));
                 return menuItems;
             }
         };

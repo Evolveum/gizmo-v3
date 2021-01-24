@@ -17,6 +17,9 @@
 package sk.lazyman.gizmo.web.app;
 
 
+import net.ftlines.wicket.fullcalendar.*;
+import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
+import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -27,6 +30,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.joda.time.DateTime;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.SummaryChartPanel;
 import sk.lazyman.gizmo.component.SummaryPanel;
@@ -65,6 +69,8 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_SUMMARY = "summary";
     private static final String ID_SUMMARY_PARTS = "summaryParts";
     private static final String ID_TABLE = "table";
+
+    private static final String ID_CALENDAR = "calendar";
 
     private IModel<ReportFilterDto> filter;
 
@@ -143,6 +149,38 @@ public class PageDashboard extends PageAppTemplate {
         SummaryPartsDataProvider partsProvider = new SummaryPartsDataProvider(this);
         SummaryChartPanel chart = new SummaryChartPanel(ID_SUMMARY_PARTS, partsProvider, getFilterModel());
         add(chart);
+
+
+        ConfigNew configNew = new ConfigNew();
+        EventSource source = new EventSource();
+        source.setBackgroundColor("black");
+        source.setEditable(true);
+
+        Event event = new Event();
+        event.setId("1");
+        event.setAllDay(true);
+        event.setStart(DateTime.now());
+        event.setTitle("asdasdasdada");
+        source.addEvent(event);
+
+        configNew.add(source);
+
+        FullCalendar fullCalendar = new FullCalendar(ID_CALENDAR, configNew) {
+
+            @Override
+            protected void onEventClicked(ClickedEvent event, CalendarResponse response) {
+                super.onEventClicked(event, response);
+            }
+
+            @Override
+            protected void onDateRangeSelected(SelectedRange range, CalendarResponse response) {
+                super.onDateRangeSelected(range, response);
+            }
+        };
+        add(fullCalendar);
+
+
+
     }
 
     private IModel<SummaryPanelDto> createSummaryModel() {

@@ -37,7 +37,6 @@ public class PartAutoCompleteText extends AutoCompleteTextField<CustomerProjectP
 
     public PartAutoCompleteText(String id, IModel<CustomerProjectPartDto> model, IModel<List<CustomerProjectPartDto>> allChoices) {
         super(id, model, CustomerProjectPartDto.class, new PartAutoCompleteConverter(allChoices), new AutoCompleteSettings());
-
         this.allChoices = allChoices;
     }
 
@@ -57,24 +56,6 @@ public class PartAutoCompleteText extends AutoCompleteTextField<CustomerProjectP
     @Override
     public <C> IConverter<C> getConverter(Class<C> type) {
         return (IConverter<C>) new PartAutoCompleteConverter(allChoices);
-    }
-
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-
-        StringBuilder componentSb = new StringBuilder("$('#").append(getMarkupId()).append("')");
-        String componentSelector = componentSb.toString();
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("if (typeof ");
-        sb.append(componentSelector);
-        sb.append(".select2 === \"function\") {\n");
-
-        sb.append(componentSelector);
-        sb.append(".select2({").append("multiple: true").append("});");
-        sb.append("}");
-        response.render(OnDomReadyHeaderItem.forScript(sb.toString()));
     }
 
 }

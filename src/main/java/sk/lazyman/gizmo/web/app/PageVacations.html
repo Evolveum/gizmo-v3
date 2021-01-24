@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2015 Viliam Repan (lazyman)
+  ~ Copyright 2021 Evolveum
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,25 +18,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
-    <div class="wrapper">
-        <nav class="main-header navbar navbar-expand-md navbar-dark navbar-black" wicket:id="navbar"></nav>
-
-        <div class="content-wrapper">
-            <div class="content-header">
-                <div class="container">
-                    <div class="row mb-2">
-                        <h1 class="m-0" wicket:id="titleHeader"/>
-                    </div>
-                </div>
-            </div>
-            <div class="container">
-                <div wicket:id="feedback"/>
-            </div>
-            <div class="container">
-                <wicket:child/>
-            </div>
-        </div>
-    </div>
+   <div wicket:id="calendar"></div>
 </wicket:extend>
 </body>
 </html>

@@ -39,15 +39,33 @@
             </div>
         </div>
 
-        <div class="col-md-6 col-lg-5" >
-            <canvas wicket:id="summaryParts" width="400" height="400"></canvas>
+        <div class="col-md-6" >
+            <div class="card">
+                <div class="card-header">Pomer</div>
+                <div class="card-body">
+                    <canvas wicket:id="summaryParts"></canvas>  <!-- width="400" height="400"-->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" >
+            <div class="card">
+                <div class="card-header">Calendar</div>
+                <div class="card-body">
+                    <div wicket:id="calendar"></div>  <!-- width="400" height="400"-->
+                </div>
+            </div>
         </div>
     </div>
 
 
     <div class="row">
         <div class="col-md-12">
-            <div wicket:id="table"/>
+            <div class="card">
+                <div class="card-header">Work log</div>
+                <div class="card-body">
+                    <div wicket:id="table"/>
+                </div>
+            </div>
         </div>
     </div>
 </wicket:extend>
