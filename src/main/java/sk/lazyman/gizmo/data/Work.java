@@ -18,7 +18,7 @@ package sk.lazyman.gizmo.data;
 
 import com.querydsl.core.annotations.QueryInit;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * @author lazyman

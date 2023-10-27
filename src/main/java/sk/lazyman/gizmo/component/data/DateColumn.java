@@ -17,7 +17,6 @@
 package sk.lazyman.gizmo.component.data;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 
@@ -39,7 +38,7 @@ public class DateColumn<T, S> extends PropertyColumn<T, S> {
 
     @Override
     public IModel<Object> getDataModel(final IModel<T> rowModel) {
-        return new AbstractReadOnlyModel<Object>() {
+        return new IModel<Object>() {
 
             @Override
             public Object getObject() {

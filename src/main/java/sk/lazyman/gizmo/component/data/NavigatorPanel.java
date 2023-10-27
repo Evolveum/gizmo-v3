@@ -27,7 +27,6 @@ import org.apache.wicket.markup.html.list.LoopItem;
 import org.apache.wicket.markup.html.navigation.paging.IPageable;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.AbstractRepeater;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
 
@@ -84,7 +83,7 @@ public class NavigatorPanel extends Panel {
 
     private void initPrevious() {
         WebMarkupContainer previous = new WebMarkupContainer(ID_PREVIOUS);
-        previous.add(new AttributeModifier("class", new AbstractReadOnlyModel<String>() {
+        previous.add(new AttributeModifier("class", new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -92,7 +91,7 @@ public class NavigatorPanel extends Panel {
             }
         }));
         add(previous);
-        AjaxLink previousLink = new AjaxLink(ID_PREVIOUS_LINK) {
+        AjaxLink<Void> previousLink = new AjaxLink<>(ID_PREVIOUS_LINK) {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
@@ -119,7 +118,7 @@ public class NavigatorPanel extends Panel {
             }
         });
         add(first);
-        AjaxLink firstLink = new AjaxLink(ID_FIRST_LINK) {
+        AjaxLink<Void> firstLink = new AjaxLink<>(ID_FIRST_LINK) {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
@@ -140,7 +139,7 @@ public class NavigatorPanel extends Panel {
     }
 
     private void initNavigation() {
-        IModel<Integer> model = new AbstractReadOnlyModel<Integer>() {
+        IModel<Integer> model = new IModel<Integer>() {
 
             @Override
             public Integer getObject() {
@@ -167,7 +166,7 @@ public class NavigatorPanel extends Panel {
                 };
                 item.add(pageLink);
 
-                item.add(new AttributeModifier("class", new AbstractReadOnlyModel<String>() {
+                item.add(new AttributeModifier("class", new IModel<String>() {
 
                     @Override
                     public String getObject() {
@@ -210,7 +209,7 @@ public class NavigatorPanel extends Panel {
 
     private void initNext() {
         WebMarkupContainer next = new WebMarkupContainer(ID_NEXT);
-        next.add(new AttributeModifier("class", new AbstractReadOnlyModel<String>() {
+        next.add(new AttributeModifier("class", new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -219,7 +218,7 @@ public class NavigatorPanel extends Panel {
         }));
         add(next);
 
-        AjaxLink nextLink = new AjaxLink(ID_NEXT_LINK) {
+        AjaxLink<Void> nextLink = new AjaxLink<Void>(ID_NEXT_LINK) {
 
             @Override
             public void onClick(AjaxRequestTarget target) {

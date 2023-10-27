@@ -18,13 +18,13 @@ package sk.lazyman.gizmo.data;
 
 import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 /**
  * @author lazyman
  */
-@Entity
+@Entity//(name = "g_user")
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "ldapDn", name = "u_ldapdn"),
         @UniqueConstraint(columnNames = "name", name = "u_name")
@@ -61,14 +61,17 @@ public class User implements Serializable {
         return name;
     }
 
+//    @Column(name = "givenname")
     public String getGivenName() {
         return givenName;
     }
 
+//    @Column(name = "familyname")
     public String getFamilyName() {
         return familyName;
     }
 
+//    @Column(name = "ldapdn")
     public String getLdapDn() {
         return ldapDn;
     }

@@ -23,7 +23,6 @@ import org.apache.wicket.feedback.ComponentFeedbackMessageFilter;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import sk.lazyman.gizmo.component.SimplePanel;
 
@@ -44,7 +43,7 @@ public class HFormGroup<F extends FormInput, T extends Serializable> extends Sim
                       String feedbackSize, boolean required) {
         super(id, value);
 
-        add(AttributeModifier.append("class", new AbstractReadOnlyModel<String>() {
+        add(AttributeModifier.append("class", new IModel<Object>() {
 
             @Override
             public String getObject() {

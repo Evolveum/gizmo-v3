@@ -19,13 +19,9 @@ package sk.lazyman.gizmo.security;
 import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication;
-import org.apache.wicket.core.request.handler.PageProvider;
-import org.apache.wicket.core.request.handler.RenderPageRequestHandler;
 import org.apache.wicket.core.request.mapper.MountedMapper;
+import org.apache.wicket.csp.CSPDirective;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.request.IRequestHandler;
-import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
-import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.UrlPathPageParametersEncoder;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.settings.ApplicationSettings;
@@ -73,9 +69,14 @@ public class GizmoApplication extends AuthenticatedWebApplication {
 //        Bootstrap.install(this, settings);
 //        BootstrapLess.install(this);
 
+        getCspSettings().blocking().clear()
+                .unsafeInline()
+                .add(CSPDirective.IMG_SRC, "data:")
+                .add(CSPDirective.FONT_SRC, "data:");
+
         getJavaScriptLibrarySettings().setJQueryReference(
-                new PackageResourceReference(GizmoApplication.class,
-                        "../../../../webjars/AdminLTE/3.0.5/plugins/jquery/jquery.min.js"));
+                new PackageResourceReference(GizmoApplication.class, "../../../../META-INF/resources/webjars/jquery/3.6.0/jquery.min.js"));
+
 
 
         getComponentInstantiationListeners().add(new SpringComponentInjector(this));
@@ -107,16 +108,16 @@ public class GizmoApplication extends AuthenticatedWebApplication {
         mount(new MountedMapper("/error/404", PageError404.class, new UrlPathPageParametersEncoder()));
 
 //        getRequestCycleListeners().add(new CsrfPreventionRequestCycleListener());
-        getRequestCycleListeners().add(new AbstractRequestCycleListener() {
-
-            @Override
-            public IRequestHandler onException(RequestCycle cycle, Exception ex) {
-                LOGGER.error("Error occurred during page rendering, reason: {} (more on DEBUG level)", ex.getMessage());
-                LOGGER.debug("Error occurred during page rendering", ex);
-
-                return new RenderPageRequestHandler(new PageProvider(new PageError(ex)));
-            }
-        });
+//        getRequestCycleListeners().add(new AbstractRequestCycleListener() {
+//
+//            @Override
+//            public IRequestHandler onException(RequestCycle cycle, Exception ex) {
+//                LOGGER.error("Error occurred during page rendering, reason: {} (more on DEBUG level)", ex.getMessage());
+//                LOGGER.debug("Error occurred during page rendering", ex);
+//
+//                return new RenderPageRequestHandler(new PageProvider(new PageError(ex)));
+//            }
+//        });
     }
 
     @Override

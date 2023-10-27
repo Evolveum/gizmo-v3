@@ -23,7 +23,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.navigation.paging.IPageable;
 import org.apache.wicket.markup.repeater.data.DataViewBase;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.StringResourceModel;
 import sk.lazyman.gizmo.util.LoadableModel;
@@ -45,7 +44,7 @@ public class CountToolbar extends AbstractToolbar {
         super.onInitialize();
 
         WebMarkupContainer td = new WebMarkupContainer(ID_TD);
-        td.add(AttributeModifier.replace("colspan", new AbstractReadOnlyModel<String>() {
+        td.add(AttributeModifier.replace("colspan", new IModel<String>() {
 
             @Override
             public String getObject() {

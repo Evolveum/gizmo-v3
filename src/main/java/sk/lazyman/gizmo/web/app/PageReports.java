@@ -25,7 +25,6 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.util.time.Duration;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.AjaxSubmitButton;
 import sk.lazyman.gizmo.component.GizmoTabbedPanel;
@@ -46,6 +45,7 @@ import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -188,7 +188,7 @@ public class PageReports extends PageAppTemplate {
 
                 return tempFile;
             }
-        }, "Export_" + new Date(System.currentTimeMillis()).toString() + ".xlsx").setCacheDuration(Duration.NONE).setDeleteAfterDownload(true);
+        }, "Export_" + new Date(System.currentTimeMillis()).toString() + ".xlsx").setCacheDuration(Duration.ofMillis(0)).setDeleteAfterDownload(true);
         form.add(exportExcel);
 
 

@@ -18,7 +18,7 @@ package sk.lazyman.gizmo.data;
 
 import sk.lazyman.gizmo.util.GizmoUtils;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;

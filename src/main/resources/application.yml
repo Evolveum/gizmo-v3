@@ -14,13 +14,16 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/gizmo3
     driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: password
+
   jpa:
     database-platform: sk.lazyman.gizmo.util.GizmoPostgreSQLDialect
     hibernate:
       naming:
         physical-strategy: sk.lazyman.gizmo.util.GizmoNamingStrategy
       ddl-auto: none
-      use-new-id-generator-mappings: true
+#      use-new-id-generator-mappings: true
     show-sql: true
 server:
   tomcat:
@@ -30,6 +33,7 @@ server:
   #      enabled: true
   #      port: 9090
   servlet:
+    context-path: /gizmo
     application-display-name: Gizmo
     session:
       timeout: 15  # in minutes. By default spring uses seconds, but tomcat/container (not embedded) uses this value

@@ -19,7 +19,6 @@ package sk.lazyman.gizmo.web.error;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.http.WebResponse;
 import org.wicketstuff.annotation.mount.MountPath;
@@ -72,7 +71,7 @@ public class PageError extends PageTemplate {
         Label title = new Label(ID_TITLE, createPageTitleModel());
         add(title);
 
-        final IModel<String> message = new AbstractReadOnlyModel<String>() {
+        final IModel<String> message = new IModel<String>() {
 
             @Override
             public String getObject() {

@@ -48,7 +48,7 @@ import sk.lazyman.gizmo.repository.UserRepository;
 import sk.lazyman.gizmo.web.PageTemplate;
 import sk.lazyman.gizmo.web.error.PageError;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

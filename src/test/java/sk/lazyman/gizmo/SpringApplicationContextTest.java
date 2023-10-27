@@ -21,8 +21,6 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.tool.hbm2ddl.SchemaExport;
-import org.hibernate.tool.schema.TargetType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -37,7 +35,6 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
 
@@ -47,7 +44,6 @@ import static org.testng.AssertJUnit.assertNotNull;
  * @author lazyman
  */
 @ContextConfiguration(locations = {
-        "file:src/main/webapp/WEB-INF/ctx-web.xml",
         "classpath:ctx-test.xml"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class SpringApplicationContextTest extends BaseTest {
@@ -65,7 +61,7 @@ public class SpringApplicationContextTest extends BaseTest {
         properties.putAll(sessionFactoryBean.getJpaPropertyMap());
         configuration.setProperties(properties);
 
-
+//        AbstractQuerydslProcessor
 
         StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
                 .applySettings(properties).build();
@@ -82,10 +78,10 @@ public class SpringApplicationContextTest extends BaseTest {
 
         addAnnotatedClasses("sk.lazyman.gizmo.data", configuration);
 
-        SchemaExport export = new SchemaExport();
-        export.setOutputFile(fileName);
-        export.setDelimiter(";");
-        export.create(EnumSet.of(TargetType.SCRIPT, TargetType.STDOUT), metadata);
+//        SchemaExport export = new SchemaExport();
+//        export.setOutputFile(fileName);
+//        export.setDelimiter(";");
+//        export.create(EnumSet.of(TargetType.SCRIPT, TargetType.STDOUT), metadata);
 
     }
 

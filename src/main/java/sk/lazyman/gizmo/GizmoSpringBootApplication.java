@@ -15,6 +15,7 @@
  */
 package sk.lazyman.gizmo;
 
+import jakarta.servlet.DispatcherType;
 import org.apache.wicket.Application;
 import org.apache.wicket.protocol.http.WicketFilter;
 import org.springframework.boot.SpringApplication;
@@ -26,13 +27,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.context.request.RequestContextListener;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
-import javax.servlet.DispatcherType;
 
 @EnableJpaRepositories("sk.lazyman.gizmo.repository")
 @EnableTransactionManagement
-@EnableWebMvc
 @SpringBootApplication
 public class GizmoSpringBootApplication extends SpringBootServletInitializer {
 
@@ -56,7 +53,7 @@ public class GizmoSpringBootApplication extends SpringBootServletInitializer {
         filter.setDispatcherTypes(DispatcherType.ERROR, DispatcherType.REQUEST, DispatcherType.FORWARD);
         filter.addUrlPatterns("/*");
         filter.addInitParameter(WicketFilter.FILTER_MAPPING_PARAM, "/*");
-        filter.addInitParameter(Application.CONFIGURATION, "development");     // deployment development
+        filter.addInitParameter(Application.CONFIGURATION, "deployment");     // deployment development
         filter.addInitParameter("applicationBean", "gizmoApplication");
         filter.addInitParameter(WicketFilter.APP_FACT_PARAM, "org.apache.wicket.spring.SpringWebApplicationFactory");
         return filter;

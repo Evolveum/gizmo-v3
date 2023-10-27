@@ -17,9 +17,6 @@
 package sk.lazyman.gizmo.web.app;
 
 
-import net.ftlines.wicket.fullcalendar.*;
-import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
-import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -30,7 +27,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.joda.time.DateTime;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.SummaryChartPanel;
 import sk.lazyman.gizmo.component.SummaryPanel;
@@ -53,6 +49,7 @@ import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +57,7 @@ import java.util.List;
 /**
  * @author lazyman
  */
-@MountPath(value = "/app/dashboard", alt = "/app")
+@MountPath(value = "/dashboard", alt = "/app")
 public class PageDashboard extends PageAppTemplate {
 
     private static final String ID_BTN_PREVIOUS = "previous";
@@ -135,8 +132,8 @@ public class PageDashboard extends PageAppTemplate {
         add(next);
 
 
-        SummaryPanel summary = new SummaryPanel(ID_SUMMARY, createSummaryModel());
-        add(summary);
+//        SummaryPanel summary = new SummaryPanel(ID_SUMMARY, createSummaryModel());
+//        add(summary);
 
         AbstractTaskDataProvider provider = new AbstractTaskDataProvider(this);
         provider.setFilter(filter.getObject());
@@ -151,33 +148,33 @@ public class PageDashboard extends PageAppTemplate {
         add(chart);
 
 
-        ConfigNew configNew = new ConfigNew();
-        EventSource source = new EventSource();
-        source.setBackgroundColor("black");
-        source.setEditable(true);
-
-        Event event = new Event();
-        event.setId("1");
-        event.setAllDay(true);
-        event.setStart(DateTime.now());
-        event.setTitle("asdasdasdada");
-        source.addEvent(event);
-
-        configNew.add(source);
-
-        FullCalendar fullCalendar = new FullCalendar(ID_CALENDAR, configNew) {
-
-            @Override
-            protected void onEventClicked(ClickedEvent event, CalendarResponse response) {
-                super.onEventClicked(event, response);
-            }
-
-            @Override
-            protected void onDateRangeSelected(SelectedRange range, CalendarResponse response) {
-                super.onDateRangeSelected(range, response);
-            }
-        };
-        add(fullCalendar);
+//        ConfigNew configNew = new ConfigNew();
+//        EventSource source = new EventSource();
+//        source.setBackgroundColor("black");
+//        source.setEditable(true);
+//
+//        Event event = new Event();
+//        event.setId("1");
+//        event.setAllDay(true);
+//        event.setStart(LocalDateTime.now());
+//        event.setTitle("asdasdasdada");
+//        source.addEvent(event);
+//
+//        configNew.add(source);
+//
+//        FullCalendar fullCalendar = new FullCalendar(ID_CALENDAR, configNew) {
+//
+//            @Override
+//            protected void onEventClicked(ClickedEvent event, CalendarResponse response) {
+//                super.onEventClicked(event, response);
+//            }
+//
+//            @Override
+//            protected void onDateRangeSelected(SelectedRange range, CalendarResponse response) {
+//                super.onDateRangeSelected(range, response);
+//            }
+//        };
+//        add(fullCalendar);
 
 
 

@@ -31,8 +31,8 @@
         <property name="password" value=""/>
     </bean>
 
-    <bean class="sk.lazyman.gizmo.JndiH2DataSource" init-method="init">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
+<!--    <bean class="sk.lazyman.gizmo.JndiH2DataSource" init-method="init">-->
+<!--        <property name="dataSource" ref="dataSource"/>-->
+<!--    </bean>-->
 
 </beans>

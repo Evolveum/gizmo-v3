@@ -16,6 +16,10 @@
 
 package sk.lazyman.gizmo.web.app;
 
+import jakarta.activation.DataHandler;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.core.util.string.ComponentRenderer;
@@ -35,22 +39,14 @@ import sk.lazyman.gizmo.component.form.AreaFormGroup;
 import sk.lazyman.gizmo.component.form.FormGroup;
 import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.data.provider.ListDataProvider;
-import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.EmailDto;
 import sk.lazyman.gizmo.dto.ReportFilterDto;
-import sk.lazyman.gizmo.dto.WorkFilterDto;
-import sk.lazyman.gizmo.repository.CustomerRepository;
 import sk.lazyman.gizmo.repository.EmailLogRepository;
-import sk.lazyman.gizmo.repository.ProjectRepository;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
 import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
-import javax.activation.DataHandler;
-import javax.mail.*;
-import javax.mail.internet.*;
-import javax.mail.util.ByteArrayDataSource;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
@@ -186,7 +182,7 @@ public class PageEmail extends PageAppTemplate {
             props.put("mail.smtp.host", getPropertyValue(MAIL_HOST));
             props.put("mail.smtp.port", getPropertyValue(MAIL_PORT));
 
-            Session session = javax.mail.Session.getDefaultInstance(props, null);
+            Session session = jakarta.mail.Session.getDefaultInstance(props, null);
             Message mail = buildMail(session);
             Transport.send(mail);
 

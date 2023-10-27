@@ -19,7 +19,7 @@
 <body>
 <wicket:extend>
     <div wicket:id="feedback"/>
-    <div class="login-page" style="min-height: 513.390625px;">
+    <div class="login-page">
         <div class="login-box">
             <div class="login-logo">
                 <b>Gizmo</b>
@@ -28,9 +28,9 @@
                 <div class="card-body login-card-body">
                     <p class="login-box-msg"><wicket:message key="PageLogin.heading"/></p>
 
-                    <form class="form-signin" role="form" wicket:id="form">
+                    <form class="form-signin" method="post" action="spring_security_login">
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control" wicket:id="username">
+                            <input name="username" type="text" class="form-control">
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fa fa-user"></span>
@@ -38,7 +38,7 @@
                             </div>
                         </div>
                         <div class="input-group mb-3">
-                            <input type="password" class="form-control" wicket:id="password">
+                            <input name="password" type="password" class="form-control">
                             <div class="input-group-append">
                                 <div class="input-group-text">
                                     <span class="fa fa-lock"></span>
@@ -49,7 +49,7 @@
 
                             <!-- /.col -->
                             <div class="col-4">
-                                <button type="submit" class="btn btn-primary btn-block"  wicket:id="signin">
+                                <button type="submit" class="btn btn-primary btn-block">
                                     <wicket:message key="PageLogin.btn.signIn"/></button>
                             </div>
                             <!-- /.col -->

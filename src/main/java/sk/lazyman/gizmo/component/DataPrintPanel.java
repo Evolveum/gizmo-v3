@@ -21,17 +21,15 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import sk.lazyman.gizmo.data.*;
 import sk.lazyman.gizmo.dto.ReportFilterDto;
-import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.Date;
 import java.util.List;
 
@@ -151,7 +149,7 @@ public class DataPrintPanel extends SimplePanel<ReportFilterDto> {
     }
 
     private IModel<String> createCustomerModel(final IModel<AbstractTask> model) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -168,7 +166,7 @@ public class DataPrintPanel extends SimplePanel<ReportFilterDto> {
     }
 
     private IModel<String> createProjectPartModel(final IModel<AbstractTask> model) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -186,7 +184,7 @@ public class DataPrintPanel extends SimplePanel<ReportFilterDto> {
     }
 
     private IModel<String> createLengthModel(final IModel<AbstractTask> model) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -203,7 +201,7 @@ public class DataPrintPanel extends SimplePanel<ReportFilterDto> {
     }
 
     private IModel<String> createRealizatorModel(final IModel<AbstractTask> model) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -228,7 +226,7 @@ public class DataPrintPanel extends SimplePanel<ReportFilterDto> {
     }
 
     private IModel<String> createStringDateModel(final IModel<Date> dateModel) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {

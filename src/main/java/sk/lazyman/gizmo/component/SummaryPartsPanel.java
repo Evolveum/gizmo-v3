@@ -19,14 +19,12 @@ package sk.lazyman.gizmo.component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
 import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.dto.PartSummary;
 import sk.lazyman.gizmo.dto.ReportFilterDto;
-import sk.lazyman.gizmo.dto.WorkFilterDto;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -67,7 +65,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
                 part.setRenderBodyOnly(true);
                 item.add(part);
 
-                Label work = new Label(ID_WORK, new AbstractReadOnlyModel<String>() {
+                Label work = new Label(ID_WORK, new IModel<String>() {
 
                     @Override
                     public String getObject() {
@@ -79,7 +77,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
                 work.setRenderBodyOnly(true);
                 item.add(work);
 
-                Label invoice = new Label(ID_INVOICE, new AbstractReadOnlyModel<String>() {
+                Label invoice = new Label(ID_INVOICE, new IModel<String>() {
 
                     @Override
                     public String getObject() {
@@ -104,7 +102,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
     }
 
     private IModel<String> createSumWorkModel() {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -120,7 +118,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
     }
 
     private IModel<String> createSumInvoiceModel() {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {

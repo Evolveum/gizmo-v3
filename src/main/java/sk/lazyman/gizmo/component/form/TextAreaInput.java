@@ -19,7 +19,6 @@ package sk.lazyman.gizmo.component.form;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 
 public class TextAreaInput<T> extends FormInput<T> {
@@ -31,7 +30,7 @@ public class TextAreaInput<T> extends FormInput<T> {
         super(id, model);
 
         TextArea<T> text = new TextArea<T>(ID_INPUT, model);
-        text.add(AttributeAppender.replace("rows", new AbstractReadOnlyModel<String>() {
+        text.add(AttributeAppender.replace("rows", new IModel<String>() {
 
             @Override
             public String getObject() {

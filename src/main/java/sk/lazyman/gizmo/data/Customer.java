@@ -16,10 +16,9 @@
 
 package sk.lazyman.gizmo.data;
 
-import org.springframework.transaction.annotation.Transactional;
 import sk.lazyman.gizmo.util.GizmoUtils;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 

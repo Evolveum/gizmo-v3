@@ -19,7 +19,6 @@ package sk.lazyman.gizmo.component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.basic.MultiLineLabel;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.slf4j.Logger;
@@ -29,7 +28,6 @@ import sk.lazyman.gizmo.data.User;
 import sk.lazyman.gizmo.dto.CustomerProjectPartDto;
 import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.ReportSearchSummaryDto;
-import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
@@ -108,7 +106,7 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
     }
 
     private IModel<String> createStringDateModel(final IModel<Date> dateModel) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -124,7 +122,7 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
     }
 
     private IModel<String> createRealizatorModel() {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -147,7 +145,7 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
     }
 
     private IModel<String> createProjectModel() {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -170,7 +168,7 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
     }
 
     private IModel<String> createHourMDModel(final IModel<Double> model) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
             @Override
             public String getObject() {
                 return createHourMd(model.getObject());

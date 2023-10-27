@@ -17,62 +17,101 @@ package sk.lazyman.gizmo;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import sk.lazyman.gizmo.security.GizmoAuthProvider;
+
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig { //} extends WebSecurityConfigurerAdapter {
 
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/gizmo/js/**");
-        web.ignoring().antMatchers("/gizmo/css/**");
-        web.ignoring().antMatchers("/css/**");
-        web.ignoring().antMatchers("/favicon.ico");
-        web.ignoring().antMatchers("/gizmo/img/**");
-        web.ignoring().antMatchers("/gizmo/fonts/**");
 
-        web.ignoring().antMatchers("/static-web/**");
-        web.ignoring().antMatchers("/gizmo/less/**");
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> {
 
-        web.ignoring().antMatchers("/gizmo/wicket/resource/**");
+            web.ignoring().requestMatchers(new AntPathRequestMatcher("/js/**"));
+            web.ignoring().requestMatchers(new AntPathRequestMatcher("/css/**"));
+            web.ignoring().requestMatchers(new AntPathRequestMatcher("/img/**"));
+            web.ignoring().requestMatchers(new AntPathRequestMatcher("/fonts/**"));
+
+            web.ignoring().requestMatchers(new AntPathRequestMatcher("/static/**"));
+
+            web.ignoring().requestMatchers(new AntPathRequestMatcher("/wicket/resource/**"));
+
+            web.ignoring().requestMatchers(new AntPathRequestMatcher("/favicon.ico"));
+        };
     }
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return (web) -> web.ignoring().requestMatchers(
+//                "/static/js/**",
+//                "/js/**",
+//                "/static/css/**",
+//                "/static/**",
+//                "/css/**",
+//                "/favicon.ico",
+//                "/static/img/**",
+//                "/static/fonts/**",
+//                "/static/wicket/resource/**");
+//    }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/j_spring_security_check",
-                        "/spring_security_login",
-                        "/login",
-                        "/error",
-                        "/error/*",
-                        "/bootstrap",
-                        "/wicket/resource/**")
-                    .permitAll()
-                .anyRequest().authenticated();
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests((authz) -> authz
+                        .requestMatchers(
+                                antMatcher("/j_spring_security_check"),
+                                antMatcher("/spring_security_login"),
+                                antMatcher("/login"),
+                                antMatcher("/error"),
+                                antMatcher("/error/*"),
+                                antMatcher("/bootstrap"),
+                                antMatcher("/wicket/resource/**"))
+                            .permitAll()
+                        .anyRequest()
+                            .authenticated());
 
-        http.formLogin()
+        http.formLogin((formLogin) -> formLogin
                 .loginPage("/login")
-                .loginProcessingUrl("/spring_security_login");
+                .loginProcessingUrl("/spring_security_login"));
 
-        http.logout()
+
+        http.logout((logout) -> logout
                 .clearAuthentication(true)
                 .logoutUrl("/j_spring_security_logout")
                 .logoutSuccessUrl("/app/dashboard")
-                .invalidateHttpSession(true);
+                .invalidateHttpSession(true));
 
-        http.sessionManagement()
+        http.sessionManagement((sessionManagement) -> sessionManagement
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
-                .maximumSessions(1);
+                .maximumSessions(1));
 
         http.csrf().disable();
 
+        http.headers().disable();
+//        http.headers(headers -> headers
+//                        .disable()
+//                        .defaultsDisabled()
+//                        .xssProtection(HeadersConfigurer.XXssConfig::disable).defaultsDisabled()
+//                .contentSecurityPolicy(contentSecurityPolicy -> contentSecurityPolicy
+//                        .
+//                        .policyDirectives(
+//                                "default-src 'unsafe-inline'; " +
+//                                "script-src 'strict-dynamic'; " +
+//                                "style-src 'strict-dynamic';"))
+//                        .policyDirectives("script-src 'self'; style-src 'self'; style-src-attr 'self'; script-src-elem 'self'; style-src-elem 'self';"))
+//        );
+
+        return http.build();
     }
 
     @Bean

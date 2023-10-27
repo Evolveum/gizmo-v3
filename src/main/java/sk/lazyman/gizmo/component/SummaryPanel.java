@@ -16,48 +16,22 @@
 
 package sk.lazyman.gizmo.component;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AttributeAppender;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.Loop;
 import org.apache.wicket.markup.html.list.LoopItem;
-import org.apache.wicket.model.*;
-import org.apache.wicket.model.util.ListModel;
-import sk.lazyman.gizmo.data.QAbstractTask;
-import sk.lazyman.gizmo.data.QWork;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import sk.lazyman.gizmo.data.Work;
-import sk.lazyman.gizmo.data.provider.AbstractTaskDataProvider;
-import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
 import sk.lazyman.gizmo.dto.TaskLength;
-import sk.lazyman.gizmo.dto.WorkFilterDto;
 import sk.lazyman.gizmo.security.SecurityUtils;
-import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.web.app.PageWork;
 
-import javax.swing.*;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.Month;
-import java.time.chrono.ChronoLocalDate;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author lazyman
@@ -122,7 +96,7 @@ public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
                         link.setBody(createDayModel(weekIndex, dayIndex));
                         dayItem.add(link);
 
-                        dayItem.add(AttributeAppender.append("class", new AbstractReadOnlyModel<String>() {
+                        dayItem.add(AttributeAppender.append("class", new IModel<String>() {
 
                             @Override
                             public String getObject() {
@@ -160,7 +134,7 @@ public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
     }
 
     private IModel<String> createDayModel(final int monthIndex, final int dayIndex) {
-        return new AbstractReadOnlyModel<String>() {
+        return new IModel<String>() {
 
             @Override
             public String getObject() {

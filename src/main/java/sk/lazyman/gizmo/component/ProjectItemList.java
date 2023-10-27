@@ -23,7 +23,6 @@ import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -64,7 +63,7 @@ public class ProjectItemList<T extends Serializable> extends SimplePanel<List<Pr
     }
 
     private void createItemBody(final ListItem<ProjectListItem<T>> item) {
-        item.add(AttributeAppender.append("class", new AbstractReadOnlyModel<String>() {
+        item.add(AttributeAppender.append("class", new IModel<String>() {
 
             @Override
             public String getObject() {
@@ -73,7 +72,7 @@ public class ProjectItemList<T extends Serializable> extends SimplePanel<List<Pr
             }
         }));
 
-        AjaxLink link = new AjaxLink(ID_LINK) {
+        AjaxLink<Void> link = new AjaxLink<>(ID_LINK) {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
@@ -92,7 +91,7 @@ public class ProjectItemList<T extends Serializable> extends SimplePanel<List<Pr
         description.setRenderBodyOnly(true);
         link.add(description);
 
-        AjaxLink edit = new AjaxLink(ID_EDIT) {
+        AjaxLink<Void> edit = new AjaxLink<>(ID_EDIT) {
 
             @Override
             public void onClick(AjaxRequestTarget target) {

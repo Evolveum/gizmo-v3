@@ -25,9 +25,9 @@ import java.sql.Types;
  */
 public class GizmoPostgreSQLDialect extends PostgresPlusDialect {
 
+
     public GizmoPostgreSQLDialect() {
         super();
-
-        registerColumnType(Types.DOUBLE, "float4");
+//        registerColumnTypes(Types.DOUBLE, "float4");
     }
 }

@@ -22,7 +22,6 @@ import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.feedback.ComponentFeedbackMessageFilter;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import sk.lazyman.gizmo.component.SimplePanel;
 
@@ -41,7 +40,7 @@ public class FormGroup<F extends FormInput, T extends Serializable> extends Simp
     public FormGroup(String id, IModel<T> value, IModel<String> label, boolean required) {
         super(id, value);
 
-        add(AttributeModifier.append("class", new AbstractReadOnlyModel<String>() {
+        add(AttributeModifier.append("class", new IModel<String>() {
 
             @Override
             public String getObject() {
