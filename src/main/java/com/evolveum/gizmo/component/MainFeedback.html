@@ -15,11 +15,17 @@
   ~ limitations under the License.
   -->
 
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="unit" parallel="false">
-    <test name="Web Tests" preserve-order="true" parallel="false" verbose="10">
-        <classes>
-             <class name="com.evolveum.gizmo.SpringApplicationContextTest"/>
-        </classes>
-    </test>
-</suite>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <div wicket:id="feedbackul">
+        <div wicket:id="messages" class="alert alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert">
+                <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+            </button>
+            <span wicket:id="message"/>
+        </div>
+    </div>
+</wicket:panel>
+</body>
+</html>

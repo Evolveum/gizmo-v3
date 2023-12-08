@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2015 Viliam Repan (lazyman)
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:extend>
+    <div wicket:id="feedback"/>
+    <div class="login-page">
+        <div class="login-box">
+            <div class="login-logo">
+                <b>Gizmo</b>
+            </div>
+            <div class="card">
+                <div class="card-body login-card-body">
+                    <p class="login-box-msg"><wicket:message key="PageLogin.heading"/></p>
+
+                    <form class="form-signin" method="post" action="spring_security_login">
+                        <div class="input-group mb-3">
+                            <input name="username" type="text" class="form-control">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fa fa-user"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input name="password" type="password" class="form-control">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fa fa-lock"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <!-- /.col -->
+                            <div class="col-4">
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <wicket:message key="PageLogin.btn.signIn"/></button>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                    </form>
+
+
+                </div>
+                <!-- /.login-card-body -->
+            </div>
+        </div>
+    </div>
+
+
+<!--    <div class="container">-->
+<!--        <div wicket:id="feedback"/>-->
+
+<!--        <form class="form-signin" role="form" wicket:id="form">-->
+<!--            <h2 class="form-signin-heading"><wicket:message key="PageLogin.heading"/></h2>-->
+<!--            <div class="form-group" wicket:id="usernameGroup">-->
+<!--                <input type="text" class="form-control" wicket:id="username" required autofocus>-->
+<!--            </div>-->
+<!--            <div class="form-group" wicket:id="passwordGroup">-->
+<!--                <input type="password" class="form-control" wicket:id="password" required>-->
+<!--            </div>-->
+
+<!--            <button class="btn btn-lg btn-primary btn-block" type="submit" wicket:id="signin">-->
+<!--                <wicket:message key="PageLogin.btn.signIn"/></button>-->
+<!--        </form>-->
+<!--    </div>-->
+</wicket:extend>
+</body>
+</html>

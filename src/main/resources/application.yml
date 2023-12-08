@@ -21,7 +21,7 @@ spring:
     database-platform: sk.lazyman.gizmo.util.GizmoPostgreSQLDialect
     hibernate:
       naming:
-        physical-strategy: sk.lazyman.gizmo.util.GizmoNamingStrategy
+        physical-strategy: com.evolveum.gizmo.util.GizmoNamingStrategy
       ddl-auto: none
 #      use-new-id-generator-mappings: true
     show-sql: true

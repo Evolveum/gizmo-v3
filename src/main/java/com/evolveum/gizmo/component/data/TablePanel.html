@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
 <!--
   ~ Copyright 2015 Viliam Repan (lazyman)
   ~
@@ -15,11 +15,16 @@
   ~ limitations under the License.
   -->
 
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="unit" parallel="false">
-    <test name="Web Tests" preserve-order="true" parallel="false" verbose="10">
-        <classes>
-             <class name="com.evolveum.gizmo.SpringApplicationContextTest"/>
-        </classes>
-    </test>
-</suite>
+<html xmlns:wicket="http://wicket.apache.org">
+<wicket:panel>
+    <div class="dataTables_wrapper dt-bootstrap4">
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-bordered table-hover dataTable dtr-inline" wicket:id="table" />
+
+            </div>
+        </div>
+<!--        <div class="row" wicket:id="paging" />-->
+    </div>
+</wicket:panel>
+</html>

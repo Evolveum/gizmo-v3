@@ -15,11 +15,20 @@
   ~ limitations under the License.
   -->
 
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="unit" parallel="false">
-    <test name="Web Tests" preserve-order="true" parallel="false" verbose="10">
-        <classes>
-             <class name="com.evolveum.gizmo.SpringApplicationContextTest"/>
-        </classes>
-    </test>
-</suite>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:panel>
+    <div class="list-group-item" wicket:id="repeater">
+        <a wicket:id="link">
+            <h5 class="list-group-item-heading">
+                <span wicket:id="name"/>&nbsp;<small><span wicket:id="description"/></small>
+            </h5>
+        </a>
+        <a wicket:id="edit" class="btn btn-xs btn-default pull-right" wicket:message="title:CompanyList.edit">
+            <i class="fa fa-fw fa-pencil"/>
+        </a>
+        <div class="clearfix" wicket:id="properties"/>
+    </div>
+</wicket:panel>
+</body>
+</html>
