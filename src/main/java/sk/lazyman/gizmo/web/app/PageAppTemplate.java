@@ -61,13 +61,6 @@ public class PageAppTemplate extends PageTemplate {
         initLayout();
     }
 
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-//        response.render(CssHeaderItem.forReference(
-//                new LessResourceReference(PageAppTemplate.class, "PageAppTemplate.less")));
-    }
-
     private void initLayout() {
 
         LoadableModel<List<NavigationMenuItem>> menuModel = new LoadableModel<List<NavigationMenuItem>>() {

@@ -15,4 +15,18 @@ import '../../../node_modules/sparklines';
 
 import '../../../node_modules/admin-lte/plugins/bootstrap-switch/js/bootstrap-switch';
 
+import interactionPlugin from '@fullcalendar/interaction';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+
+import MidPointFullCalendar from "./fullCalendar";
+
+window.MidPointFullCalendar = new MidPointFullCalendar();
+window.interactionPlugin = interactionPlugin;
+window.dayGridPlugin = dayGridPlugin;
+window.timeGridPlugin = timeGridPlugin;
+window.listPlugin = listPlugin;
+
+
 

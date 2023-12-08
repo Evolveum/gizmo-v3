@@ -80,8 +80,8 @@ public class SummaryDataProvider implements Serializable {
         if (tuples != null) {
             for (Tuple tuple : tuples) {
                 TaskLength taskLength = new TaskLength(tuple.get(1, Double.class), tuple.get(2, Double.class));
-                Date day = tuple.get(0, Date.class);
-                LocalDate date = day.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate date = tuple.get(0, LocalDate.class);
+//                LocalDate date = day.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 dto.getDates().put(date, taskLength);
             }
         }

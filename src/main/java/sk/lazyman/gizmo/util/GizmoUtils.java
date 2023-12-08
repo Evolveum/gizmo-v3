@@ -368,6 +368,11 @@ public class GizmoUtils {
                         dto.getCustomerId(), dto.getProjectId()));
                 addedProjects.add(dto.getProjectId());
             }
+            if (!addedProjects.contains(dto.getPartId())) {
+                list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getProjectName(), dto.getPartName(),
+                        dto.getCustomerId(), dto.getProjectId(), dto.getPartId()));
+                addedProjects.add(dto.getPartId());
+            }
         }
 
         return list;

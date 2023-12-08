@@ -17,6 +17,11 @@
 package sk.lazyman.gizmo.web.app;
 
 
+import net.ftlines.wicket.fullcalendar.*;
+import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
+import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
+import net.ftlines.wicket.fullcalendar.callback.View;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -27,9 +32,15 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.wicketstuff.annotation.mount.MountPath;
 import sk.lazyman.gizmo.component.SummaryChartPanel;
 import sk.lazyman.gizmo.component.SummaryPanel;
+import sk.lazyman.gizmo.component.calendar.CalendarPanel;
+import sk.lazyman.gizmo.component.calendar.Event;
+import sk.lazyman.gizmo.component.calendar.HeaderToolbar;
+import sk.lazyman.gizmo.component.calendar.Plugins;
 import sk.lazyman.gizmo.component.data.LinkColumn;
 import sk.lazyman.gizmo.component.data.LinkIconColumn;
 import sk.lazyman.gizmo.component.data.TablePanel;
@@ -41,6 +52,7 @@ import sk.lazyman.gizmo.data.provider.SummaryDataProvider;
 import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.dto.SummaryPanelDto;
+import sk.lazyman.gizmo.dto.TaskLength;
 import sk.lazyman.gizmo.repository.AbstractTaskRepository;
 import sk.lazyman.gizmo.security.GizmoAuthWebSession;
 import sk.lazyman.gizmo.security.GizmoPrincipal;
@@ -48,11 +60,12 @@ import sk.lazyman.gizmo.security.SecurityUtils;
 import sk.lazyman.gizmo.util.GizmoUtils;
 import sk.lazyman.gizmo.util.LoadableModel;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lazyman
@@ -100,11 +113,6 @@ public class PageDashboard extends PageAppTemplate {
         return filter;
     }
 
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-    }
-
     private void initLayout() {
 
         Label month = new Label(ID_MONTH, new PropertyModel<>(filter, "month"));
@@ -131,10 +139,6 @@ public class PageDashboard extends PageAppTemplate {
         next.setOutputMarkupId(true);
         add(next);
 
-
-//        SummaryPanel summary = new SummaryPanel(ID_SUMMARY, createSummaryModel());
-//        add(summary);
-
         AbstractTaskDataProvider provider = new AbstractTaskDataProvider(this);
         provider.setFilter(filter.getObject());
 
@@ -145,39 +149,59 @@ public class PageDashboard extends PageAppTemplate {
 
         SummaryPartsDataProvider partsProvider = new SummaryPartsDataProvider(this);
         SummaryChartPanel chart = new SummaryChartPanel(ID_SUMMARY_PARTS, partsProvider, getFilterModel());
+        chart.setOutputMarkupId(true);
         add(chart);
 
 
-//        ConfigNew configNew = new ConfigNew();
-//        EventSource source = new EventSource();
-//        source.setBackgroundColor("black");
-//        source.setEditable(true);
-//
-//        Event event = new Event();
-//        event.setId("1");
-//        event.setAllDay(true);
-//        event.setStart(LocalDateTime.now());
-//        event.setTitle("asdasdasdada");
-//        source.addEvent(event);
-//
-//        configNew.add(source);
-//
-//        FullCalendar fullCalendar = new FullCalendar(ID_CALENDAR, configNew) {
-//
-//            @Override
-//            protected void onEventClicked(ClickedEvent event, CalendarResponse response) {
-//                super.onEventClicked(event, response);
-//            }
-//
-//            @Override
-//            protected void onDateRangeSelected(SelectedRange range, CalendarResponse response) {
-//                super.onDateRangeSelected(range, response);
-//            }
-//        };
-//        add(fullCalendar);
+        CalendarPanel calendarPanel = new CalendarPanel(ID_CALENDAR, createCalendarModel());
+        add(calendarPanel);
 
+    }
 
+    private IModel<sk.lazyman.gizmo.component.calendar.FullCalendar> createCalendarModel() {
+        return () -> {
 
+            List<Plugins> calendarPlugins = List.of(Plugins.DAY_GRID);
+            HeaderToolbar headerToolbar = new HeaderToolbar();
+
+            sk.lazyman.gizmo.component.calendar.FullCalendar configNew =
+                    new sk.lazyman.gizmo.component.calendar.FullCalendar(
+                            calendarPlugins,
+                            headerToolbar,
+                            Date.from(filter.getObject().getDateFrom().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
+                            createEvents()
+                    );
+
+            return configNew;
+        };
+    }
+
+    private List<Event> createEvents() {
+        IModel<SummaryPanelDto> summaryModel = createSummaryModel();
+        SummaryPanelDto summary = summaryModel.getObject();
+        Map<LocalDate, TaskLength> workSummaryPerDeay = summary.getDates();
+
+        List<Event> events = new ArrayList<>();
+        int i = 0;
+        for (Map.Entry<LocalDate, TaskLength> entry : workSummaryPerDeay.entrySet()) {
+            i++;
+
+            TaskLength length = entry.getValue();
+            String lenghtAsString = StringUtils.join(new Object[]{length.getLength(), length.getInvoice()}, '/');
+            LocalDate startDay = entry.getKey();
+            Date day = Date.from(startDay.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            boolean isWeekend = DayOfWeek.SATURDAY == startDay.getDayOfWeek() || DayOfWeek.SUNDAY == startDay.getDayOfWeek();
+            boolean isFullDay = length.getLength() >= 8;
+            Event event = new Event(Integer.toString(i), lenghtAsString, day, isFullDay ? "green" : "red");
+            events.add(event);
+        }
+        return events;
+    }
+
+    private void refreshComponents(AjaxRequestTarget target) {
+        target.add(get(ID_TABLE));
+        target.add(get(ID_CALENDAR));
+        target.add(get(ID_SUMMARY_PARTS));
     }
 
     private IModel<SummaryPanelDto> createSummaryModel() {
@@ -230,7 +254,7 @@ public class PageDashboard extends PageAppTemplate {
 
             @Override
             protected IModel<String> createLinkModel(final IModel<AbstractTask> rowModel) {
-                return (IModel<String>) () -> {
+                return () -> {
                     PropertyModel<LocalDate> propertyModel = new PropertyModel<>(rowModel, getPropertyExpression());
                     LocalDate date = propertyModel.getObject();
                     return date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
@@ -251,7 +275,6 @@ public class PageDashboard extends PageAppTemplate {
             }
         });
         columns.add(GizmoUtils.createWorkInvoiceColumn(this));
-        columns.add(GizmoUtils.createAbstractTaskRealizatorColumn(this));
         columns.add(GizmoUtils.createWorkProjectColumn(this));
         columns.add(new PropertyColumn<>(createStringResource("AbstractTask.trackId"), AbstractTask.F_TRACK_ID));
         columns.add(new PropertyColumn<>(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));

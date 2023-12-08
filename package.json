@@ -36,7 +36,12 @@
       "webpack": "^5.76.0",
       "webpack-cli": "^5.0.0",
       "webpack-merge": "^5.8.0",
-      "bootstrap4-toggle" : "^3.6.1"
+      "bootstrap4-toggle" : "^3.6.1",
+      "@fullcalendar/core": "^6.1.9",
+      "@fullcalendar/daygrid": "^6.1.9",
+      "@fullcalendar/interaction": "^6.1.9",
+      "@fullcalendar/list": "^6.1.9",
+      "@fullcalendar/timegrid": "^6.1.9"
   }
 }
 

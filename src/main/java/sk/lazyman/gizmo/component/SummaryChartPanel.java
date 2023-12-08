@@ -16,22 +16,17 @@
 
 package sk.lazyman.gizmo.component;
 
-import com.github.openjson.JSONArray;
-import com.github.openjson.JSONObject;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
+import com.evolveum.wicket.chartjs.*;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import sk.lazyman.gizmo.data.provider.SummaryPartsDataProvider;
 import sk.lazyman.gizmo.dto.PartSummary;
 import sk.lazyman.gizmo.dto.ReportFilterDto;
 import sk.lazyman.gizmo.util.LoadableModel;
-import com.evolveum.wicket.chartjs.*;
 
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author lazyman
@@ -50,22 +45,25 @@ public class SummaryChartPanel extends SimplePanel<ReportFilterDto> {
     protected void onInitialize() {
         super.onInitialize();
 
-        DoughnutChartConfiguration config = new DoughnutChartConfiguration();
+        IModel<DoughnutChartConfiguration> chartModel = () -> {
+            DoughnutChartConfiguration config = new DoughnutChartConfiguration();
 
-        List<PartSummary> partSummaries = provider.createSummary(getModelObject());
-        ChartData chartData = new ChartData();
-        chartData.addDataset(createDataset(partSummaries));
+            List<PartSummary> partSummaries = provider.createSummary(getModelObject());
+            ChartData chartData = new ChartData();
+            chartData.addDataset(createDataset(partSummaries));
 
-        partSummaries.stream().map(s -> s.getName()).forEach(s -> {
-            chartData.addLabel(s);
-        });
+            partSummaries.stream().map(s -> s.getName()).forEach(s -> {
+                chartData.addLabel(s);
+            });
 
-        config.setData(chartData);
+            config.setData(chartData);
 
-        config.setOptions(createChartOptions());
+            config.setOptions(createChartOptions());
+            return config;
+        };
 
 
-        ChartJsPanel chart = new ChartJsPanel("chart", Model.of(config));
+        ChartJsPanel chart = new ChartJsPanel("chart", chartModel);
         add(chart);
 
     }

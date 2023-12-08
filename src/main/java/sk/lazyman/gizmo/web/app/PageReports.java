@@ -57,9 +57,9 @@ public class PageReports extends PageAppTemplate {
     private static final String ID_FROM = "from";
     private static final String ID_TO = "to";
     private static final String ID_REALIZATOR = "realizator";
+    private static final String ID_PROJECT = "project";
     private static final String ID_PER_USER = "perUser";
     private static final String ID_SHOW_SUMMARY = "showSummary";
-    private static final String ID_PROJECT = "project";
 
     private static final String ID_DETAILS = "details";
 

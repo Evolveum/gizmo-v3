@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Viliam Repan (lazyman)
+ * Copyright (C) 2023 Evolveum
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,27 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AttributeAppender;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractToolbar;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationToolbar;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.Loop;
 import org.apache.wicket.markup.html.list.LoopItem;
 import org.apache.wicket.markup.html.navigation.paging.IPageable;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.AbstractRepeater;
+import org.apache.wicket.markup.repeater.data.DataViewBase;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.StringResourceModel;
 import sk.lazyman.gizmo.component.VisibleEnableBehaviour;
+import sk.lazyman.gizmo.util.LoadableModel;
 
 /**
  * @author lazyman
  */
-public class NavigatorPanel extends Panel {
+public class NavigatorToolbar extends AbstractToolbar {
 
     private int PAGING_SIZE = 5;
 
@@ -48,12 +55,14 @@ public class NavigatorPanel extends Panel {
     private static final String ID_NEXT = "next";
     private static final String ID_NEXT_LINK = "nextLink";
 
-    private final IPageable pageable;
+    private static final String ID_TD = "td";
+    private static final String ID_COUNT = "count";
+
+
     private final boolean showPageListing;
 
-    public NavigatorPanel(String id, IPageable pageable, boolean showPageListing) {
-        super(id);
-        this.pageable = pageable;
+    public NavigatorToolbar(DataTable<?, ?> table, boolean showPageListing) {
+        super(table);
         this.showPageListing = showPageListing;
 
         setOutputMarkupId(true);
@@ -61,25 +70,86 @@ public class NavigatorPanel extends Panel {
 
             @Override
             public boolean isVisible() {
-                return NavigatorPanel.this.pageable.getPageCount() > 0;
+                return NavigatorToolbar.this.getTable().getPageCount() > 0;
             }
         });
-
-        initLayout();
     }
 
     @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-//        response.render(CssHeaderItem.forReference(
-//                new LessResourceReference(NavigatorPanel.class, "NavigatorPanel.less")));
+    protected void onInitialize() {
+        super.onInitialize();
+        initLayout();
     }
 
     private void initLayout() {
+        initNavigationPanel();
+        initCountPanel();
+    }
+
+    private void initNavigationPanel() {
         initPrevious();
         initFirst();
         initNavigation();
         initNext();
+    }
+
+    private void initCountPanel() {
+//        WebMarkupContainer td = new WebMarkupContainer(ID_TD);
+//        td.add(AttributeModifier.replace("colspan", new IModel<String>() {
+//
+//            @Override
+//            public String getObject() {
+//                return String.valueOf(getTable().getColumns().size());
+//            }
+//        }));
+//        add(td);
+
+        Label count = new Label(ID_COUNT, createModel());
+        count.setRenderBodyOnly(true);
+        add(count);
+
+    }
+
+    private IModel<String> createModel() {
+        return new LoadableModel<String>() {
+
+            @Override
+            protected String load() {
+                long from = 0;
+                long to = 0;
+                long count = 0;
+
+                IPageable pageable = getTable();
+                if (pageable instanceof DataViewBase) {
+                    DataViewBase view = (DataViewBase) pageable;
+
+                    from = view.getFirstItemOffset() + 1;
+                    to = from + view.getItemsPerPage() - 1;
+                    long itemCount = view.getItemCount();
+                    if (to > itemCount) {
+                        to = itemCount;
+                    }
+                    count = itemCount;
+                } else if (pageable instanceof DataTable) {
+                    DataTable table = (DataTable) pageable;
+
+                    from = table.getCurrentPage() * table.getItemsPerPage() + 1;
+                    to = from + table.getItemsPerPage() - 1;
+                    long itemCount = table.getItemCount();
+                    if (to > itemCount) {
+                        to = itemCount;
+                    }
+                    count = itemCount;
+                }
+
+                if (count > 0) {
+                    return new StringResourceModel("CountToolbar.label", NavigatorToolbar.this)
+                            .setParameters(new Object[]{from, to, count}).getString();
+                }
+
+                return new StringResourceModel("CountToolbar.noFound", NavigatorToolbar.this, null).getString();
+            }
+        };
     }
 
     private void initPrevious() {
@@ -144,7 +214,7 @@ public class NavigatorPanel extends Panel {
 
             @Override
             public Integer getObject() {
-                int count = (int) pageable.getPageCount();
+                int count = (int) getTable().getPageCount();
                 if (count < PAGING_SIZE) {
                     return count;
                 }
@@ -171,7 +241,7 @@ public class NavigatorPanel extends Panel {
 
                     @Override
                     public String getObject() {
-                        return pageable.getCurrentPage() == pageLink.getPageNumber() ? " active" : "";
+                        return getTable().getCurrentPage() == pageLink.getPageNumber() ? " active" : "";
                     }
                 }));
             }
@@ -187,8 +257,8 @@ public class NavigatorPanel extends Panel {
     }
 
     private long computePageNumber(int loopIndex) {
-        long current = pageable.getCurrentPage();
-        long count = pageable.getPageCount();
+        long current = getTable().getCurrentPage();
+        long count = getTable().getPageCount();
 
         final long half = PAGING_SIZE / 2;
 
@@ -237,19 +307,19 @@ public class NavigatorPanel extends Panel {
     }
 
     private boolean isPreviousEnabled() {
-        return pageable.getCurrentPage() > 0;
+        return getTable().getCurrentPage() > 0;
     }
 
     private boolean isNextEnabled() {
-        return pageable.getCurrentPage() + 1 < pageable.getPageCount();
+        return getTable().getCurrentPage() + 1 < getTable().getPageCount();
     }
 
     private boolean showFirstAndDots() {
-        return pageable.getCurrentPage() >= PAGING_SIZE - 1;
+        return getTable().getCurrentPage() >= PAGING_SIZE - 1;
     }
 
     private void previousPerformed(AjaxRequestTarget target) {
-        changeCurrentPage(target, pageable.getCurrentPage() - 1);
+        changeCurrentPage(target, getTable().getCurrentPage() - 1);
     }
 
     private void firstPerformed(AjaxRequestTarget target) {
@@ -257,13 +327,13 @@ public class NavigatorPanel extends Panel {
     }
 
     private void nextPerformed(AjaxRequestTarget target) {
-        changeCurrentPage(target, pageable.getCurrentPage() + 1);
+        changeCurrentPage(target, getTable().getCurrentPage() + 1);
     }
 
     private void changeCurrentPage(AjaxRequestTarget target, long page) {
-        pageable.setCurrentPage(page);
+        getTable().setCurrentPage(page);
 
-        Component container = ((Component) pageable);
+        Component container = ((Component) getTable());
         while (container instanceof AbstractRepeater) {
             container = container.getParent();
         }

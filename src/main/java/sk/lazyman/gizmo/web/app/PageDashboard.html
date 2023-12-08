@@ -17,29 +17,22 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
+
 <wicket:extend>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-12">
             <div class="card card-primary">
                 <div class="card-body p-0">
-                    <div class="fc-toolbar fc-header-toolbar">
-                        <div class="fc-left">
-                            <a wicket:id="previous"><i class="fa fa-chevron-left"/></a>
-                        </div>
-                        <div class="fc-center">
-                            <h2 wicket:id="month"></h2>
-                        </div>
-                        <div class="fc-right">
-                            <a wicket:id="next"><i class="fa fa-chevron-right"/></a>
-                        </div>
-                    </div>
+                    <h2 wicket:id="month"></h2>
+                    <a wicket:id="previous"><i class="fa fa-chevron-left"/></a>
+                    <a wicket:id="next"><i class="fa fa-chevron-right"/></a>
 <!--                    <div wicket:id="summary"/>-->
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6" >
+        <div class="col-6" >
             <div class="card">
                 <div class="card-header">Pomer</div>
                 <div class="card-body">
@@ -47,14 +40,16 @@
                 </div>
             </div>
         </div>
-<!--        <div class="col-md-6" >-->
-<!--            <div class="card">-->
-<!--                <div class="card-header">Calendar</div>-->
-<!--                <div class="card-body">-->
-<!--                    <div wicket:id="calendar"></div>  &lt;!&ndash; width="400" height="400"&ndash;&gt;-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
+        <div class="col-6" >
+            <div class="card">
+                <div class="card-header">Calendar</div>
+                <div class="card-body">
+                    <div wicket:id="calendar"></div>
+
+<!--                    <div wicket:id="calendarOld"></div>  &lt;!&ndash; width="400" height="400"&ndash;&gt;-->
+                </div>
+            </div>
+        </div>
     </div>
 
 

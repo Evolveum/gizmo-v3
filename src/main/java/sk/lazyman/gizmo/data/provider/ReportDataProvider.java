@@ -162,7 +162,9 @@ public class ReportDataProvider extends SortableDataProvider<AbstractTask, Strin
         bb.or(log.customer.id.eq(dto.getCustomerId()));
 
         QWork work = task.as(QWork.class);
-        if (dto.getProjectId() != null) {
+        if (dto.getPartId() != null) {
+            bb.or(work.part.id.eq(dto.getPartId()));
+        } else if (dto.getProjectId() != null) {
             bb.or(work.part.project.id.eq(dto.getProjectId()));
         } else if (dto.getCustomerId() != null) {
             bb.or(work.part.project.customer.id.eq(dto.getCustomerId()));

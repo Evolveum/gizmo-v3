@@ -105,51 +105,23 @@ public class PageProjects extends PageAppProjects {
     }
 
     private void initButtons(Form form) {
-        IconButton search = new IconButton(ID_SEARCH, createStringResource("fa-search")) {
+        IconButton search = new IconButton(ID_SEARCH, createStringResource("fa-search"), createStringResource("btn-primary")) {
 
             @Override
             protected void submitPerformed(AjaxRequestTarget target) {
                 searchPerformed(target);
             }
         };
-//        BootstrapAjaxButton search = new BootstrapAjaxButton(ID_SEARCH,
-//                createStringResource("PageProjects.search"), Buttons.Type.Primary) {
-//
-//            @Override
-//            protected void onError(AjaxRequestTarget target) {
-//                target.add(getFeedbackPanel());
-//            }
-//
-//            @Override
-//            protected void onSubmit(AjaxRequestTarget target) {
-//                searchPerformed(target);
-//            }
-//        };
-//        search.setSize(Buttons.Size.Small);
+        search.setRenderBodyOnly(true);
         form.add(search);
 
-//        BootstrapAjaxButton clear = new BootstrapAjaxButton(ID_CLEAR, Buttons.Type.Danger) {
-//
-//            @Override
-//            protected void onError(AjaxRequestTarget target) {
-//                target.add(getFeedbackPanel());
-//            }
-//
-//            @Override
-//            protected void onSubmit(AjaxRequestTarget target) {
-//                clearPerformed(target);
-//            }
-//        };
-//        clear.setSize(Buttons.Size.Small);
-//        clear.setIconType(
-//                FontAwesomeIconTypeBuilder.on(FontAwesomeIconTypeBuilder.FontAwesomeGraphic.trash_o)
-//                        .size(FontAwesomeIconTypeBuilder.Size.large).build());
-        IconButton clear = new IconButton(ID_CLEAR, createStringResource("fa-trash")) {
+        IconButton clear = new IconButton(ID_CLEAR, createStringResource("fa-trash"), createStringResource("btn-danger")) {
             @Override
             protected void submitPerformed(AjaxRequestTarget target) {
                 clearPerformed(target);
             }
         };
+        clear.setRenderBodyOnly(true);
         form.add(clear);
 
         AjaxButton newProject = new AjaxButton(ID_NEW_PROJECT, createStringResource("PageProjects.newProject")) {

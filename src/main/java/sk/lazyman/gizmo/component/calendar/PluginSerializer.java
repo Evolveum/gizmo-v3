@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Viliam Repan (lazyman)
+ * Copyright (C) 2023 Evolveum
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,19 @@
  * limitations under the License.
  */
 
+package sk.lazyman.gizmo.component.calendar;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+
+import java.io.IOException;
+
+public class PluginSerializer extends JsonSerializer<Plugins> {
+
+    @Override
+    public void serialize(Plugins value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        gen.writeRawValue(value.getName());
+    }
+
+}

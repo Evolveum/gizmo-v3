@@ -17,8 +17,11 @@ module.exports = {
         gizmo: [
             './src/frontend/js/gizmo.js',
             './src/frontend/scss/gizmo.scss',
-            // './src/frontend/scss/gizmo-fonts.scss',
+            './src/frontend/scss/gizmo-fonts.scss',
         ],
+        // fullCalendar: [
+        //     './src/frontend/js/fullCalendar.js',
+        // ]
     },
     devtool: false,
     output: {

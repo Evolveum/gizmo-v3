@@ -23,6 +23,7 @@ import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationToolbar;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
@@ -65,15 +66,24 @@ public class TablePanel<T> extends Panel {
         toolbars.add(AttributeAppender.append("class", "thead-dark"));
         table.addTopToolbar(headers);
 
-        CountToolbar count = new CountToolbar(table);
-        addVisibleBehaviour(count, showCount);
-        table.addBottomToolbar(count);
+//        CountToolbar count = new CountToolbar(table);
+//        addVisibleBehaviour(count, showCount);
+//        table.addBottomToolbar(count);
+
+
+//        NavigationToolbar toolbar = new NavigationToolbar(table);
+        table.addBottomToolbar(new NavigationToolbar(table));
+        table.addTopToolbar(new NavigationToolbar(table));
+
+//        NavigatorToolbar navigation = new NavigatorToolbar(table, true);
+////        addVisibleBehaviour(count, showCount);
+//        table.addBottomToolbar(navigation);
 
         add(table);
 
-        NavigatorPanel nb2 = new NavigatorPanel(ID_PAGING, table, true);
-        addVisibleBehaviour(nb2, showPaging);
-        add(nb2);
+//        NavigatorPanel nb2 = new NavigatorPanel(ID_PAGING, table, true);
+//        addVisibleBehaviour(nb2, showPaging);
+//        add(nb2);
 
         setItemsPerPage(rowsPerPage);
     }

@@ -24,14 +24,15 @@
             <div class="input-group">
                 <input type="text" class="form-control input-sm" wicket:id="searchText"
                        wicket:message="placeholder:PageCustomers.searchText">
+
                 <span class="input-group-btn">
-                    <button type="button" wicket:id="clear"></button>
-                    <button type="button" wicket:id="search"></button>
+                    <div wicket:id="search"></div>
+                    <div wicket:id="clear"></div>
                 </span>
             </div>
         </div>
 
-        <a class="btn btn-success btn-sm" wicket:id="newCustomer"/>
+        <div wicket:id="newCustomer"/>
     </form>
     <div wicket:id="table"/>
 </wicket:extend>

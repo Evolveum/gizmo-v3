@@ -13,9 +13,15 @@ public class IconButton extends SimplePanel<String> {
 
     private static final String ID_BUTTON = "button";
     private static final String ID_ICON = "icon";
+    private final IModel<String> buttonClass;
 
-    public IconButton(String id, IModel<String> label) {
+//    public IconButton(String id, IModel<String> label) {
+//        super(id, label);
+//    }
+
+    public IconButton(String id, IModel<String> label, IModel<String> buttonClass) {
         super(id, label);
+        this.buttonClass = buttonClass;
     }
 
     @Override
@@ -34,6 +40,7 @@ public class IconButton extends SimplePanel<String> {
             }
         };
         add(button);
+        button.add(AttributeAppender.append("class", "btn " + buttonClass.getObject()));
         WebMarkupContainer icon = new WebMarkupContainer(ID_ICON);
         icon.add(AttributeAppender.append("class", getModel()));
         button.add(icon);
@@ -43,5 +50,4 @@ public class IconButton extends SimplePanel<String> {
     protected void submitPerformed(AjaxRequestTarget target) {
 
     }
-    //<button type="button" class="btn btn-default"><i class="fas fa-align-left"></i></button>
 }

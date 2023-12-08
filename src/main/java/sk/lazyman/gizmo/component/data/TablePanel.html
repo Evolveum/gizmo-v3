@@ -17,7 +17,14 @@
 
 <html xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
-    <table class="table table-sm table-striped" wicket:id="table" />
-    <div wicket:id="paging" />
+    <div class="dataTables_wrapper dt-bootstrap4">
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-bordered table-hover dataTable dtr-inline" wicket:id="table" />
+
+            </div>
+        </div>
+<!--        <div class="row" wicket:id="paging" />-->
+    </div>
 </wicket:panel>
 </html>
