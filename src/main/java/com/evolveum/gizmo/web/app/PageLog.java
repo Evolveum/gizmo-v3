@@ -17,6 +17,7 @@
 
 package com.evolveum.gizmo.web.app;
 
+import com.evolveum.gizmo.component.AjaxButton;
 import com.evolveum.gizmo.component.AjaxSubmitButton;
 import com.evolveum.gizmo.component.form.*;
 import com.evolveum.gizmo.data.Customer;
@@ -39,8 +40,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.wicketstuff.annotation.mount.MountPath;
-import com.evolveum.gizmo.component.AjaxButton;
-import sk.lazyman.gizmo.component.form.*;
 
 import java.time.LocalDate;
 import java.util.Date;

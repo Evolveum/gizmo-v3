@@ -24,18 +24,37 @@
     <div class="row">
         <div class="col-12">
             <div class="card card-primary">
-                <div class="card-body p-0">
-                    <h2 wicket:id="month"></h2>
-                    <a wicket:id="previous"><i class="fa fa-chevron-left"/></a>
-                    <a wicket:id="next"><i class="fa fa-chevron-right"/></a>
-<!--                    <div wicket:id="summary"/>-->
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex">
+                            <div class="align-self-center mr-3">
+                                <button class="btn btn-xs btn-default" wicket:id="previous"><i class="fa fa-chevron-left"/></button>
+                            </div>
+                            <h2 class="align-self-center mr-3" wicket:id="month"></h2>
+                            <div class="align-self-center">
+                                <button class="btn btn-xs btn-default" wicket:id="next"><i class="fa fa-chevron-right"/></button>
+                            </div>
+                        </div>
+                        <div class="align-self-center">
+                            <button class="btn btn-sm btn-success" wicket:id="newWork">
+                                <i class="fa fa-plus"/>
+                                <wicket:message key="PageDashboard.newWork" />
+                            </button>
+                            <button class="btn btn-sm btn-primary" wicket:id="newBulk">
+                                <i class="fa fa-plus"/>
+                                <wicket:message key="PageDashboard.newBulk" />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="col-6" >
             <div class="card">
-                <div class="card-header">Pomer</div>
+                <div class="card-header">
+                    <wicket:message key="PageDashboard.work.statistics"/>
+                </div>
                 <div class="card-body">
                     <div wicket:id="summaryParts"></div>  <!-- width="400" height="400"-->
                 </div>
@@ -43,11 +62,12 @@
         </div>
         <div class="col-6" >
             <div class="card">
-                <div class="card-header">Calendar</div>
+                <div class="card-header">
+                    <wicket:message key="PageDashboard.work.calendar"/>
+                </div>
                 <div class="card-body">
                     <div wicket:id="calendar"></div>
 
-<!--                    <div wicket:id="calendarOld"></div>  &lt;!&ndash; width="400" height="400"&ndash;&gt;-->
                 </div>
             </div>
         </div>
@@ -57,7 +77,9 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">Work log</div>
+                <div class="card-header">
+                    <wicket:message key="PageDashboard.work.table"/>
+                </div>
                 <div class="card-body">
                     <div wicket:id="table"/>
                 </div>

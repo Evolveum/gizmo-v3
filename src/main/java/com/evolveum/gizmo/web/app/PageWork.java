@@ -95,7 +95,7 @@ public class PageWork extends PageAppTemplate {
 
     @Override
     protected IModel<String> createPageTitleModel() {
-        return (IModel<String>) () -> {
+        return () -> {
             Integer workId = getIntegerParam(WORK_ID);
             String key = workId != null ? "page.title.edit" : "page.title";
             return createStringResource(key).getString();

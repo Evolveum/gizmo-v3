@@ -18,17 +18,16 @@
 package com.evolveum.gizmo.data.provider;
 
 import com.evolveum.gizmo.data.*;
+import com.evolveum.gizmo.dto.PartSummary;
+import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.util.GizmoUtils;
+import com.evolveum.gizmo.web.PageTemplate;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sk.lazyman.gizmo.data.*;
-import com.evolveum.gizmo.dto.PartSummary;
-import com.evolveum.gizmo.dto.ReportFilterDto;
-import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.web.PageTemplate;
 
 import java.io.Serializable;
 import java.util.*;

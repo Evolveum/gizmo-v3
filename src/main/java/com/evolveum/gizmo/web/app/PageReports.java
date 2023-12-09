@@ -17,12 +17,22 @@
 
 package com.evolveum.gizmo.web.app;
 
+import com.evolveum.gizmo.component.AjaxSubmitButton;
+import com.evolveum.gizmo.component.GizmoTabbedPanel;
+import com.evolveum.gizmo.component.SummaryPartsPanel;
+import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
+import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.data.*;
 import com.evolveum.gizmo.data.provider.AbstractTaskDataProvider;
+import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
+import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.PartSummary;
+import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
+import com.evolveum.gizmo.util.GizmoUtils;
+import com.evolveum.gizmo.util.LoadableModel;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -49,17 +59,6 @@ import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
-import com.evolveum.gizmo.component.AjaxSubmitButton;
-import com.evolveum.gizmo.component.GizmoTabbedPanel;
-import com.evolveum.gizmo.component.SummaryPartsPanel;
-import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
-import com.evolveum.gizmo.component.data.TablePanel;
-import sk.lazyman.gizmo.data.*;
-import com.evolveum.gizmo.data.provider.ReportDataProvider;
-import com.evolveum.gizmo.dto.CustomerProjectPartDto;
-import com.evolveum.gizmo.dto.ReportFilterDto;
-import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.util.LoadableModel;
 
 import java.io.File;
 import java.io.FileOutputStream;

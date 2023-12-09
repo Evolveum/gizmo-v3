@@ -29,7 +29,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.context.request.RequestContextListener;
 
-@EnableJpaRepositories("sk.lazyman.gizmo.repository")
+@EnableJpaRepositories("com.evolveum.gizmo.repository")
 @EnableTransactionManagement
 @SpringBootApplication
 public class GizmoSpringBootApplication extends SpringBootServletInitializer {

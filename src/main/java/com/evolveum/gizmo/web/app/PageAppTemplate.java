@@ -74,53 +74,13 @@ public class PageAppTemplate extends PageTemplate {
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.users"), PageUsers.class));
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.emails"), PageEmails.class));
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.reports"), PageReports.class));
-                menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.vacations"), PageVacations.class));
+                menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.calendar"), PageCalendar.class));
                 return menuItems;
             }
         };
         NavigationPanel navbar = new NavigationPanel(ID_NAVBAR, menuModel);
         navbar.setOutputMarkupId(true);
         add(navbar);
-//        Navbar navbar = new Navbar(ID_NAVBAR) {
-//
-//            @Override
-//            protected Label newBrandLabel(String markupId) {
-//                Label label = super.newBrandLabel(markupId);
-//                label.add(AttributeAppender.replace("title", createStringResource("GizmoApplication.projectVersion")));
-//                return label;
-//            }
-//        };
-//        navbar.setBrandName(createStringResource("GizmoApplication.projectName"));
-//        navbar.setPosition(Navbar.Position.STATIC_TOP);
-//        add(navbar);
-//
-//        TopMenuItem item = new TopMenuItem(createStringResource("PageAppTemplate.menu.dashboard"), PageDashboard.class);
-//        navbar.addComponents(new ImmutableNavbarComponent(item));
-//
-//        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.customers"), PageCustomers.class);
-//        navbar.addComponents(new ImmutableNavbarComponent(item));
-//
-//        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.projects"), PageProjects.class);
-//        navbar.addComponents(new ImmutableNavbarComponent(item));
-//
-//        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.users"), PageUsers.class);
-//        navbar.addComponents(new ImmutableNavbarComponent(item));
-//
-//        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.emails"), PageEmails.class);
-//        navbar.addComponents(new ImmutableNavbarComponent(item));
-//
-//        item = new TopMenuItem(createStringResource("PageAppTemplate.menu.reports"), PageReports.class);
-//        navbar.addComponents(new ImmutableNavbarComponent(item));
-//
-//        item = new TopMenuItem(createUsernameModel(), PageUser.class, createUserPageParams());
-//        item.setActive(true);
-//        navbar.addComponents(new ImmutableNavbarComponent(item, Navbar.ComponentPosition.RIGHT));
-//
-//        NavbarExternalLink logoutLink = new NavbarExternalLink(
-//                new Model<>(RequestCycle.get().getRequest().getContextPath() + "/j_spring_security_logout"));
-//        logoutLink.setLabel(createStringResource("PageAppTemplate.menu.logout"));
-//        navbar.addComponents(new ImmutableNavbarComponent(logoutLink, Navbar.ComponentPosition.RIGHT));
-
         Label title = new Label(ID_TITLE, createPageTitleModel());
         add(title);
 

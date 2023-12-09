@@ -29,7 +29,6 @@ import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.springframework.core.env.Environment;
-import sk.lazyman.gizmo.repository.*;
 
 import jakarta.persistence.EntityManager;
 

@@ -18,7 +18,7 @@ spring:
     password: password
 
   jpa:
-    database-platform: sk.lazyman.gizmo.util.GizmoPostgreSQLDialect
+    database-platform: com.evolveum.gizmo.util.GizmoPostgreSQLDialect
     hibernate:
       naming:
         physical-strategy: com.evolveum.gizmo.util.GizmoNamingStrategy

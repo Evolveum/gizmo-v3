@@ -18,6 +18,7 @@
 package com.evolveum.gizmo.web;
 
 import com.evolveum.gizmo.component.MainFeedback;
+import com.evolveum.gizmo.security.GizmoApplication;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.web.app.PageDashboard;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +35,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.WebAttributes;
 import org.wicketstuff.annotation.mount.MountPath;
-import com.evolveum.gizmo.security.GizmoApplication;
 
 /**
  * @author lazyman

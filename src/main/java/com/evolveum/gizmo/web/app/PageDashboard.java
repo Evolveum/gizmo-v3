@@ -18,6 +18,7 @@
 package com.evolveum.gizmo.web.app;
 
 
+import com.evolveum.gizmo.component.AjaxButton;
 import com.evolveum.gizmo.component.SummaryChartPanel;
 import com.evolveum.gizmo.component.SummaryPanel;
 import com.evolveum.gizmo.component.calendar.CalendarPanel;
@@ -72,6 +73,9 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_SUMMARY = "summary";
     private static final String ID_SUMMARY_PARTS = "summaryParts";
     private static final String ID_TABLE = "table";
+
+    private static final String ID_BTN_NEW_WORK = "newWork";
+    private static final String ID_BTN_NEW_BULK = "newBulk";
 
     private static final String ID_CALENDAR = "calendar";
 
@@ -132,6 +136,26 @@ public class PageDashboard extends PageAppTemplate {
         next.setOutputMarkupId(true);
         add(next);
 
+        AjaxLink<String> newWork = new AjaxLink<>(ID_BTN_NEW_WORK, createStringResource("PageDashboard.newWork")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                newWorkPerformed();
+            }
+        };
+        newWork.setOutputMarkupId(true);
+        add(newWork);
+
+        AjaxLink<String> newBulk = new AjaxLink<>(ID_BTN_NEW_BULK, createStringResource("PageDashboard.newBulk")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                newBulkPerformed();
+            }
+        };
+        newBulk.setOutputMarkupId(true);
+        add(newBulk);
+
         AbstractTaskDataProvider provider = new AbstractTaskDataProvider(this);
         provider.setFilter(filter.getObject());
 
@@ -189,6 +213,14 @@ public class PageDashboard extends PageAppTemplate {
             events.add(event);
         }
         return events;
+    }
+
+    private void newWorkPerformed() {
+        setResponsePage(PageWork.class);
+    }
+
+    private void newBulkPerformed() {
+        setResponsePage(PageBulk.class);
     }
 
     private void refreshComponents(AjaxRequestTarget target) {
