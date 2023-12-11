@@ -17,37 +17,25 @@
 
 package com.evolveum.gizmo.web.app;
 
-import com.evolveum.gizmo.component.AjaxSubmitButton;
-import com.evolveum.gizmo.component.ProjectPartsTab;
-import com.evolveum.gizmo.component.form.AreaFormGroup;
-import com.evolveum.gizmo.component.form.CheckFormGroup;
-import com.evolveum.gizmo.component.form.DropDownFormGroup;
-import com.evolveum.gizmo.component.form.FormGroup;
-import com.evolveum.gizmo.component.modal.ProjectPartModal;
+import com.evolveum.gizmo.component.*;
 import com.evolveum.gizmo.data.Customer;
 import com.evolveum.gizmo.data.Part;
 import com.evolveum.gizmo.data.Project;
 import com.evolveum.gizmo.repository.CustomerRepository;
 import com.evolveum.gizmo.repository.PartRepository;
 import com.evolveum.gizmo.repository.ProjectRepository;
-import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
-import org.apache.commons.lang3.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.extensions.ajax.markup.html.tabs.AjaxTabbedPanel;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.util.string.StringValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.annotation.mount.MountPath;
-import com.evolveum.gizmo.component.AjaxButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,16 +52,9 @@ public class PageProject extends PageAppProjects {
     private static final Logger LOG = LoggerFactory.getLogger(PageProject.class);
 
     private static final String ID_FORM = "form";
-    private static final String ID_NAME = "name";
-    private static final String ID_DESCRIPTION = "description";
-    private static final String ID_CUSTOMER = "customer";
-    private static final String ID_CLOSED = "closed";
-    private static final String ID_COMMERCIAL = "commercial";
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
     private static final String ID_TABS = "tabs";
-    private static final String ID_PROJECT_PART = "projectPart";
-    private static final String ID_DIALOG_FORM = "dialogForm";
 
     private IModel<Project> model;
 
@@ -84,7 +65,7 @@ public class PageProject extends PageAppProjects {
     public PageProject(PageParameters params) {
         super(params);
 
-        model = new LoadableModel<Project>() {
+        model = new LoadableModel<>() {
 
             @Override
             protected Project load() {
@@ -94,108 +75,55 @@ public class PageProject extends PageAppProjects {
 
         initLayout();
     }
-
-    public PageProject(PageParameters params, IModel<Project> model) {
-        super(params);
-
-        Validate.notNull(model, "Model must not be null.");
-        this.model = model;
-
-        initLayout();
-    }
-
-    private void initDialogs() {
-        Form dialogForm = new Form(ID_DIALOG_FORM);
-        add(dialogForm);
-
-//        ProjectPartModal modal = new ProjectPartModal(ID_PROJECT_PART) {
-//
-//            @Override
-//            protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {
-//                super.savePerformed(target, model);
-//
-//                savePartPerformed(target, model);
-//            }
-//        };
-//        dialogForm.add(modal);
-    }
-
+    
     private Project loadProject() {
-        PageParameters params = getPageParameters();
-        StringValue val = params.get(PROJECT_ID);
-        String projectId = val != null ? val.toString() : null;
-
-        if (projectId == null || !projectId.matches("[0-9]+")) {
-            return new Project();
+        Integer projectId = getIntegerParam(PROJECT_ID);
+        if (projectId == null) {
+            Project project = new Project();
+            Integer customerId = getIntegerParam(PageCustomer.CUSTOMER_ID);
+            if (customerId != null) {
+                CustomerRepository repository = getCustomerRepository();
+                Optional<Customer> customer = repository.findById(customerId);
+                customer.ifPresent(project::setCustomer);
+            }
+            return project;
         }
 
         ProjectRepository repository = getProjectRepository();
-        Optional<Project> project = repository.findById(Integer.parseInt(projectId));
-        if (!project.isPresent()) {
+        Optional<Project> project = repository.findById(projectId);
+        if (project.isEmpty()) {
             getSession().error(translateString("Message.couldntFindProject", projectId));
             throw new RestartResponseException(PageProject.class);
         }
-
         return project.get();
     }
 
     @Override
     protected IModel<String> createPageTitleModel() {
-        return new IModel<String>() {
-
-            @Override
-            public String getObject() {
-                Integer id = getIntegerParam(PROJECT_ID);
-                String key = id != null ? "page.title.edit" : "page.title";
-                return createStringResource(key).getString();
-            }
+        return () -> {
+            Integer id = getIntegerParam(PROJECT_ID);
+            String key = id != null ? "page.title.edit" : "page.title";
+            return createStringResource(key).getString();
         };
     }
 
     private void initLayout() {
-        initDialogs();
-
-        Form form = new Form(ID_FORM);
+        Form<Project> form = new Form<>(ID_FORM);
         add(form);
 
-        FormGroup name = new FormGroup(ID_NAME, new PropertyModel<String>(model, Project.F_NAME),
-                createStringResource("Project.name"), true);
-        form.add(name);
-
-        FormGroup description = new AreaFormGroup(ID_DESCRIPTION, new PropertyModel<String>(model, Project.F_DESCRIPTION),
-                createStringResource("Project.description"), false);
-        form.add(description);
-
-        DropDownFormGroup customer = new DropDownFormGroup(ID_CUSTOMER,
-                new PropertyModel<Customer>(model, Project.F_CUSTOMER),
-                createStringResource("Project.customer"), true);
-        customer.setNullValid(false);
-        customer.setChoices(new LoadableModel<List<Customer>>(false) {
-
-            @Override
-            protected List<Customer> load() {
-                CustomerRepository repository = getCustomerRepository();
-                List<Customer> list = repository.listCustomers();
-                if (list == null) {
-                    list = new ArrayList<>();
-                }
-                return list;
-            }
-        });
-        customer.setRenderer(GizmoUtils.createCustomerChoiceRenderer());
-        form.add(customer);
-
-        FormGroup closed = new CheckFormGroup(ID_CLOSED, new PropertyModel<Boolean>(model, Project.F_CLOSED),
-                createStringResource("Project.closed"), true);
-        form.add(closed);
-
-        FormGroup commercial = new CheckFormGroup(ID_COMMERCIAL, new PropertyModel<Boolean>(model, Project.F_COMMERCIAL),
-                createStringResource("Project.commercial"), true);
-        form.add(commercial);
 
         initButtons(form);
 
         List<ITab> tabList = new ArrayList<>();
+
+        tabList.add(new AbstractTab(createStringResource("PageProject.basics")) {
+
+            @Override
+            public WebMarkupContainer getPanel(String panelId) {
+                return new ProjectBasicsPanel(panelId, model);
+            }
+        });
+
         tabList.add(new AbstractTab(createStringResource("PageProject.parts")) {
 
             @Override
@@ -215,13 +143,12 @@ public class PageProject extends PageAppProjects {
             }
         });
 
-        AjaxTabbedPanel tabs = new AjaxTabbedPanel(ID_TABS, tabList);
-//        AjaxBootstrapTabbedPanel tabs = new AjaxBootstrapTabbedPanel(ID_TABS, tabList);
+        GizmoTabbedPanel<ITab> tabs = new GizmoTabbedPanel<>(ID_TABS, tabList);
         tabs.setOutputMarkupId(true);
-        add(tabs);
+        form.add(tabs);
     }
 
-    private void initButtons(Form form) {
+    private void initButtons(Form<Project> form) {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override

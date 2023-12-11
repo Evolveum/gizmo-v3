@@ -18,13 +18,14 @@
 package com.evolveum.gizmo.component;
 
 import org.apache.wicket.behavior.AttributeAppender;
+import org.apache.wicket.extensions.ajax.markup.html.tabs.AjaxTabbedPanel;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.extensions.markup.html.tabs.TabbedPanel;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 
 import java.util.List;
 
-public class GizmoTabbedPanel<T extends ITab> extends TabbedPanel<T> {
+public class GizmoTabbedPanel<T extends ITab> extends AjaxTabbedPanel<T> {
 
 
     public GizmoTabbedPanel(String id, List<T> tabs) {

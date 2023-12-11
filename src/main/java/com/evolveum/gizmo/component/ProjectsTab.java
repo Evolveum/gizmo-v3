@@ -115,19 +115,14 @@ public class ProjectsTab extends SimplePanel {
     private void newProjectPerformed(AjaxRequestTarget target) {
         PageAppTemplate page = (PageAppTemplate) getPage();
         try {
-            Project project = new Project();
+//            Project project = new Project();
 
             Integer customerId = page.getIntegerParam(PageCustomer.CUSTOMER_ID);
-            if (customerId != null) {
-                CustomerRepository repository = page.getCustomerRepository();
-                Optional<Customer> customer = repository.findById(customerId);
-                if (customer != null && customer.isPresent()) {
-                    project.setCustomer(customer.get());
-                }
-            }
 
-            PageProject next = new PageProject(null, new Model<>(project));
-            setResponsePage(next);
+            PageParameters params = new PageParameters();
+            params.add(PageCustomer.CUSTOMER_ID, customerId);
+//            PageProject next = new PageProject(params, PageProject.class);
+            setResponsePage(PageProject.class, params);
         } catch (Exception ex) {
             page.handleGuiException(page, ex, target);
         }
