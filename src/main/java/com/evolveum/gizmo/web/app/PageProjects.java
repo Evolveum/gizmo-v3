@@ -51,7 +51,7 @@ public class PageProjects extends PageAppProjects {
     private static final String ID_FORM = "form";
     private static final String ID_SEARCH_TEXT = "searchText";
     private static final String ID_SEARCH = "search";
-    private static final String ID_CLEAR = "clear";
+//    private static final String ID_CLEAR = "clear";
     private static final String ID_NEW_PROJECT = "newProject";
 
     private IModel<String> searchModel = new Model<>();
@@ -116,14 +116,14 @@ public class PageProjects extends PageAppProjects {
         search.setRenderBodyOnly(true);
         form.add(search);
 
-        IconButton clear = new IconButton(ID_CLEAR, createStringResource("fa-trash"), createStringResource("btn-danger")) {
-            @Override
-            protected void submitPerformed(AjaxRequestTarget target) {
-                clearPerformed(target);
-            }
-        };
-        clear.setRenderBodyOnly(true);
-        form.add(clear);
+//        IconButton clear = new IconButton(ID_CLEAR, createStringResource("fa-trash"), createStringResource("btn-danger")) {
+//            @Override
+//            protected void submitPerformed(AjaxRequestTarget target) {
+//                clearPerformed(target);
+//            }
+//        };
+//        clear.setRenderBodyOnly(true);
+//        form.add(clear);
 
         AjaxButton newProject = new AjaxButton(ID_NEW_PROJECT, createStringResource("PageProjects.newProject")) {
 
@@ -139,10 +139,10 @@ public class PageProjects extends PageAppProjects {
         setResponsePage(PageProject.class);
     }
 
-    private void clearPerformed(AjaxRequestTarget target) {
-        searchModel.setObject(null);
-        target.add(get(ID_FORM + ":" + ID_SEARCH_TEXT), get(ID_TABLE));
-    }
+//    private void clearPerformed(AjaxRequestTarget target) {
+//        searchModel.setObject(null);
+//        target.add(get(ID_FORM + ":" + ID_SEARCH_TEXT), get(ID_TABLE));
+//    }
 
     private void searchPerformed(AjaxRequestTarget target) {
         target.add(get(ID_TABLE));

@@ -20,39 +20,34 @@
 <html xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
 
-    <div class="row">
-        <div class="col-sm-12 col-md-5">
-            <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
-                <span wicket:id="count"/>
-            </div>
-        </div>
-        <div class="col-sm-12 col-md-7">
-            <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
-                <ul class="pagination">
-                    <li class="page-item previous" wicket:id="previous">
-                        <a class="page-link" wicket:id="previousLink">
-                            <wicket:message key="NavigatorPanel.previous"/>
-                        </a>
-                    </li>
-                    <li class="page-item" wicket:id="first">
-                        <a class="page-link" wicket:id="firstLink">
-                            <wicket:message key="NavigatorPanel.first"/>
-                        </a>
-                    </li>
-                    <li class="page-item disabled" wicket:id="dots">
-                        <span><wicket:message key="NavigatorPanel.dots"/></span>
-                    </li>
-                    <li class="page-item" wicket:id="navigation">
-                        <a class="page-link" wicket:id="pageLink"/>
-                    </li>
-                    <li class="page-item next" wicket:id="next">
-                        <a class="page-link" wicket:id="nextLink">
-                            <wicket:message key="NavigatorPanel.next"/>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+    <div class="dataTables_info" role="status" aria-live="polite">
+        <span wicket:id="count"/>
     </div>
+    <div class="dataTables_paginate paging_simple_numbers">
+        <ul class="pagination">
+            <li class="page-item previous" wicket:id="previous">
+                <a class="page-link" wicket:id="previousLink">
+                    <wicket:message key="NavigatorPanel.previous"/>
+                </a>
+            </li>
+            <li class="page-item" wicket:id="first">
+                <a class="page-link" wicket:id="firstLink">
+                    <wicket:message key="NavigatorPanel.first"/>
+                </a>
+            </li>
+            <li class="page-item disabled" wicket:id="dots">
+                <span><wicket:message key="NavigatorPanel.dots"/></span>
+            </li>
+            <li class="page-item" wicket:id="navigation">
+                <a class="page-link" wicket:id="pageLink"/>
+            </li>
+            <li class="page-item next" wicket:id="next">
+                <a class="page-link" wicket:id="nextLink">
+                    <wicket:message key="NavigatorPanel.next"/>
+                </a>
+            </li>
+        </ul>
+    </div>
+
 </wicket:panel>
 </html>

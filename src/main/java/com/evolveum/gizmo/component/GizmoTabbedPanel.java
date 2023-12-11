@@ -17,8 +17,10 @@
 
 package com.evolveum.gizmo.component;
 
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.extensions.markup.html.tabs.TabbedPanel;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 
 import java.util.List;
 
@@ -31,6 +33,13 @@ public class GizmoTabbedPanel<T extends ITab> extends TabbedPanel<T> {
 
     @Override
     protected String getSelectedTabCssClass() {
-        return " active";
+        return "";
+    }
+
+    @Override
+    protected WebMarkupContainer newLink(String linkId, int index) {
+        WebMarkupContainer tabLink = super.newLink(linkId, index);
+        tabLink.add(AttributeAppender.append("class", () -> getSelectedTab() == index ? " active" : ""));
+        return tabLink;
     }
 }

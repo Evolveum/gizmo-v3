@@ -39,6 +39,7 @@ public class ReportFilterDto implements Serializable {
     public static final String F_PROJECTS = "projects";
     public static final String F_REALIZATORS = "realizators";
     public static final String F_WORK_TYPE = "workType";
+    public static final String F_MONTH_YEAR = "monthYear";
 
     private boolean summary;
     private boolean workLog;
@@ -141,7 +142,7 @@ public class ReportFilterDto implements Serializable {
         this.workType = workType;
     }
 
-    public String getMonth() {
-        return dateFrom.getMonth().getDisplayName(TextStyle.FULL, Locale.US);
+    public String getMonthYear() {
+        return dateFrom.getMonth().getDisplayName(TextStyle.FULL, Locale.US) + " " + dateFrom.getYear();
     }
 }

@@ -73,12 +73,12 @@ public class TablePanel<T> extends Panel {
 
 
 //        NavigationToolbar toolbar = new NavigationToolbar(table);
-        table.addBottomToolbar(new NavigationToolbar(table));
-        table.addTopToolbar(new NavigationToolbar(table));
+//        table.addBottomToolbar(new NavigationToolbar(table));
+//        table.addTopToolbar(new NavigationToolbar(table));
 
-//        NavigatorToolbar navigation = new NavigatorToolbar(table, true);
-////        addVisibleBehaviour(count, showCount);
-//        table.addBottomToolbar(navigation);
+        NavigatorToolbar navigation = new NavigatorToolbar(ID_PAGING, table, true);
+//        addVisibleBehaviour(count, showCount);
+        add(navigation);
 
         add(table);
 

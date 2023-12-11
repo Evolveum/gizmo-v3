@@ -17,33 +17,19 @@
 
 package com.evolveum.gizmo.web.app;
 
-import com.evolveum.gizmo.component.form.AreaFormGroup;
-import com.evolveum.gizmo.component.form.DropDownFormGroup;
-import com.evolveum.gizmo.component.form.FormGroup;
+import com.evolveum.gizmo.component.*;
+import com.evolveum.gizmo.data.Customer;
 import com.evolveum.gizmo.repository.CustomerRepository;
-import org.apache.commons.lang3.Validate;
+import com.evolveum.gizmo.util.LoadableModel;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.extensions.ajax.markup.html.tabs.AjaxTabbedPanel;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.EnumChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
-import com.evolveum.gizmo.component.AjaxButton;
-import com.evolveum.gizmo.component.AjaxSubmitButton;
-import com.evolveum.gizmo.component.ProjectsTab;
-import com.evolveum.gizmo.component.VisibleEnableBehaviour;
-import com.evolveum.gizmo.data.Customer;
-import com.evolveum.gizmo.data.CustomerType;
-import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.util.LoadableModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,15 +44,12 @@ public class PageCustomer extends PageAppCustomers {
     public static final String CUSTOMER_ID = "customerId";
 
     private static final String ID_FORM = "form";
-    private static final String ID_NAME = "name";
-    private static final String ID_TYPE = "type";
-    private static final String ID_PARTNER = "partner";
-    private static final String ID_DESCRIPTION = "description";
+
     private static final String ID_TABS = "tabs";
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
 
-    private IModel<Customer> model;
+    private final IModel<Customer> model;
 
     public PageCustomer() {
         this(null);
@@ -75,7 +58,7 @@ public class PageCustomer extends PageAppCustomers {
     public PageCustomer(PageParameters params) {
         super(params);
 
-        model = new LoadableModel<Customer>() {
+        model = new LoadableModel<>() {
 
             @Override
             protected Customer load() {
@@ -86,30 +69,17 @@ public class PageCustomer extends PageAppCustomers {
         initLayout();
     }
 
-    public PageCustomer(PageParameters params, IModel<Customer> model) {
-        super(params);
-
-        Validate.notNull(model, "Model must not be null");
-        this.model = model;
-
-        initLayout();
-    }
-
     @Override
     protected IModel<String> createPageTitleModel() {
-        return new IModel<String>() {
-
-            @Override
-            public String getObject() {
-                Integer id = getIntegerParam(CUSTOMER_ID);
-                String key = id != null ? "page.title.edit" : "page.title";
-                return createStringResource(key).getString();
-            }
+        return () -> {
+            Integer id = getCustomerId();
+            String key = id != null ? "page.title.edit" : "page.title";
+            return createStringResource(key).getString();
         };
     }
 
     private Customer loadCustomer() {
-        Integer customerId = getIntegerParam(CUSTOMER_ID);
+        Integer customerId = getCustomerId();
         if (customerId == null) {
             return new Customer();
         }
@@ -124,100 +94,45 @@ public class PageCustomer extends PageAppCustomers {
         return customer.get();
     }
 
+    private Integer getCustomerId() {
+        return getIntegerParam(CUSTOMER_ID);
+    }
+
     private void initLayout() {
-        Form form = new Form(ID_FORM);
+        Form<Customer> form = new Form<>(ID_FORM);
         add(form);
 
         initButtons(form);
 
-        FormGroup name = new FormGroup(ID_NAME, new PropertyModel<String>(model, Customer.F_NAME),
-                createStringResource("Customer.name"), true);
-        form.add(name);
+        GizmoTabbedPanel<ITab> customerTabbedPanel = new GizmoTabbedPanel<>(ID_TABS, createTabs());
+        form.add(customerTabbedPanel);
 
-        AreaFormGroup description = new AreaFormGroup(ID_DESCRIPTION,
-                new PropertyModel<String>(model, Customer.F_DESCRIPTION),
-                createStringResource("Customer.description"), false);
-        description.setRows(3);
-        form.add(description);
+    }
 
-        DropDownFormGroup type = new DropDownFormGroup(ID_TYPE,
-                new PropertyModel<CustomerType>(model, Customer.F_TYPE),
-                createStringResource("Customer.type"), true);
-        type.setChoices(GizmoUtils.createReadonlyModelFromEnum(CustomerType.class));
-        type.setRenderer(new EnumChoiceRenderer(this));
-        DropDownChoice choice = (DropDownChoice) type.getFormComponent();
-        form.add(type);
-
-        final DropDownFormGroup partner = new DropDownFormGroup(ID_PARTNER,
-                new PropertyModel<Customer>(model, Customer.F_PARTNER),
-                createStringResource("Customer.partner"), false);
-        partner.setOutputMarkupId(true);
-        partner.setChoices(new LoadableModel<List<Customer>>(false) {
-
-            @Override
-            protected List<Customer> load() {
-                CustomerRepository repository = getCustomerRepository();
-                List<Customer> list = repository.listPartners();
-                if (list == null) {
-                    list = new ArrayList<>();
-                }
-                return list;
-            }
-        });
-        partner.setRenderer(GizmoUtils.createCustomerChoiceRenderer());
-        partner.setNullValid(true);
-        partner.setDefaultChoice(null);
-        partner.getFormInput().add(new VisibleEnableBehaviour() {
-
-            @Override
-            public boolean isVisible() {
-                Customer customer = model.getObject();
-                return !CustomerType.PARTNER.equals(customer.getType());
-            }
-        });
-        form.add(partner);
-
-        choice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
-
-            @Override
-            protected void onUpdate(AjaxRequestTarget target) {
-                Customer customer = model.getObject();
-                if (CustomerType.PARTNER.equals(customer.getType())) {
-                    customer.setPartner(null);
-                }
-                target.add(partner);
-            }
-        });
-
+    private List<ITab> createTabs() {
         List<ITab> tabList = new ArrayList<>();
-        tabList.add(new AbstractTab(createStringResource("PageCustomer.projects")) {
+
+        tabList.add(new AbstractTab(createStringResource("PageCustomer.basics")) {
 
             @Override
             public WebMarkupContainer getPanel(String panelId) {
-                return new ProjectsTab(panelId);
+                return new CustomerBasicsPanel(panelId, model);
             }
         });
 
-//        tabList.add(new AbstractTab(createStringResource("PageCustomer.logs")) {
-//
-//            @Override
-//            public WebMarkupContainer getPanel(String panelId) {
-//                return new CustomerLogsTab(panelId);
-//            }
-//        });
-//
-//        tabList.add(new AbstractTab(createStringResource("PageCustomer.notifications")) {
-//
-//            @Override
-//            public WebMarkupContainer getPanel(String panelId) {
-//                return new CustomerNotificationsTab(panelId);
-//            }
-//        });
+        if (getCustomerId() != null) {
+            tabList.add(new AbstractTab(createStringResource("PageCustomer.projects")) {
 
-        AjaxTabbedPanel tabs = new AjaxTabbedPanel(ID_TABS, tabList);
-//        AjaxBootstrapTabbedPanel tabs = new AjaxBootstrapTabbedPanel(ID_TABS, tabList);
-        add(tabs);
+                @Override
+                public WebMarkupContainer getPanel(String panelId) {
+                    return new ProjectsTab(panelId);
+                }
+            });
+        }
+        return tabList;
     }
+
+
 
     private void initButtons(Form form) {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {

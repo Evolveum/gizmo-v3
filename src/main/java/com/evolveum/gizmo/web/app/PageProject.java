@@ -23,6 +23,7 @@ import com.evolveum.gizmo.component.form.AreaFormGroup;
 import com.evolveum.gizmo.component.form.CheckFormGroup;
 import com.evolveum.gizmo.component.form.DropDownFormGroup;
 import com.evolveum.gizmo.component.form.FormGroup;
+import com.evolveum.gizmo.component.modal.ProjectPartModal;
 import com.evolveum.gizmo.data.Customer;
 import com.evolveum.gizmo.data.Part;
 import com.evolveum.gizmo.data.Project;

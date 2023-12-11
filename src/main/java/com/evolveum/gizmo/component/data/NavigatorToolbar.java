@@ -28,6 +28,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.Loop;
 import org.apache.wicket.markup.html.list.LoopItem;
 import org.apache.wicket.markup.html.navigation.paging.IPageable;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.AbstractRepeater;
 import org.apache.wicket.markup.repeater.data.DataViewBase;
 import org.apache.wicket.model.IModel;
@@ -38,7 +39,7 @@ import com.evolveum.gizmo.util.LoadableModel;
 /**
  * @author lazyman
  */
-public class NavigatorToolbar extends AbstractToolbar {
+public class NavigatorToolbar extends Panel {
 
     private int PAGING_SIZE = 5;
 
@@ -57,9 +58,11 @@ public class NavigatorToolbar extends AbstractToolbar {
 
 
     private final boolean showPageListing;
+    private DataTable<?, ?> table;
 
-    public NavigatorToolbar(DataTable<?, ?> table, boolean showPageListing) {
-        super(table);
+    public NavigatorToolbar(String id, DataTable<?, ?> table, boolean showPageListing) {
+        super(id);
+        this.table = table;
         this.showPageListing = showPageListing;
 
         setOutputMarkupId(true);
@@ -70,6 +73,10 @@ public class NavigatorToolbar extends AbstractToolbar {
                 return NavigatorToolbar.this.getTable().getPageCount() > 0;
             }
         });
+    }
+
+    public DataTable<?, ?> getTable() {
+        return table;
     }
 
     @Override
@@ -207,17 +214,13 @@ public class NavigatorToolbar extends AbstractToolbar {
     }
 
     private void initNavigation() {
-        IModel<Integer> model = new IModel<Integer>() {
-
-            @Override
-            public Integer getObject() {
-                int count = (int) getTable().getPageCount();
-                if (count < PAGING_SIZE) {
-                    return count;
-                }
-
-                return PAGING_SIZE;
+        IModel<Integer> model = () -> {
+            int count = (int) getTable().getPageCount();
+            if (count < PAGING_SIZE) {
+                return count;
             }
+
+            return PAGING_SIZE;
         };
 
         Loop navigation = new Loop(ID_NAVIGATION, model) {
@@ -234,13 +237,7 @@ public class NavigatorToolbar extends AbstractToolbar {
                 };
                 item.add(pageLink);
 
-                item.add(new AttributeAppender("class", new IModel<String>() {
-
-                    @Override
-                    public String getObject() {
-                        return getTable().getCurrentPage() == pageLink.getPageNumber() ? " active" : "";
-                    }
-                }));
+                item.add(new AttributeAppender("class", (IModel<String>) () -> getTable().getCurrentPage() == pageLink.getPageNumber() ? " active" : ""));
             }
         };
         navigation.add(new VisibleEnableBehaviour() {
@@ -328,14 +325,23 @@ public class NavigatorToolbar extends AbstractToolbar {
     }
 
     private void changeCurrentPage(AjaxRequestTarget target, long page) {
-        getTable().setCurrentPage(page);
 
-        Component container = ((Component) getTable());
-        while (container instanceof AbstractRepeater) {
-            container = container.getParent();
-        }
-        target.add(container);
-        target.add(this);
+            // Tell the PageableListView which page to print next
+            getTable().setCurrentPage(page);
+
+            target.add(getTable());
+            target.add(this);
+            // Return the current page.
+//            setResponsePage(getPage());
+//        }
+//        getTable().setCurrentPage(page);
+//
+//        Component container = getTable();
+//        while (container instanceof AbstractRepeater) {
+//            container = container.getParent();
+//        }
+//        target.add(container);
+////        target.add(this);
     }
 
     private void pageLinkPerformed(AjaxRequestTarget target, long page) {

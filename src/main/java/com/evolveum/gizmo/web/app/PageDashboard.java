@@ -112,7 +112,7 @@ public class PageDashboard extends PageAppTemplate {
 
     private void initLayout() {
 
-        Label month = new Label(ID_MONTH, new PropertyModel<>(filter, "month"));
+        Label month = new Label(ID_MONTH, new PropertyModel<>(filter, ReportFilterDto.F_MONTH_YEAR));
         month.setOutputMarkupId(true);
         add(month);
 
@@ -160,7 +160,7 @@ public class PageDashboard extends PageAppTemplate {
         provider.setFilter(filter.getObject());
 
         List<IColumn<AbstractTask, String>> columns = createColumns();
-        TablePanel<AbstractTask> table = new TablePanel<>(ID_TABLE, provider, columns, 50);
+        TablePanel<AbstractTask> table = new TablePanel<>(ID_TABLE, provider, columns, 20);
         table.setOutputMarkupId(true);
         add(table);
 

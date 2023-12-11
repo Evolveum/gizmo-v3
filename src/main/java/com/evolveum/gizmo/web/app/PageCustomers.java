@@ -49,7 +49,7 @@ public class PageCustomers extends PageAppCustomers {
     private static final String ID_FORM = "form";
     private static final String ID_SEARCH_TEXT = "searchText";
     private static final String ID_SEARCH = "search";
-    private static final String ID_CLEAR = "clear";
+//    private static final String ID_CLEAR = "clear";
     private static final String ID_NEW_CUSTOMER = "newCustomer";
 
     private IModel<String> searchModel = new Model<>();
@@ -94,7 +94,7 @@ public class PageCustomers extends PageAppCustomers {
         });
         columns.add(new PropertyColumn(createStringResource("Customer.type"), Customer.F_TYPE));
         columns.add(new PropertyColumn(createStringResource("Customer.description"), Customer.F_DESCRIPTION));
-        columns.add(new PropertyColumn(createStringResource("Customer.partner"), Customer.F_PARTNER));
+        columns.add(new PropertyColumn(createStringResource("Customer.partner"), Customer.F_PARTNER + "." + Customer.F_NAME));
 
         TablePanel table = new TablePanel(ID_TABLE, provider, columns, 20);
         table.setOutputMarkupId(true);
@@ -112,15 +112,15 @@ public class PageCustomers extends PageAppCustomers {
         search.setRenderBodyOnly(true);
         form.add(search);
 
-        IconButton clear = new IconButton(ID_CLEAR, createStringResource("fa-trash"), createStringResource("btn-danger")) {
-
-            @Override
-            protected void submitPerformed(AjaxRequestTarget target) {
-                clearPerformed(target);
-            }
-        };
-        clear.setRenderBodyOnly(true);
-        form.add(clear);
+//        IconButton clear = new IconButton(ID_CLEAR, createStringResource("fa-trash"), createStringResource("btn-danger")) {
+//
+//            @Override
+//            protected void submitPerformed(AjaxRequestTarget target) {
+//                clearPerformed(target);
+//            }
+//        };
+//        clear.setRenderBodyOnly(true);
+//        form.add(clear);
 
         IconButton newCustomer = new IconButton(ID_NEW_CUSTOMER, createStringResource("fa-plus"), createStringResource("btn-success")) {
 

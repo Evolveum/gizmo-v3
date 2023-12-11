@@ -16,18 +16,13 @@
   ~
   -->
 
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
-<body>
-<wicket:extend>
-            <form role="form" wicket:id="form">
-                <div wicket:id="tabs"/>
-
-                <div class="form-group">
-                    <a class="btn btn-danger" wicket:id="cancel"/>
-                    <a class="btn btn-primary" wicket:id="save"/>
-                </div>
-            </form>
-
-</wicket:extend>
-</body>
-</html>
+<wicket:panel xmlns:wicket="http://wicket.apache.org">
+    <div class="card">
+        <div class="card-body">
+            <div wicket:id="name"/>
+            <div wicket:id="description"/>
+            <div wicket:id="type"/>
+            <div wicket:id="partner"/>
+        </div>
+    </div>
+</wicket:panel>

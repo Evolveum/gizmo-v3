@@ -38,7 +38,11 @@ public class SimplePanel<T> extends Panel {
     public SimplePanel(String id, IModel<T> model) {
         super(id);
         this.model = model == null ? createModel() : model;
+    }
 
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
         initLayout();
     }
 

@@ -17,10 +17,22 @@
 
 package com.evolveum.gizmo.component.modal;
 
+import com.evolveum.gizmo.component.AjaxButton;
+import com.evolveum.gizmo.component.AjaxSubmitButton;
+import com.evolveum.gizmo.component.form.AreaFormGroup;
+import com.evolveum.gizmo.component.form.FormGroup;
+import com.evolveum.gizmo.data.Part;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
+
 /**
  * @author lazyman
  */
-public class ProjectPartModal { //extends Modal<Part> {
+public class ProjectPartModal {
+//        extends ModalDialog {
 //
 //    private static final String ID_LABEL = "label";
 //    private static final String ID_NAME = "name";
@@ -43,15 +55,11 @@ public class ProjectPartModal { //extends Modal<Part> {
 //    }
 //
 //    private IModel<String> createTitle() {
-//        return new AbstractReadOnlyModel<String>() {
-//
-//            @Override
-//            public String getObject() {
+//        return () -> {
 //                Part part = partModel.getObject();
 //
 //                String key = part.getId() != null ? "ProjectPartModal.edit" : "ProjectPartModal.new";
 //                return createStringResource(key).getObject();
-//            }
 //        };
 //    }
 //
@@ -68,8 +76,8 @@ public class ProjectPartModal { //extends Modal<Part> {
 //        description.setOutputMarkupId(true);
 //        add(description);
 //
-//        BootstrapAjaxButton cancel = new BootstrapAjaxButton(BUTTON_MARKUP_ID,
-//                createStringResource("GizmoApplication.button.cancel"), Buttons.Type.Default) {
+//        AjaxSubmitButton cancel = new AjaxSubmitButton(BUTTON_MARKUP_ID,
+//                createStringResource("GizmoApplication.button.cancel")) {
 //
 //            @Override
 //            protected void onSubmit(AjaxRequestTarget target) {
@@ -83,7 +91,7 @@ public class ProjectPartModal { //extends Modal<Part> {
 //        };
 //        addButton(cancel);
 //
-//        BootstrapAjaxButton save = new BootstrapAjaxButton(BUTTON_MARKUP_ID,
+//        AjaxSubmitButton save = new AjaxSubmitButton(BUTTON_MARKUP_ID,
 //                createStringResource("GizmoApplication.button.save"), Buttons.Type.Primary) {
 //
 //            @Override

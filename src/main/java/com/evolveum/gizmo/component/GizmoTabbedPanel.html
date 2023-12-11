@@ -18,10 +18,16 @@
   -->
 
 <wicket:panel xmlns:wicket="http://wicket.apache.org">
-    <div wicket:id="tabs-container" class="tab-row">
+    <div wicket:id="tabs-container">
         <ul class="nav nav-tabs">
-            <li wicket:id="tabs" class="nav-item"><a class="nav-link" href="#" wicket:id="link"><span wicket:id="title">[[tab title]]</span></a></li>
+            <li wicket:id="tabs" class="nav-item">
+                <a class="nav-link" href="#" wicket:id="link">
+                    <span wicket:id="title">[[tab title]]</span>
+                </a>
+            </li>
         </ul>
     </div>
-    <div wicket:id="panel" class="tab-panel"><!-- no panel --></div>
+    <div class="tab-content">
+        <div wicket:id="panel" role="tabpanel" class="tab-pane fade active show"><!-- no panel --></div>
+    </div>
 </wicket:panel>
