@@ -35,6 +35,7 @@ public class ReportFilterDto implements Serializable {
     public static final String F_DATE_FROM = "dateFrom";
     public static final String F_DATE_TO = "dateTo";
     public static final String F_CUSTOM_PROJECT_PART = "customerProjectPart";
+    public static final String F_CUSTOMER = "customer";
     public static final String F_PROJECT = "project";
     public static final String F_PROJECTS = "projects";
     public static final String F_REALIZATORS = "realizators";
@@ -47,7 +48,9 @@ public class ReportFilterDto implements Serializable {
 
     private LocalDate dateFrom;
     private LocalDate dateTo;
-    private List<CustomerProjectPartDto> customerProjectPart;
+    private List<CustomerProjectPartDto> customerProjectPart = new ArrayList<>();
+    private List<CustomerProjectPartDto> customer = new ArrayList<>();
+    private List<CustomerProjectPartDto> project = new ArrayList<>();
     private List<User> realizators;
     private WorkType workType = WorkType.ALL;
 
@@ -102,25 +105,45 @@ public class ReportFilterDto implements Serializable {
         this.customerProjectPart = customerProjectPartDtos;
     }
 
-    public CustomerProjectPartDto getProject() {
-        List<CustomerProjectPartDto> projects = getCustomerProjectPartDtos();
-        if (projects.isEmpty()) {
-            return null;
-        }
-
-        return projects.get(0);
+    public List<CustomerProjectPartDto> getCustomerProjectPart() {
+        return customerProjectPart;
     }
 
-
-
-    public void setProject(CustomerProjectPartDto project) {
-        List<CustomerProjectPartDto> projects = getCustomerProjectPartDtos();
-        projects.clear();
-
-        if (project != null) {
-            projects.add(project);
-        }
+    public List<CustomerProjectPartDto> getProject() {
+        return project;
     }
+
+    public void setProject(List<CustomerProjectPartDto> project) {
+        this.project = project;
+    }
+
+    public List<CustomerProjectPartDto> getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(List<CustomerProjectPartDto> customer) {
+        this.customer = customer;
+    }
+
+    //    public CustomerProjectPartDto getProject() {
+//        List<CustomerProjectPartDto> projects = getCustomerProjectPartDtos();
+//        if (projects.isEmpty()) {
+//            return null;
+//        }
+//
+//        return projects.get(0);
+//    }
+
+
+
+//    public void setProject(CustomerProjectPartDto project) {
+//        List<CustomerProjectPartDto> projects = getCustomerProjectPartDtos();
+//        projects.clear();
+//
+//        if (project != null) {
+//            projects.add(project);
+//        }
+//    }
 
 
     public List<User> getRealizators() {

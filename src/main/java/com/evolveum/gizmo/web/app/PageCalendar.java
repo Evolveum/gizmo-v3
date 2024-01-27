@@ -18,6 +18,7 @@
 package com.evolveum.gizmo.web.app;
 
 import com.evolveum.gizmo.component.AjaxSubmitButton;
+import com.evolveum.gizmo.component.SummaryPanel;
 import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.calendar.*;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
@@ -38,7 +39,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -60,6 +63,10 @@ public class PageCalendar extends PageAppTemplate {
     private static final String ID_REALIZATOR = "realizator";
     private static final String ID_PROJECT = "project";
     private static final String ID_SHOW = "show";
+
+    private static final String ID_BTN_PREVIOUS = "previous";
+    private static final String ID_BTN_NEXT = "next";
+    private static final String ID_MONTH = "month";
 
     private IModel<ReportFilterDto> model;
 
@@ -89,15 +96,40 @@ public class PageCalendar extends PageAppTemplate {
         form.setOutputMarkupId(true);
         add(form);
 
-        LocalDateTextField from = new LocalDateTextField(ID_FROM, new PropertyModel<>(model, ReportFilterDto.F_DATE_FROM), "dd/MM/yyyy");
-        from.setOutputMarkupId(true);
-        from.add(new DateRangePickerBehavior());
-        form.add(from);
 
-        LocalDateTextField to = new LocalDateTextField(ID_TO, new PropertyModel<>(model, ReportFilterDto.F_DATE_TO), "dd/MM/yyyy");
-        to.setOutputMarkupId(true);
-        to.add(new DateRangePickerBehavior());
-        form.add(to);
+        Label month = new Label(ID_MONTH, new PropertyModel<>(model, ReportFilterDto.F_MONTH_YEAR));
+        month.setOutputMarkupId(true);
+        form.add(month);
+
+        AjaxLink<String> prev = new AjaxLink<>(ID_BTN_PREVIOUS, createStringResource("fa-chevron")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                previousClicked(target);
+            }
+        };
+        prev.setOutputMarkupId(true);
+        form.add(prev);
+
+        AjaxLink<String> next = new AjaxLink<>(ID_BTN_NEXT, createStringResource("fa-chevron")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                nextClicked(target);
+            }
+        };
+        next.setOutputMarkupId(true);
+        form.add(next);
+
+//        LocalDateTextField from = new LocalDateTextField(ID_FROM, new PropertyModel<>(model, ReportFilterDto.F_DATE_FROM), "dd/MM/yyyy");
+//        from.setOutputMarkupId(true);
+//        from.add(new DateRangePickerBehavior());
+//        form.add(from);
+//
+//        LocalDateTextField to = new LocalDateTextField(ID_TO, new PropertyModel<>(model, ReportFilterDto.F_DATE_TO), "dd/MM/yyyy");
+//        to.setOutputMarkupId(true);
+//        to.add(new DateRangePickerBehavior());
+//        form.add(to);
 
 
         MultiselectDropDownInput<User> realizators = new
@@ -289,5 +321,31 @@ public class PageCalendar extends PageAppTemplate {
         }
 
         return expr;
+    }
+
+    private void previousClicked(AjaxRequestTarget target) {
+        ReportFilterDto workFilter = model.getObject();
+        LocalDate defaultFrom = workFilter.getDateFrom();
+        workFilter.setDateFrom(defaultFrom.minusMonths(1));
+        LocalDate defaultTo = workFilter.getDateTo();
+        workFilter.setDateTo(defaultTo.minusMonths(1));
+        handleCalendatNavigation(target, workFilter);
+    }
+
+    private void nextClicked(AjaxRequestTarget target) {
+        ReportFilterDto workFilter = model.getObject();
+        LocalDate defaultFrom = workFilter.getDateFrom();
+        workFilter.setDateFrom(defaultFrom.plusMonths(1));
+
+        LocalDate defaultTo = workFilter.getDateTo();
+        workFilter.setDateTo(defaultTo.plusMonths(1));
+        handleCalendatNavigation(target, workFilter);
+    }
+
+    private void handleCalendatNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
+        GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
+        session.setDashboardFilter(workFilter);
+
+        target.add(PageCalendar.this);
     }
 }

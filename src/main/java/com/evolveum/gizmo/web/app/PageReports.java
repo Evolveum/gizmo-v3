@@ -75,6 +75,8 @@ public class PageReports extends PageAppTemplate {
     private static final String ID_TO = "to";
     private static final String ID_REALIZATOR = "realizator";
     private static final String ID_PROJECT = "project";
+    private static final String ID_PART = "part";
+    private static final String ID_CUSTOMER = "customer";
     private static final String ID_PER_USER = "perUser";
     private static final String ID_SHOW_SUMMARY = "showSummary";
 
@@ -135,11 +137,23 @@ public class PageReports extends PageAppTemplate {
         realizators.setOutputMarkupId(true);
         form.add(realizators);
 
+        MultiselectDropDownInput<CustomerProjectPartDto> customerCombo = new MultiselectDropDownInput<>(ID_CUSTOMER,
+                new PropertyModel<>(model, ReportFilterDto.F_CUSTOMER),
+                GizmoUtils.createCustomerProjectPartList(this, true, false, false),
+                GizmoUtils.createCustomerProjectPartRenderer());
+        form.add(customerCombo);
+
         MultiselectDropDownInput<CustomerProjectPartDto> projectCombo = new MultiselectDropDownInput<>(ID_PROJECT,
+                new PropertyModel<>(model, ReportFilterDto.F_PROJECT),
+                GizmoUtils.createCustomerProjectPartList(this, true, true, false),
+                GizmoUtils.createCustomerProjectPartRenderer());
+        form.add(projectCombo);
+
+        MultiselectDropDownInput<CustomerProjectPartDto> partCombo = new MultiselectDropDownInput<>(ID_PART,
                 new PropertyModel<>(model, ReportFilterDto.F_CUSTOM_PROJECT_PART),
                 GizmoUtils.createCustomerProjectPartList(this, true, true, true),
                 GizmoUtils.createCustomerProjectPartRenderer());
-        form.add(projectCombo);
+        form.add(partCombo);
 
         AjaxCheckBox perUser = new AjaxCheckBox(ID_PER_USER, new PropertyModel<>(model, ReportFilterDto.F_PER_USER)) {
             @Override

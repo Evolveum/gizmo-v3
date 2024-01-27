@@ -243,7 +243,16 @@ public class GizmoUtils {
 
             @Override
             public Object getDisplayValue(CustomerProjectPartDto object) {
-                return object != null ? object.getCustomerName() + " - " + object.getProjectName() + " - " + object.getPartName() : null;
+                if (object == null) {
+                    return null;
+                }
+                if (object.getPartName() != null) {
+                    return object.getCustomerName() + " - " + object.getProjectName() + " - " + object.getPartName();
+                }
+                if (object.getProjectName() != null) {
+                    return object.getCustomerName() + " - " + object.getProjectName();
+                }
+                return object.getCustomerName();
             }
 
             @Override

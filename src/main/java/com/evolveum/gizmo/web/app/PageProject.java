@@ -75,7 +75,7 @@ public class PageProject extends PageAppProjects {
 
         initLayout();
     }
-    
+
     private Project loadProject() {
         Integer projectId = getIntegerParam(PROJECT_ID);
         if (projectId == null) {

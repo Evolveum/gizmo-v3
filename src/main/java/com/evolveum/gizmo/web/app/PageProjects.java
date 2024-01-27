@@ -51,7 +51,6 @@ public class PageProjects extends PageAppProjects {
     private static final String ID_FORM = "form";
     private static final String ID_SEARCH_TEXT = "searchText";
     private static final String ID_SEARCH = "search";
-//    private static final String ID_CLEAR = "clear";
     private static final String ID_NEW_PROJECT = "newProject";
 
     private IModel<String> searchModel = new Model<>();
@@ -106,7 +105,10 @@ public class PageProjects extends PageAppProjects {
     }
 
     private void initButtons(Form form) {
-        IconButton search = new IconButton(ID_SEARCH, createStringResource("fa-search"), createStringResource("btn-primary")) {
+        IconButton search = new IconButton(ID_SEARCH,
+                createStringResource("PageProjects.search"),
+                createStringResource("fa-search"),
+                createStringResource("btn-primary")) {
 
             @Override
             protected void submitPerformed(AjaxRequestTarget target) {
@@ -116,33 +118,23 @@ public class PageProjects extends PageAppProjects {
         search.setRenderBodyOnly(true);
         form.add(search);
 
-//        IconButton clear = new IconButton(ID_CLEAR, createStringResource("fa-trash"), createStringResource("btn-danger")) {
-//            @Override
-//            protected void submitPerformed(AjaxRequestTarget target) {
-//                clearPerformed(target);
-//            }
-//        };
-//        clear.setRenderBodyOnly(true);
-//        form.add(clear);
-
-        AjaxButton newProject = new AjaxButton(ID_NEW_PROJECT, createStringResource("PageProjects.newProject")) {
+        IconButton newProject = new IconButton(ID_NEW_PROJECT,
+                createStringResource("PageProjects.newProject"),
+                createStringResource("fa-plus"),
+                createStringResource("btn-success")) {
 
             @Override
-            public void onClick(AjaxRequestTarget target) {
+            protected void submitPerformed(AjaxRequestTarget target) {
                 newProjectPerformed(target);
             }
         };
+
         form.add(newProject);
     }
 
     private void newProjectPerformed(AjaxRequestTarget target) {
         setResponsePage(PageProject.class);
     }
-
-//    private void clearPerformed(AjaxRequestTarget target) {
-//        searchModel.setObject(null);
-//        target.add(get(ID_FORM + ":" + ID_SEARCH_TEXT), get(ID_TABLE));
-//    }
 
     private void searchPerformed(AjaxRequestTarget target) {
         target.add(get(ID_TABLE));

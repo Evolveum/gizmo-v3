@@ -19,7 +19,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
-    <form class="form-inline pull-right search" role="form" wicket:id="form">
+    <form class="d-flex flex-row justify-content-between" role="form" wicket:id="form">
         <div class="form-group">
             <label class="sr-only"><wicket:message key="PageProjects.searchText"/></label>
             <div class="input-group">
@@ -27,13 +27,11 @@
                        wicket:message="placeholder:PageProjects.searchText">
                 <span class="input-group-btn">
                     <div wicket:id="search"></div>
-<!--                    <div wicket:id="clear"></div>-->
-
                 </span>
             </div>
         </div>
 
-        <a class="btn btn-success" wicket:id="newProject"/>
+        <div wicket:id="newProject"/>
     </form>
     <div wicket:id="table"/>
 </wicket:extend>

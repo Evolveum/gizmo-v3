@@ -102,7 +102,10 @@ public class PageCustomers extends PageAppCustomers {
     }
 
     private void initButtons(Form form) {
-        IconButton search = new IconButton(ID_SEARCH, createStringResource("fa-search"), createStringResource("btn-primary")) {
+        IconButton search = new IconButton(ID_SEARCH,
+                createStringResource("PageCustomers.search"),
+                createStringResource("fa-search"),
+                createStringResource("btn-primary")) {
 
             @Override
             protected void submitPerformed(AjaxRequestTarget target) {
@@ -122,7 +125,10 @@ public class PageCustomers extends PageAppCustomers {
 //        clear.setRenderBodyOnly(true);
 //        form.add(clear);
 
-        IconButton newCustomer = new IconButton(ID_NEW_CUSTOMER, createStringResource("fa-plus"), createStringResource("btn-success")) {
+        IconButton newCustomer = new IconButton(ID_NEW_CUSTOMER,
+                createStringResource("PageCustomers.newCustomer"),
+                createStringResource("fa-plus"),
+                createStringResource("btn-success")) {
 
             @Override
             protected void submitPerformed(AjaxRequestTarget target) {
