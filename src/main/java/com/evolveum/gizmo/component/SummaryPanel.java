@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.list.LoopItem;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import com.evolveum.gizmo.data.Work;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import java.time.LocalDate;
 
@@ -91,7 +92,9 @@ public class SummaryPanel extends SimplePanel<SummaryPanelDto> {
                                 Work work = new Work();
                                 work.setDate(SummaryPanel.this.getModelObject().getDayModel(weekIndex, dayIndex));
                                 work.setRealizator(SecurityUtils.getPrincipalUser().getUser());
-                                setResponsePage(new PageWork(new Model(work)));
+                                PageParameters params = new PageParameters();
+                                params.set(PageWork.WORK_ID, work.getId());
+                                setResponsePage(PageWork.class, params);
                             }
                         };
                         link.setBody(createDayModel(weekIndex, dayIndex));

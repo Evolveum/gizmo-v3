@@ -31,9 +31,16 @@ public class MultiselectDropDownInput<T> extends ListMultipleChoice<T> {
     private static final String ID_INPUT = "input";
 
     private IModel<List<User>> choices;
+    private boolean multiple = true;
 
     public MultiselectDropDownInput(String id, IModel<List<T>> model, IModel<List<T>> choices, IChoiceRenderer<T> renderer) {
         super(id, model, choices, renderer);
+        setOutputMarkupId(true);
+    }
+
+    public MultiselectDropDownInput(String id, IModel<List<T>> model, boolean multiple, IModel<List<T>> choices, IChoiceRenderer<T> renderer) {
+        super(id, model, choices, renderer);
+        this.multiple = multiple;
         setOutputMarkupId(true);
     }
 
@@ -50,7 +57,7 @@ public class MultiselectDropDownInput<T> extends ListMultipleChoice<T> {
         sb.append(".select2 === \"function\") {\n");
 
         sb.append(componentSelector);
-        sb.append(".select2({").append("multiple: true").append("});");
+        sb.append(".select2({").append("multiple: " + multiple + ", width: 'element'").append("});");
         sb.append("}");
         response.render(OnDomReadyHeaderItem.forScript(sb.toString()));
     }

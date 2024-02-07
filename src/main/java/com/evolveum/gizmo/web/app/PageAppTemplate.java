@@ -25,6 +25,7 @@ import com.evolveum.gizmo.security.SecurityUtils;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -84,9 +85,16 @@ public class PageAppTemplate extends PageTemplate {
         Label title = new Label(ID_TITLE, createPageTitleModel());
         add(title);
 
+        Fragment fragment = createHeaderButtonsFragment("buttons");
+        add(fragment);
+
         MainFeedback feedback = new MainFeedback(ID_FEEDBACK);
         feedback.setOutputMarkupId(true);
         add(feedback);
+    }
+
+    public Fragment createHeaderButtonsFragment(String fragmentId) {
+        return new  Fragment(fragmentId, "buttonsFragment", this);
     }
 
     public MainFeedback getFeedbackPanel() {

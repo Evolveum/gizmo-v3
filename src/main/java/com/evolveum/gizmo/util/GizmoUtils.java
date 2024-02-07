@@ -473,7 +473,10 @@ public class GizmoUtils {
                 invoice = work.getInvoiceLength();
             }
 
-            return StringUtils.join(new Object[]{length, " (", invoice, ')'});
+            String roundedLength = String.format("%.2g%n", length);
+            String roundedInvoice = String.format("%.2g%n", invoice);
+
+            return StringUtils.join(roundedLength, " (", roundedInvoice, ')');
         };
     }
 

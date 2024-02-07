@@ -21,13 +21,15 @@ import com.evolveum.gizmo.data.User;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author lazyman
  */
 public class BulkDto implements Serializable {
 
-    public static final String F_REALIZATOR = "realizator";
+    public static final String F_WORK_LENGTH = "workLength";
     public static final String F_FROM = "from";
     public static final String F_TO = "to";
     public static final String F_PART = "part";
@@ -37,7 +39,8 @@ public class BulkDto implements Serializable {
     private LocalDate from;
     private LocalDate to;
     private String description;
-    private CustomerProjectPartDto part;
+    private List<CustomerProjectPartDto> part = new ArrayList<>();
+    private double workLength;
 
     public LocalDate getFrom() {
         return from;
@@ -47,11 +50,11 @@ public class BulkDto implements Serializable {
         this.from = from;
     }
 
-    public CustomerProjectPartDto getPart() {
+    public List<CustomerProjectPartDto> getPart() {
         return part;
     }
 
-    public void setPart(CustomerProjectPartDto part) {
+    public void setPart(List<CustomerProjectPartDto> part) {
         this.part = part;
     }
 
@@ -77,5 +80,13 @@ public class BulkDto implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public double getWorkLength() {
+        return workLength;
+    }
+
+    public void setWorkLength(double workLength) {
+        this.workLength = workLength;
     }
 }

@@ -41,6 +41,7 @@ import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -136,26 +137,6 @@ public class PageDashboard extends PageAppTemplate {
         next.setOutputMarkupId(true);
         add(next);
 
-        AjaxLink<String> newWork = new AjaxLink<>(ID_BTN_NEW_WORK, createStringResource("PageDashboard.newWork")) {
-
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                newWorkPerformed();
-            }
-        };
-        newWork.setOutputMarkupId(true);
-        add(newWork);
-
-        AjaxLink<String> newBulk = new AjaxLink<>(ID_BTN_NEW_BULK, createStringResource("PageDashboard.newBulk")) {
-
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                newBulkPerformed();
-            }
-        };
-        newBulk.setOutputMarkupId(true);
-        add(newBulk);
-
         AbstractTaskDataProvider provider = new AbstractTaskDataProvider(this);
         provider.setFilter(filter.getObject());
 
@@ -173,6 +154,33 @@ public class PageDashboard extends PageAppTemplate {
         CalendarPanel calendarPanel = new CalendarPanel(ID_CALENDAR, createCalendarModel());
         add(calendarPanel);
 
+    }
+
+    @Override
+    public Fragment createHeaderButtonsFragment(String fragmentId) {
+        Fragment fragment = new  Fragment(fragmentId, "buttonsFragment", this);
+
+        AjaxLink<String> newWork = new AjaxLink<>(ID_BTN_NEW_WORK, createStringResource("PageDashboard.newWork")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                newWorkPerformed();
+            }
+        };
+        newWork.setOutputMarkupId(true);
+        fragment.add(newWork);
+
+        AjaxLink<String> newBulk = new AjaxLink<>(ID_BTN_NEW_BULK, createStringResource("PageDashboard.newBulk")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                newBulkPerformed();
+            }
+        };
+        newBulk.setOutputMarkupId(true);
+        fragment.add(newBulk);
+
+        return fragment;
     }
 
     private IModel<com.evolveum.gizmo.component.calendar.FullCalendar> createCalendarModel() {
@@ -307,7 +315,7 @@ public class PageDashboard extends PageAppTemplate {
 
             @Override
             protected IModel<String> createIconModel(IModel<AbstractTask> rowModel) {
-                return new Model<>("fa fa-lg fa-trash-o text-danger");
+                return new Model<>("fa fa-trash text-danger");
             }
 
             @Override

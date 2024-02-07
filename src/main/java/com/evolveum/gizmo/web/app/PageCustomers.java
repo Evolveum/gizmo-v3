@@ -21,10 +21,12 @@ import com.evolveum.gizmo.data.provider.BasicDataProvider;
 import com.querydsl.core.types.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -114,22 +116,38 @@ public class PageCustomers extends PageAppCustomers {
         search.setRenderBodyOnly(true);
         form.add(search);
 
-        IconButton newCustomer = new IconButton(ID_NEW_CUSTOMER,
-                createStringResource("PageCustomers.newCustomer"),
-                createStringResource("fa-plus"),
-                createStringResource("btn-success")) {
-
-            @Override
-            protected void submitPerformed(AjaxRequestTarget target) {
-                newCustomerPerformed(target);
-            }
-        };
-
-
-        form.add(newCustomer);
     }
 
-    private void newCustomerPerformed(AjaxRequestTarget target) {
+    @Override
+    public Fragment createHeaderButtonsFragment(String fragmentId) {
+//        IconButton newCustomer = new IconButton(ID_NEW_CUSTOMER,
+//                createStringResource("PageCustomers.newCustomer"),
+//                createStringResource("fa-plus"),
+//                createStringResource("btn-success")) {
+//
+//            @Override
+//            protected void submitPerformed(AjaxRequestTarget target) {
+//                newCustomerPerformed(target);
+//            }
+//        };
+//        form.add(newCustomer);
+//
+        Fragment fragment = new  Fragment(fragmentId, "buttonsFragment", this);
+
+        AjaxLink<String> newCustomer = new AjaxLink<>(ID_NEW_CUSTOMER, createStringResource("PageCustomers.newCustomer")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                newCustomerPerformed();
+            }
+        };
+        newCustomer.setOutputMarkupId(true);
+        fragment.add(newCustomer);
+
+        return fragment;
+    }
+
+    private void newCustomerPerformed() {
         setResponsePage(PageCustomer.class);
     }
 

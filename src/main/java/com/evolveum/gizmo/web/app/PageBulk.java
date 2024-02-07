@@ -19,6 +19,7 @@ package com.evolveum.gizmo.web.app;
 
 import com.evolveum.gizmo.component.AjaxButton;
 import com.evolveum.gizmo.component.AjaxSubmitButton;
+import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.form.*;
 import com.evolveum.gizmo.data.Part;
 import com.evolveum.gizmo.data.TaskType;
@@ -26,6 +27,7 @@ import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.Work;
 import com.evolveum.gizmo.dto.BulkDto;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
+import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.repository.PartRepository;
 import com.evolveum.gizmo.repository.WorkRepository;
 import com.evolveum.gizmo.security.GizmoPrincipal;
@@ -35,12 +37,17 @@ import com.evolveum.gizmo.util.LoadableModel;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.behavior.AttributeAppender;
+import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.validation.validator.RangeValidator;
 import org.wicketstuff.annotation.mount.MountPath;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -53,7 +60,7 @@ import java.util.Optional;
 public class PageBulk extends PageAppTemplate {
 
     private static final String ID_FORM = "form";
-    private static final String ID_REALIZATOR = "realizator";
+    private static final String ID_LENGTH = "length";
     private static final String ID_FROM = "from";
     private static final String ID_TO = "to";
     private static final String ID_DESCRIPTION = "description";
@@ -70,7 +77,7 @@ public class PageBulk extends PageAppTemplate {
     private IModel<BulkDto> model;
 
     public PageBulk() {
-        model = new LoadableModel<BulkDto>(false) {
+        model = new LoadableModel<>(false) {
 
             @Override
             protected BulkDto load() {
@@ -86,53 +93,43 @@ public class PageBulk extends PageAppTemplate {
         initLayout();
     }
 
+    @Override
+    protected IModel<String> createPageTitleModel() {
+        return () -> {
+            GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
+            return createStringResource("page.title", principal.getUser().getFullName()).getString();
+        };
+    }
+
     private void initLayout() {
         Form form = new Form(ID_FORM);
         add(form);
 
-        HDropDownFormGroup<User> realizator = new HDropDownFormGroup<>(ID_REALIZATOR,
-                new PropertyModel<User>(model, BulkDto.F_REALIZATOR),
-                createStringResource("AbstractTask.realizator"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-        realizator.setRenderer(GizmoUtils.createUserChoiceRenderer());
-        realizator.setChoices(users);
-        form.add(realizator);
+        MultiselectDropDownInput<CustomerProjectPartDto> partCombo = new MultiselectDropDownInput<>(ID_PART,
+                new PropertyModel<>(model, BulkDto.F_PART),
+                false,
+                GizmoUtils.createCustomerProjectPartList(this, true, true, true),
+                GizmoUtils.createCustomerProjectPartRenderer());
+        form.add(partCombo);
 
-        HFormGroup part = new HFormGroup<AutoCompleteInput, CustomerProjectPartDto>(ID_PART,
-                new PropertyModel<CustomerProjectPartDto>(model, BulkDto.F_PART),
-                createStringResource("Work.part"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true) {
-
-            @Override
-            protected FormInput createInput(String componentId, IModel<CustomerProjectPartDto> model,
-                                            IModel<String> placeholder) {
-                AutoCompleteInput formInput = new AutoCompleteInput(componentId, model, projects);
-                FormComponent input = formInput.getFormComponent();
-                input.add(AttributeAppender.replace("placeholder", placeholder));
-
-                return formInput;
-            }
-        };
-        form.add(part);
-        FormComponent partText = part.getFormComponent();
-        partText.add(new AjaxFormComponentUpdatingBehavior("blur") {
-
-            @Override
-            protected void onUpdate(AjaxRequestTarget target) {
-            }
-        });
-
-        HFormGroup from = new HDateFormGroup(ID_FROM, new PropertyModel<Date>(model, BulkDto.F_FROM),
-                createStringResource("PageBulk.from"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        LocalDateTextField from = new LocalDateTextField(ID_FROM, new PropertyModel<>(model, BulkDto.F_FROM), "dd/MM/yyyy");
+        from.setOutputMarkupId(true);
+        from.add(new DateRangePickerBehavior());
         form.add(from);
 
-        HFormGroup to = new HDateFormGroup(ID_TO, new PropertyModel<Date>(model, BulkDto.F_TO),
-                createStringResource("PageBulk.to"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        LocalDateTextField to = new LocalDateTextField(ID_TO, new PropertyModel<>(model, BulkDto.F_TO), "dd/MM/yyyy");
+        to.setOutputMarkupId(true);
+        to.add(new DateRangePickerBehavior());
         form.add(to);
 
-        HAreaFormGroup description = new HAreaFormGroup(ID_DESCRIPTION, new
-                PropertyModel<String>(model, BulkDto.F_DESCRIPTION),
-                createStringResource("AbstractTask.description"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-        description.setRows(5);
+        TextField<Double> length = new TextField<>(ID_LENGTH, new PropertyModel<>(model, BulkDto.F_WORK_LENGTH));
+        length.add(new RangeValidator<>(0.0, 2000.0));
+        length.setType(Double.class);
+        form.add(length);
+
+        TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(model, BulkDto.F_DESCRIPTION));
         form.add(description);
+
 
         initButtons(form);
     }
@@ -172,11 +169,17 @@ public class PageBulk extends PageAppTemplate {
         try {
             BulkDto bulk = model.getObject();
 
-            PartRepository parts = getProjectPartRepository();
-            CustomerProjectPartDto partDto = bulk.getPart();
-            Optional<Part> optionalPart = parts.findById(partDto.getPartId());
+            PartRepository partsRepository = getProjectPartRepository();
+            List<CustomerProjectPartDto> parts = bulk.getPart();
+            if (parts.size() > 1) {
+                error(createStringResource("Message.onlyOnePartAllowed").getString());
+                target.add(getFeedbackPanel());
+                return;
+            }
+            CustomerProjectPartDto partDto = parts.get(0);
+            Optional<Part> optionalPart = partsRepository.findById(partDto.getPartId());
             Part part = null;
-            if (optionalPart != null && optionalPart.isPresent()) {
+            if (optionalPart.isPresent()) {
                 part = optionalPart.get();
             }
 
@@ -186,6 +189,10 @@ public class PageBulk extends PageAppTemplate {
 
             int count = 0;
             while (date.isBefore(to)) {
+                if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                    date = date.plusDays(1);
+                    continue;
+                }
                 Work work = createWork(bulk, part, date);
                 repository.save(work);
 
@@ -214,7 +221,7 @@ public class PageBulk extends PageAppTemplate {
         work.setDate(date);
         work.setDescription(bulk.getDescription());
         work.setInvoiceLength(0);
-        work.setWorkLength(8);
+        work.setWorkLength(bulk.getWorkLength());
         work.setType(TaskType.WORK);
 
         return work;

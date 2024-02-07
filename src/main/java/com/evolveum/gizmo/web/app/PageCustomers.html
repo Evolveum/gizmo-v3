@@ -31,10 +31,15 @@
                 </span>
             </div>
         </div>
-
-        <div wicket:id="newCustomer"/>
     </form>
     <div wicket:id="table"/>
+
+    <wicket:fragment wicket:id="buttonsFragment" >
+        <button class="btn btn-success" wicket:id="newCustomer">
+            <i class="fa fa-plus"/>
+            <wicket:message key="PageCustomers.newCustomer" />
+        </button>
+    </wicket:fragment>
 </wicket:extend>
 </body>
 </html>

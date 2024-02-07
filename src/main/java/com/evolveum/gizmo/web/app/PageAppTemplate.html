@@ -25,8 +25,9 @@
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container">
-                    <div class="row mb-2">
+                    <div class="d-flex justify-content-between">
                         <h1 class="m-0" wicket:id="titleHeader"/>
+                        <div wicket:id="buttons"/>
                     </div>
                 </div>
             </div>
@@ -38,6 +39,10 @@
             </div>
         </div>
     </div>
+
+    <wicket:fragment wicket:id="buttonsFragment" />
+
 </wicket:extend>
+
 </body>
 </html>

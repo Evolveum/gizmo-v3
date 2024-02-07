@@ -17,10 +17,16 @@
 
 package com.evolveum.gizmo.web.app;
 
+import com.evolveum.gizmo.component.VisibleEnableBehaviour;
+import com.evolveum.gizmo.component.form.IconButton;
+import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
+import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.repository.PartRepository;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -30,8 +36,12 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.wicketstuff.annotation.mount.MountPath;
 import com.evolveum.gizmo.component.AjaxButton;
@@ -47,8 +57,11 @@ import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author lazyman
@@ -59,7 +72,6 @@ public class PageWork extends PageAppTemplate {
     public static final String WORK_ID = "workId";
 
     private static final String ID_FORM = "form";
-    private static final String ID_REALIZATOR = "realizator";
     private static final String ID_DATE = "date";
     private static final String ID_LENGTH = "length";
     private static final String ID_INVOICE = "invoice";
@@ -67,28 +79,27 @@ public class PageWork extends PageAppTemplate {
     private static final String ID_TRACK_ID = "trackId";
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
-    private static final String ID_PART = "part";
+    private static final String ID_ADD = "add";
+    private static final String ID_CUSTOMER_PROJECT_PART = "customerProjectPart";
 
     private IModel<List<CustomerProjectPartDto>> projects =
             GizmoUtils.createCustomerProjectPartList(this, true, true, true);
 
-    private IModel<Work> model;
+    private IModel<List<WorkDto>> model;
 
     public PageWork() {
+        this(null);
+    }
+
+    public PageWork(PageParameters params) {
+        super(params);
         model = new LoadableModel<>(false) {
 
             @Override
-            protected Work load() {
-                return loadWork();
+            protected List<WorkDto> load() {
+                return loadWorks();
             }
         };
-
-        initLayout();
-    }
-
-    public PageWork(IModel<Work> model) {
-        Validate.notNull(model, "Model must not be null.");
-        this.model = model;
 
         initLayout();
     }
@@ -98,21 +109,52 @@ public class PageWork extends PageAppTemplate {
         return () -> {
             Integer workId = getIntegerParam(WORK_ID);
             String key = workId != null ? "page.title.edit" : "page.title";
-            return createStringResource(key).getString();
+            GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
+
+            return createStringResource(key, principal.getUser().getFullName()).getString();
         };
     }
 
-    private Work loadWork() {
+    @Override
+    public Fragment createHeaderButtonsFragment(String fragmentId) {
+        Fragment fragment = new  Fragment(fragmentId, "buttonsFragment", this);
+
+        AjaxButton addWork = new AjaxButton(ID_ADD, createStringResource("GizmoApplication.button.new")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                addNewWork(target);
+            }
+        };
+        addWork.add(new VisibleEnableBehaviour() {
+            @Override
+            public boolean isVisible() {
+                return isMultipleWorkEnabled();
+            }
+        });
+        fragment.add(addWork);
+        return fragment;
+    }
+
+    protected boolean isMultipleWorkEnabled() {
+        return true;
+    }
+
+    private void addNewWork(AjaxRequestTarget target) {
+        model.getObject().add(new WorkDto());
+        target.add(PageWork.this);
+    }
+
+    private List<WorkDto> loadWorks() {
+        ArrayList<WorkDto> list = new ArrayList<>();
+        list.add(loadWork());
+        return list;
+    }
+
+    private WorkDto loadWork() {
         Integer workId = getIntegerParam(WORK_ID);
         if (workId == null) {
-            GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
-            User user = principal.getUser();
-
-            Work work = new Work();
-            work.setRealizator(user);
-            work.setDate(LocalDate.now());
-
-            return work;
+            return new WorkDto();
         }
 
         WorkRepository repository = getWorkRepository();
@@ -122,118 +164,59 @@ public class PageWork extends PageAppTemplate {
             throw new RestartResponseException(PageWork.class);
         }
 
-        return work.get();
+        return new WorkDto(work.get());
     }
 
     private void initLayout() {
-        Label realizator = new Label(ID_REALIZATOR, new PropertyModel<>(model, (Work.F_REALIZATOR + ".fullName")));
-        realizator.setRenderBodyOnly(true);
-        add(realizator);
+
 
         Form<Work> form = new Form<>(ID_FORM);
         add(form);
 
-        PartAutoCompleteText part = new PartAutoCompleteText(ID_PART,
-                createPartModel(new PropertyModel<>(model, Work.F_PART)),
-                GizmoUtils.createCustomerProjectPartList(this, true, true, true));
-        form.add(part);
-
-        LocalDateTextField from = new LocalDateTextField(ID_DATE, new PropertyModel<>(model, Work.F_DATE), "dd/MM/yyyy");
-        from.setOutputMarkupId(true);
-        from.add(new DateRangePickerBehavior());
-        form.add(from);
-
-        TextField<Double> invoice = new TextField<>(ID_INVOICE, new PropertyModel<>(model, Work.F_INVOICE_LENGTH), Double.class);
-        invoice.add(new RangeValidator<>(0.0, 2000.0));
-        invoice.setOutputMarkupId(true);
-        form.add(invoice);
-
-        TextField<Double> length = new TextField<>(ID_LENGTH, new PropertyModel<>(model, Work.F_WORK_LENGTH));
-        length.add(new RangeValidator<>(0.0, 2000.0));
-        length.setType(Double.class);
-        form.add(length);
-
-        length.add(new AjaxFormComponentUpdatingBehavior("blur") {
+        ListView<WorkDto> list = new ListView<>("works", model) {
 
             @Override
-            protected void onUpdate(AjaxRequestTarget target) {
-                if (isProjectCommercial()) {
-                    Work work = model.getObject();
-                    work.setInvoiceLength(work.getWorkLength());
-
-                    target.focusComponent(invoice);
-                    target.add(invoice);
-                }
+            protected void populateItem(ListItem<WorkDto> item) {
+                createNewWorkForm(item, item.getModel());
             }
-        });
-
-        TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(model, Work.F_DESCRIPTION));
-        form.add(description);
-
-        TextField<String> trackId = new TextField<>(ID_TRACK_ID, new PropertyModel<>(model, Work.F_TRACK_ID));
-        form.add(trackId);
+        };
+        form.add(list);
 
         initButtons(form);
     }
 
-    private boolean isProjectCommercial() {
-        Work work = model.getObject();
-        Part part = work.getPart();
-        if (part == null) {
-            return false;
-        }
+    private void createNewWorkForm(ListItem<WorkDto> item, IModel<WorkDto> workModel) {
+        MultiselectDropDownInput<CustomerProjectPartDto> partCombo = new MultiselectDropDownInput<>(ID_CUSTOMER_PROJECT_PART,
+                new PropertyModel<>(workModel, WorkDto.F_CUSTOMER_PROJECT_PART),
+                isMultiProjectEnabled(),
+                GizmoUtils.createCustomerProjectPartList(this, true, true, true),
+                GizmoUtils.createCustomerProjectPartRenderer());
+        item.add(partCombo);
 
-        Project project = part.getProject();
-        return project.isCommercial();
+        LocalDateTextField from = new LocalDateTextField(ID_DATE, new PropertyModel<>(workModel, Work.F_DATE), "dd/MM/yyyy");
+        from.setOutputMarkupId(true);
+        from.add(new DateRangePickerBehavior());
+        item.add(from);
+
+        TextField<Double> invoice = new TextField<>(ID_INVOICE, new PropertyModel<>(workModel, WorkDto.F_INVOICE_LENGTH), Double.class);
+        invoice.add(new RangeValidator<>(0.0, 2000.0));
+        invoice.setOutputMarkupId(true);
+        item.add(invoice);
+
+        TextField<Double> length = new TextField<>(ID_LENGTH, new PropertyModel<>(workModel, Work.F_WORK_LENGTH));
+        length.add(new RangeValidator<>(0.0, 2000.0));
+        length.setType(Double.class);
+        item.add(length);
+
+        TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(workModel, Work.F_DESCRIPTION));
+        item.add(description);
+
+        TextField<String> trackId = new TextField<>(ID_TRACK_ID, new PropertyModel<>(workModel, Work.F_TRACK_ID));
+        item.add(trackId);
     }
 
-    private IModel<CustomerProjectPartDto> createPartModel(final IModel<Part> model) {
-        return new IModel<>() {
-
-            private Part part;
-
-            @Override
-            public CustomerProjectPartDto getObject() {
-                part = model.getObject();
-
-                if (part == null) {
-                    return null;
-                }
-
-                for (CustomerProjectPartDto dto : projects.getObject()) {
-                    if (part.getId().equals(dto.getPartId())) {
-                        return dto;
-                    }
-                }
-
-                return null;
-            }
-
-            @Override
-            public void setObject(CustomerProjectPartDto object) {
-                if (object == null || object.getPartId() == null) {
-                    model.setObject(null);
-                    return;
-                }
-
-                Integer id = object.getPartId();
-                if (part != null && id.equals(part.getId())) {
-                    model.setObject(part);
-                    return;
-                }
-
-                PartRepository repository = getProjectPartRepository();
-                Optional<Part> optionalPart = repository.findById(id);
-                if (optionalPart.isPresent()) {
-                    part = optionalPart.get();
-                    model.setObject(part);
-                }
-            }
-
-            @Override
-            public void detach() {
-            }
-        };
+    protected boolean isMultiProjectEnabled() {
+        return getIntegerParam(WORK_ID) == null;
     }
 
     private void initButtons(Form<Work> form) {
@@ -266,12 +249,16 @@ public class PageWork extends PageAppTemplate {
     }
 
     private void saveWorkPerformed(AjaxRequestTarget target) {
-        WorkRepository repository = getWorkRepository();
         try {
-            Work work = model.getObject();
-            work = repository.save(work);
+            PartRepository repositoryPart = getProjectPartRepository();
+            List<WorkDto> preparedWorks = model.getObject();
 
-            model.setObject(work);
+            List<Work> works = preparedWorks.stream()
+                    .map(preparedWork -> preparedWork.createWorks(repositoryPart))
+                    .flatMap(Collection::stream)
+                    .toList();
+
+            works.forEach(work -> getWorkRepository().save(work));
 
             PageDashboard response = new PageDashboard();
             response.success(createStringResource("Message.workSavedSuccessfully").getString());
