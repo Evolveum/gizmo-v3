@@ -193,7 +193,7 @@ public class PageWork extends PageAppTemplate {
                 GizmoUtils.createCustomerProjectPartRenderer());
         item.add(partCombo);
 
-        LocalDateTextField from = new LocalDateTextField(ID_DATE, new PropertyModel<>(workModel, Work.F_DATE), "dd/MM/yyyy");
+        LocalDateTextField from = new LocalDateTextField(ID_DATE, new PropertyModel<>(workModel, WorkDto.F_DATE), "dd/MM/yyyy");
         from.setOutputMarkupId(true);
         from.add(new DateRangePickerBehavior());
         item.add(from);
@@ -203,15 +203,15 @@ public class PageWork extends PageAppTemplate {
         invoice.setOutputMarkupId(true);
         item.add(invoice);
 
-        TextField<Double> length = new TextField<>(ID_LENGTH, new PropertyModel<>(workModel, Work.F_WORK_LENGTH));
+        TextField<Double> length = new TextField<>(ID_LENGTH, new PropertyModel<>(workModel, WorkDto.F_WORK_LENGTH));
         length.add(new RangeValidator<>(0.0, 2000.0));
         length.setType(Double.class);
         item.add(length);
 
-        TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(workModel, Work.F_DESCRIPTION));
+        TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(workModel, WorkDto.F_DESCRIPTION));
         item.add(description);
 
-        TextField<String> trackId = new TextField<>(ID_TRACK_ID, new PropertyModel<>(workModel, Work.F_TRACK_ID));
+        TextField<String> trackId = new TextField<>(ID_TRACK_ID, new PropertyModel<>(workModel, WorkDto.F_TRACK_ID));
         item.add(trackId);
     }
 

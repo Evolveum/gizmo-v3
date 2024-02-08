@@ -32,7 +32,10 @@ import java.util.stream.Collectors;
 
 public class WorkDto implements Serializable {
 
-    public static final String F_PART = "part";
+    public static final String F_DATE = "date";
+    public static final String F_TRACK_ID = "trackId";
+    public static final String F_DESCRIPTION = "description";
+    public static final String F_WORK_LENGTH = "workLength";
     public static final String F_INVOICE_LENGTH = "invoiceLength";
     public static final String F_CUSTOMER_PROJECT_PART = "customerProjectPart";
 
@@ -76,7 +79,7 @@ public class WorkDto implements Serializable {
     }
 
     public double getWorkLength() {
-        return invoiceLength;
+        return workLength;
     }
 
 
