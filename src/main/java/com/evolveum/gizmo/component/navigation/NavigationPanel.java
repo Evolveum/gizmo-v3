@@ -17,13 +17,18 @@
 
 package com.evolveum.gizmo.component.navigation;
 
+import com.evolveum.gizmo.component.LabeledLink;
+import com.evolveum.gizmo.security.SecurityUtils;
+import com.evolveum.gizmo.web.app.PageUser;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
 import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.web.app.PageDashboard;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import java.util.List;
 
@@ -32,6 +37,7 @@ public class NavigationPanel extends SimplePanel<List<NavigationMenuItem>> {
     private static final String ID_HOME = "home";
     private static final String ID_MENU_ITEMS = "menuItems";
     private static final String ID_MENU_ITEM = "menuItem";
+    private static final String ID_USER = "user";
 
     public NavigationPanel(String id, IModel<List<NavigationMenuItem>> model) {
         super(id, model);
@@ -57,6 +63,19 @@ public class NavigationPanel extends SimplePanel<List<NavigationMenuItem>> {
             }
         };
         add(listView);
+
+        String fullName = SecurityUtils.getPrincipalUser().getFullName();
+        LabeledLink user = new LabeledLink(ID_USER, () -> fullName) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                Integer userId = SecurityUtils.getPrincipalUser().getUserId();
+                PageParameters params = new PageParameters();
+                params.add(PageUser.USER_ID, userId);
+                setResponsePage(PageUser.class, params);
+            }
+        };
+        add(user);
 
 
     }

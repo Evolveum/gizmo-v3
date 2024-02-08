@@ -19,15 +19,18 @@ package com.evolveum.gizmo.web.app;
 
 import com.evolveum.gizmo.component.AjaxButton;
 import com.evolveum.gizmo.component.AjaxSubmitButton;
-import com.evolveum.gizmo.component.form.HCheckFormGroup;
-import com.evolveum.gizmo.component.form.HFormGroup;
-import com.evolveum.gizmo.component.form.HPasswordGroup;
+import com.evolveum.gizmo.component.VisibleEnableBehaviour;
+import com.evolveum.gizmo.component.form.*;
 import com.evolveum.gizmo.data.User;
+import com.evolveum.gizmo.data.Work;
+import com.evolveum.gizmo.dto.ProjectSearchSettings;
 import com.evolveum.gizmo.repository.UserRepository;
 import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
@@ -55,7 +58,7 @@ public class PageUser extends PageAppUsers {
     private IModel<User> model;
 
     public PageUser() {
-        model = new LoadableModel<User>(false) {
+        model = new LoadableModel<>(false) {
 
             @Override
             protected User load() {
@@ -82,48 +85,44 @@ public class PageUser extends PageAppUsers {
         Form form = new Form(ID_FORM);
         add(form);
 
-        HFormGroup username = new HFormGroup(ID_NAME, new PropertyModel<String>(model, User.F_NAME),
-                createStringResource("User.name"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        TextField<String> username = new TextField<>(ID_NAME, new PropertyModel<>(model, User.F_NAME));
         form.add(username);
 
-        HFormGroup firstName = new HFormGroup(ID_GIVEN_NAME, new PropertyModel<String>(model, User.F_GIVEN_NAME),
-                createStringResource("User.givenName"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        TextField<String> firstName = new TextField<>(ID_GIVEN_NAME, new PropertyModel<>(model, User.F_GIVEN_NAME));
         form.add(firstName);
 
-        HFormGroup lastName = new HFormGroup(ID_FAMILY_NAME, new PropertyModel<String>(model, User.F_FAMILY_NAME),
-                createStringResource("User.familyName"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
+        TextField<String> lastName = new TextField<>(ID_FAMILY_NAME, new PropertyModel<>(model, User.F_FAMILY_NAME));
         form.add(lastName);
 
-        HFormGroup email = new HFormGroup(ID_LDAP_DN, new PropertyModel<String>(model, User.F_LDAP_DN),
-                createStringResource("User.ldapDn"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, false);
-        form.add(email);
+        TextField<String> ldapDn = new TextField<>(ID_LDAP_DN, new PropertyModel<>(model, User.F_LDAP_DN));
+        ldapDn.setEnabled(false);
+        form.add(ldapDn);
 
-        HFormGroup enabled = new HCheckFormGroup(ID_ENABLED, new PropertyModel<Boolean>(model, User.F_ENABLED),
-                createStringResource("User.enabled"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, true);
-        form.add(enabled);
-
-        HFormGroup password = new HPasswordGroup(ID_PASSWORD, new PropertyModel<String>(model, User.F_PASSWORD),
-                createStringResource("User.password"), LABEL_SIZE, TEXT_SIZE, FEEDBACK_SIZE, false);
-        form.add(password);
-
-        AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
-
+        AjaxCheckBox enabled = new AjaxCheckBox(ID_ENABLED, new PropertyModel<>(model, User.F_ENABLED)) {
             @Override
-            protected void onSubmit(AjaxRequestTarget target) {
-                userSavePerformed(target);
-            }
-
-            @Override
-            protected void onError(AjaxRequestTarget target) {
-                target.add(form);
+            protected void onUpdate(AjaxRequestTarget target) {
             }
         };
-        form.add(save);
+        enabled.setOutputMarkupId(true);
+        form.add(enabled);
 
-        AjaxButton cancel = new AjaxButton(ID_CANCEL, createStringResource("GizmoApplication.button.cancel")) {
+        PasswordInput password = new PasswordInput(ID_PASSWORD, new PropertyModel<>(model, User.F_PASSWORD));
+        form.add(password);
+
+        IconButton save = new IconButton(ID_SAVE, createStringResource("GizmoApplication.button.save"), createStringResource("fa fa-save"), createStringResource("btn-success")) {
 
             @Override
-            public void onClick(AjaxRequestTarget target) {
+            public void submitPerformed(AjaxRequestTarget target) {
+                userSavePerformed(target);
+            }
+        };
+
+        form.add(save);
+
+        IconButton cancel = new IconButton(ID_CANCEL, createStringResource("GizmoApplication.button.cancel"), createStringResource("fa fa-times"), createStringResource("btn-danger")) {
+
+            @Override
+            public void submitPerformed(AjaxRequestTarget target) {
                 cancelPerformed(target);
             }
         };
@@ -138,7 +137,10 @@ public class PageUser extends PageAppUsers {
         try {
             UserRepository repo = getUserRepository();
             User user = model.getObject();
-            user.setPassword(GizmoUtils.toSha1(user.getPassword()));
+            if (user.getPassword() != null) {
+                user.setPassword(GizmoUtils.toSha1(user.getPassword()));
+            }
+
             repo.saveAndFlush(user);
 
             PageUsers next = new PageUsers();

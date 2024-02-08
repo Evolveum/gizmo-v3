@@ -50,19 +50,6 @@ public class SecurityConfig { //} extends WebSecurityConfigurerAdapter {
             web.ignoring().requestMatchers(new AntPathRequestMatcher("/favicon.ico"));
         };
     }
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return (web) -> web.ignoring().requestMatchers(
-//                "/static/js/**",
-//                "/js/**",
-//                "/static/css/**",
-//                "/static/**",
-//                "/css/**",
-//                "/favicon.ico",
-//                "/static/img/**",
-//                "/static/fonts/**",
-//                "/static/wicket/resource/**");
-//    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
