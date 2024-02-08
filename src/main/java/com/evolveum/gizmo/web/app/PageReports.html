@@ -19,86 +19,54 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <body>
 <wicket:extend>
-    <div class="container">
+    <div wicket:id="confirmDownload"/>
     <form wicket:id="form">
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label"><wicket:message key="PageReports.dateFrom"/></label>
-            <div class="col-sm-4">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">
-                        <i class="fa fa-calendar"></i>
-                      </span>
-                    </div>
-                    <input type="text" class="form-control float-right"
-                           wicket:id="from"/>
+        <div class="card">
+            <div class="card-body">
+               <div class="form-row">
+                   <div class="form-group">
+                       <label><wicket:message key="PageReports.dateFrom"/></label>
+                       <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">
+                                <i class="fa fa-calendar"></i>
+                              </span>
+                           </div>
+                           <input type="text" class="form-control float-right"
+                                  wicket:id="from"/>
+                       </div>
+                   </div>
+
+                   <div class="form-group">
+                       <label><wicket:message key="PageReports.dateTo"/></label>
+                       <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">
+                                <i class="fa fa-calendar"></i>
+                              </span>
+                           </div>
+                           <input type="text" class="form-control float-right"
+                                  wicket:id="to"/>
+                       </div>
+                   </div>
+               </div>
+
+               <div class="form-group">
+                   <label><wicket:message key="PageReports.realizator"/></label>
+                   <select class="form-control" wicket:id="realizator"/>
+               </div>
+
+
+               <div wicket:id="customer"/>
+
+                <div>
+                    <a class="btn btn-primary btn-sm" wicket:id="preview"/>
+                    <a class="btn btn-success btn-sm" wicket:id="export"/>
                 </div>
             </div>
         </div>
 
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label"><wicket:message key="PageReports.dateTo"/></label>
-            <div class="col-sm-4">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">
-                        <i class="fa fa-calendar"></i>
-                      </span>
-                    </div>
-                    <input type="text" class="form-control float-right"
-                           wicket:id="to"/>
-                </div>
-            </div>
-        </div>
 
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label"><wicket:message key="PageReports.customer"/></label>
-            <div class="col-sm-4">
-                <select class="form-control" wicket:id="customer"/>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label"><wicket:message key="PageReports.project"/></label>
-            <div class="col-sm-4">
-                <select class="form-control" wicket:id="project"/>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label"><wicket:message key="PageReports.part"/></label>
-            <div class="col-sm-4">
-                <select class="form-control" wicket:id="part"/>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label"><wicket:message key="PageReports.realizator"/></label>
-            <div class="col-sm-4">
-                <select class="form-control" wicket:id="realizator"/>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label"><wicket:message key="PageReports.perUser"/></label>
-            <div class="col-sm-4">
-                <div class="checkbox">
-                        <input type="checkbox" wicket:id="perUser"/>&nbsp;
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label class="col-sm-2 col-form-label"><wicket:message key="PageReports.showSummary"/></label>
-            <div class="col-sm-4">
-                <div class="checkbox">
-                    <input type="checkbox" wicket:id="showSummary"/>&nbsp;
-                </div>
-            </div>
-        </div>
-
-        <a class="btn btn-primary btn-sm" wicket:id="preview"/>
-        <a class="btn btn-default btn-sm" wicket:id="export">Download</a>
     </form>
 
     <div class="clearfix"/>
@@ -108,7 +76,7 @@
             <div wicket:id="details"/>
         </div>
     </div>
-    </div>
+
 </wicket:extend>
 </body>
 </html>

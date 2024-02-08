@@ -85,6 +85,7 @@ public class PageBulk extends PageAppTemplate {
                 GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
                 dto.setRealizator(principal.getUser());
                 dto.setFrom(LocalDate.now());
+                dto.setWorkLength(8);
 
                 return dto;
             }

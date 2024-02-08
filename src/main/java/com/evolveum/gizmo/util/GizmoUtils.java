@@ -20,6 +20,7 @@ package com.evolveum.gizmo.util;
 import com.evolveum.gizmo.data.*;
 import com.evolveum.gizmo.data.provider.AbstractTaskDataProvider;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
+import com.evolveum.gizmo.dto.ProjectSearchSettings;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.repository.CustomerRepository;
 import com.evolveum.gizmo.repository.UserRepository;
@@ -315,6 +316,40 @@ public class GizmoUtils {
         };
     }
 
+    public static LoadableModel<List<CustomerProjectPartDto>> createCustomerProjectPartList(final PageTemplate page,
+                                                                                     IModel<ProjectSearchSettings> settings) {
+        return new LoadableModel<>(false) {
+
+            @Override
+            protected List<CustomerProjectPartDto> load() {
+                List<CustomerProjectPartDto> list = null;
+                try {
+                    ProjectSearchSettings searchSettings = settings.getObject();
+                    if (searchSettings.isCustomerSearch() && searchSettings.isProjectSearch() && !searchSettings.isPartSearch()) {
+                        List<CustomerProjectPartDto> dbList = listProjectsFromDb(page.getEntityManager());
+                        list = listCustomersProjects(dbList);
+                    } else if (searchSettings.isCustomerSearch() && searchSettings.isProjectSearch() && searchSettings.isPartSearch()) {
+                        list = listProjectsFromDb(page.getEntityManager());
+                    } else if (searchSettings.isCustomerSearch() && !searchSettings.isProjectSearch() && !searchSettings.isPartSearch()) {
+                        list = listCustomers(page);
+                    }
+                } catch (Exception ex) {
+                    handleModelException(page, "Message.couldntLoadProjectData", ex);
+                }
+
+                if (list == null) {
+                    list = new ArrayList<>();
+                }
+
+                LOG.debug("Found {} items.", list.size());
+
+                Collections.sort(list);
+
+                return list;
+            }
+        };
+    }
+
     private static List<CustomerProjectPartDto> listProjectsFromDb(EntityManager entityManager) {
         QCustomer customer = QCustomer.customer;
         QProject project = QProject.project;
@@ -368,20 +403,20 @@ public class GizmoUtils {
         Set<Integer> addedCustomers = new HashSet<>();
         Set<Integer> addedProjects = new HashSet<>();
         for (CustomerProjectPartDto dto : dbList) {
-            if (!addedCustomers.contains(dto.getCustomerId())) {
-                list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getCustomerId()));
-                addedCustomers.add(dto.getCustomerId());
-            }
+//            if (!addedCustomers.contains(dto.getCustomerId())) {
+//                list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getCustomerId()));
+//                addedCustomers.add(dto.getCustomerId());
+//            }
             if (!addedProjects.contains(dto.getProjectId())) {
                 list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getProjectName(),
                         dto.getCustomerId(), dto.getProjectId()));
                 addedProjects.add(dto.getProjectId());
             }
-            if (!addedProjects.contains(dto.getPartId())) {
-                list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getProjectName(), dto.getPartName(),
-                        dto.getCustomerId(), dto.getProjectId(), dto.getPartId()));
-                addedProjects.add(dto.getPartId());
-            }
+//            if (!addedProjects.contains(dto.getPartId())) {
+//                list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getProjectName(), dto.getPartName(),
+//                        dto.getCustomerId(), dto.getProjectId(), dto.getPartId()));
+//                addedProjects.add(dto.getPartId());
+//            }
         }
 
         return list;

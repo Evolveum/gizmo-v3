@@ -18,28 +18,32 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
-    <table class="table table-condensed table-striped table-bordered">
-        <thead>
-            <tr>
-                <th><wicket:message key="SummaryPartsPanel.part"/></th>
-                <th><wicket:message key="SummaryPartsPanel.work"/></th>
-                <th><wicket:message key="SummaryPartsPanel.invoice"/></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr wicket:id="partRepeater">
-                <td><span wicket:id="part"/></td>
-                <td><span wicket:id="work"/></td>
-                <td><span wicket:id="invoice"/></td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr class="info">
-                <td><b><wicket:message key="SummaryPartsPanel.summary"/></b></td>
-                <td><b><span wicket:id="sumWork"/></b></td>
-                <td><b><span wicket:id="sumInvoice"/></b></td>
-            </tr>
-        </tfoot>
-    </table>
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-condensed table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th><wicket:message key="SummaryPartsPanel.part"/></th>
+                    <th><wicket:message key="SummaryPartsPanel.work"/></th>
+                    <th><wicket:message key="SummaryPartsPanel.invoice"/></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr wicket:id="partRepeater">
+                    <td><span wicket:id="part"/></td>
+                    <td><span wicket:id="work"/></td>
+                    <td><span wicket:id="invoice"/></td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr class="info">
+                    <td><b><wicket:message key="SummaryPartsPanel.summary"/></b></td>
+                    <td><b><span wicket:id="sumWork"/></b></td>
+                    <td><b><span wicket:id="sumInvoice"/></b></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
 </wicket:panel>
 </html>

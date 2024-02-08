@@ -28,7 +28,7 @@ import java.util.Locale;
 
 public class ReportFilterDto implements Serializable {
 
-    public static final String F_SUMMARY = "summary";
+//    public static final String F_SUMMARY = "summary";
     public static final String F_WORKLOG = "worklog";
     public static final String F_PER_USER = "perUser";
 //    public static final String F_SHOW_SUMMARY = "showSummary";
@@ -42,7 +42,7 @@ public class ReportFilterDto implements Serializable {
     public static final String F_WORK_TYPE = "workType";
     public static final String F_MONTH_YEAR = "monthYear";
 
-    private boolean summary;
+//    private boolean summary;
     private boolean workLog;
     private boolean perUser;
 
@@ -54,13 +54,13 @@ public class ReportFilterDto implements Serializable {
     private List<User> realizators;
     private WorkType workType = WorkType.ALL;
 
-    public boolean isSummary() {
-        return summary;
-    }
-
-    public void setSummary(boolean summary) {
-        this.summary = summary;
-    }
+//    public boolean isSummary() {
+//        return summary;
+//    }
+//
+//    public void setSummary(boolean summary) {
+//        this.summary = summary;
+//    }
 
     public boolean isWorkLog() {
         return workLog;

@@ -36,7 +36,7 @@ server:
     context-path: /gizmo
     application-display-name: Gizmo
     session:
-      timeout: 15  # in minutes. By default spring uses seconds, but tomcat/container (not embedded) uses this value
+      timeout: 30m  # in minutes. By default spring uses seconds, but tomcat/container (not embedded) uses this value
       # as minutes - so we end up with never expiring session.
 
 

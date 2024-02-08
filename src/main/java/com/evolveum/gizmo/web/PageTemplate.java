@@ -107,15 +107,6 @@ public class PageTemplate extends WebPage {
         return createStringResourceStatic(resourceKey);
     }
 
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-
-//        Bootstrap.install(Application.get());
-//        Bootstrap.renderHead(response);
-//        response.render(CssHeaderItem.forReference(
-//                new LessResourceReference(PageTemplate.class, "PageTemplate.less")));
-    }
 
     protected IModel<String> createPageTitleModel() {
         return createStringResource("page.title");

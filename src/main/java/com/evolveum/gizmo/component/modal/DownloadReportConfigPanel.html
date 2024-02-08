@@ -1,0 +1,37 @@
+<!--
+  ~  Copyright (C) 2023 Evolveum
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  ~
+  -->
+<html xmlns:wicket="http://wicket.apache.org">
+<wicket:panel>
+    <div class="form-group">
+        <label><wicket:message key="PageReports.reportName"/></label>
+        <input type="text" class="form-control float-right" wicket:id="reportName"/>
+    </div>
+
+   <div class="form-check form-check-inline">
+       <input class="form-check-input" type="checkbox" wicket:id="perUser"/>
+       <label class="form-check-label"><wicket:message key="PageReports.perUser"/></label>
+   </div>
+
+   <div class="form-check form-check-inline">
+       <input class="form-check-input" type="checkbox" wicket:id="showSummary"/>
+       <label class="form-check-label"><wicket:message key="PageReports.showSummary"/></label>
+   </div>
+
+
+    <a class="btn btn-primary btn-sm" wicket:id="export"><wicket:message key="PageReports.downloadReport"/> </a>
+</wicket:panel>
+</html>
