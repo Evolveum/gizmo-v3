@@ -121,10 +121,10 @@ public class ReportDataProvider extends SortableDataProvider<AbstractTask, Strin
             list.add(task.type.eq(filter.getWorkType().getType()));
         }
 
-        List<CustomerProjectPartDto> allFilter = new ArrayList<>();
-        allFilter.addAll(filter.getCustomerProjectPart());
-        allFilter.addAll(filter.getCustomer());
-        allFilter.addAll(filter.getProject());
+        List<CustomerProjectPartDto> allFilter = filter.getCustomerProjectPartDtos();
+//        allFilter.addAll();
+//        allFilter.addAll(filter.getCustomer());
+//        allFilter.addAll(filter.getProject());
         p = createProjectListPredicate(allFilter);
         if (p != null) {
             list.add(p);

@@ -34,7 +34,8 @@ public class ReportFilterDto implements Serializable {
 //    public static final String F_SHOW_SUMMARY = "showSummary";
     public static final String F_DATE_FROM = "dateFrom";
     public static final String F_DATE_TO = "dateTo";
-    public static final String F_CUSTOM_PROJECT_PART = "customerProjectPart";
+//    public static final String F_CUSTOM_PROJECT_PART = "customerProjectPart";
+    public static final String F_PROJECT_SEARCH_SETTINGS = "projectSearchSettings";
     public static final String F_CUSTOMER = "customer";
     public static final String F_PROJECT = "project";
     public static final String F_PROJECTS = "projects";
@@ -48,9 +49,11 @@ public class ReportFilterDto implements Serializable {
 
     private LocalDate dateFrom;
     private LocalDate dateTo;
-    private List<CustomerProjectPartDto> customerProjectPart = new ArrayList<>();
-    private List<CustomerProjectPartDto> customer = new ArrayList<>();
-    private List<CustomerProjectPartDto> project = new ArrayList<>();
+
+    private ProjectSearchSettings projectSearchSettings = new ProjectSearchSettings();
+//    private List<CustomerProjectPartDto> customerProjectPart = new ArrayList<>();
+//    private List<CustomerProjectPartDto> customer = new ArrayList<>();
+//    private List<CustomerProjectPartDto> project = new ArrayList<>();
     private List<User> realizators;
     private WorkType workType = WorkType.ALL;
 
@@ -95,34 +98,40 @@ public class ReportFilterDto implements Serializable {
     }
 
     public List<CustomerProjectPartDto> getCustomerProjectPartDtos() {
-        if (customerProjectPart == null) {
-            customerProjectPart = new ArrayList<>();
-        }
-        return customerProjectPart;
+       return projectSearchSettings.getCustomerProjectPartDtoList();
+
+    }
+//
+//    public void setCustomerProjectPartDtos(List<CustomerProjectPartDto> customerProjectPartDtos) {
+//        this.customerProjectPart = customerProjectPartDtos;
+//    }
+//
+//    public List<CustomerProjectPartDto> getCustomerProjectPart() {
+//        return customerProjectPart;
+//    }
+//
+//    public List<CustomerProjectPartDto> getProject() {
+//        return project;
+//    }
+//
+//    public void setProject(List<CustomerProjectPartDto> project) {
+//        this.project = project;
+//    }
+//
+//    public List<CustomerProjectPartDto> getCustomer() {
+//        return customer;
+//    }
+//
+//    public void setCustomer(List<CustomerProjectPartDto> customer) {
+//        this.customer = customer;
+//    }
+
+    public ProjectSearchSettings getProjectSearchSettings() {
+        return projectSearchSettings;
     }
 
-    public void setCustomerProjectPartDtos(List<CustomerProjectPartDto> customerProjectPartDtos) {
-        this.customerProjectPart = customerProjectPartDtos;
-    }
-
-    public List<CustomerProjectPartDto> getCustomerProjectPart() {
-        return customerProjectPart;
-    }
-
-    public List<CustomerProjectPartDto> getProject() {
-        return project;
-    }
-
-    public void setProject(List<CustomerProjectPartDto> project) {
-        this.project = project;
-    }
-
-    public List<CustomerProjectPartDto> getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(List<CustomerProjectPartDto> customer) {
-        this.customer = customer;
+    public void setProjectSearchSettings(ProjectSearchSettings projectSearchSettings) {
+        this.projectSearchSettings = projectSearchSettings;
     }
 
     //    public CustomerProjectPartDto getProject() {

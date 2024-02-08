@@ -21,12 +21,14 @@ import com.evolveum.gizmo.component.AjaxSubmitButton;
 import com.evolveum.gizmo.component.SummaryPanel;
 import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.calendar.*;
+import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.data.QAbstractTask;
 import com.evolveum.gizmo.data.QLog;
 import com.evolveum.gizmo.data.QWork;
 import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
+import com.evolveum.gizmo.dto.ProjectSearchSettings;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.dto.WorkType;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
@@ -121,17 +123,6 @@ public class PageCalendar extends PageAppTemplate {
         next.setOutputMarkupId(true);
         form.add(next);
 
-//        LocalDateTextField from = new LocalDateTextField(ID_FROM, new PropertyModel<>(model, ReportFilterDto.F_DATE_FROM), "dd/MM/yyyy");
-//        from.setOutputMarkupId(true);
-//        from.add(new DateRangePickerBehavior());
-//        form.add(from);
-//
-//        LocalDateTextField to = new LocalDateTextField(ID_TO, new PropertyModel<>(model, ReportFilterDto.F_DATE_TO), "dd/MM/yyyy");
-//        to.setOutputMarkupId(true);
-//        to.add(new DateRangePickerBehavior());
-//        form.add(to);
-
-
         MultiselectDropDownInput<User> realizators = new
                 MultiselectDropDownInput<>(ID_REALIZATOR,
                 new PropertyModel<>(model, ReportFilterDto.F_REALIZATORS),
@@ -140,11 +131,9 @@ public class PageCalendar extends PageAppTemplate {
         realizators.setOutputMarkupId(true);
         form.add(realizators);
 
-        MultiselectDropDownInput<CustomerProjectPartDto> projectCombo = new MultiselectDropDownInput<>(ID_PROJECT,
-                new PropertyModel<>(model, ReportFilterDto.F_CUSTOM_PROJECT_PART),
-                GizmoUtils.createCustomerProjectPartList(this, true, true, true),
-                GizmoUtils.createCustomerProjectPartRenderer());
-        form.add(projectCombo);
+        CustomerProjectPartSearchPanel customerProjectSearchPanel = new CustomerProjectPartSearchPanel(ID_PROJECT, new PropertyModel<>(model, ReportFilterDto.F_PROJECT_SEARCH_SETTINGS));
+        customerProjectSearchPanel.setOutputMarkupId(true);
+        form.add(customerProjectSearchPanel);
 
         AjaxSubmitButton preview = new AjaxSubmitButton(ID_SHOW, createStringResource("PageCalendar.button.show")) {
 
@@ -254,7 +243,8 @@ public class PageCalendar extends PageAppTemplate {
             list.add(task.type.eq(filter.getWorkType().getType()));
         }
 
-        p = createProjectListPredicate(filter.getCustomerProjectPartDtos());
+        ProjectSearchSettings settings = filter.getProjectSearchSettings();
+        p = createProjectListPredicate(settings.getCustomerProjectPartDtoList());
         if (p != null) {
             list.add(p);
         }

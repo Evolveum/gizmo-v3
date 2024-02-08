@@ -21,14 +21,12 @@ import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.component.VisibleEnableBehaviour;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ProjectSearchSettings;
-import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
 
 import java.util.List;

@@ -164,7 +164,7 @@ public class PageReports extends PageAppTemplate {
         realizators.setOutputMarkupId(true);
         form.add(realizators);
 
-        CustomerProjectPartSearchPanel customerProjectSearchPanel = new CustomerProjectPartSearchPanel(ID_CUSTOMER, projectSearchModel);
+        CustomerProjectPartSearchPanel customerProjectSearchPanel = new CustomerProjectPartSearchPanel(ID_CUSTOMER, new PropertyModel<>(getFilterModel(), ReportFilterDto.F_PROJECT_SEARCH_SETTINGS));
         customerProjectSearchPanel.setOutputMarkupId(true);
         form.add(customerProjectSearchPanel);
 
