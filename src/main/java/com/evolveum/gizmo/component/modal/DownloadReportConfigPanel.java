@@ -25,20 +25,19 @@ import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.PartSummary;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.web.app.PageReports;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.*;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
@@ -46,18 +45,25 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.STSheetViewType;
+import org.vandeseer.easytable.TableDrawer;
+import org.vandeseer.easytable.structure.Row;
+import org.vandeseer.easytable.structure.Table;
+import org.vandeseer.easytable.structure.cell.TextCell;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
 
 public class DownloadReportConfigPanel extends SimplePanel<ReportFilterDto> {
 
     private static final String ID_PER_USER = "perUser";
     private static final String ID_SHOW_SUMMARY = "showSummary";
+    private static final String ID_CUSTOMER_REPORT = "customerReport";
     private static final String ID_REPORT_NAME = "reportName";
 
     private IModel<DownloadSettingsDto> downloadModel;
@@ -98,6 +104,14 @@ public class DownloadReportConfigPanel extends SimplePanel<ReportFilterDto> {
         };
         add(showSummary);
 
+        AjaxCheckBox customerReport = new AjaxCheckBox(ID_CUSTOMER_REPORT, new PropertyModel<>(downloadModel, DownloadSettingsDto.F_CUSTOMER_REPORT)) {
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                downloadModel.getObject().setCustomerReport(!downloadModel.getObject().isCustomerReport());
+            }
+        };
+        add(customerReport);
+
         DownloadLink exportExcel = new DownloadLink("export", new IModel<>()
         {
             private static final long serialVersionUID = 1L;
@@ -106,28 +120,8 @@ public class DownloadReportConfigPanel extends SimplePanel<ReportFilterDto> {
             public File getObject()
             {
                 File tempFile = new File("export.xlsx");
-                try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-
-//                    style.setShrinkToFit(true);
-                    ReportFilterDto filterDto = getModelObject();
-                    if (filterDto.isPerUser()) {
-                        generateReportPerUser(workbook, filterDto);
-                    } else {
-                        generateUsersReport(workbook, filterDto);
-                    }
-
-                    if (downloadModel.getObject().isSummary()) {
-                    generateSummaryReport(workbook, filterDto);
-                    }
-
-                    FileOutputStream os = new FileOutputStream(tempFile);
-                    workbook.write(os);
-
-                } catch (Exception e) {
-                    System.out.println("exceltion " + e.getMessage());
-                    e.printStackTrace();
-                }
-
+                DownloadSettingsDto downloadSettings = downloadModel.getObject();
+                generateExcelReport(tempFile, downloadSettings);
                 return tempFile;
             }
         }, new PropertyModel<>(downloadModel, DownloadSettingsDto.F_REPORT_NAME))
@@ -135,6 +129,41 @@ public class DownloadReportConfigPanel extends SimplePanel<ReportFilterDto> {
                 .setDeleteAfterDownload(true);
         add(exportExcel);
     }
+
+    private void generateExcelReport(File tempFile, DownloadSettingsDto downloadSettings) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+
+            ReportFilterDto filterDto = getModelObject();
+
+            if (downloadSettings.isCustomerReport()) {
+
+                generateUsersReport(workbook, filterDto);
+                generateSummaryReport(workbook, filterDto);
+                FileOutputStream os = new FileOutputStream(tempFile);
+                workbook.write(os);
+
+                return;
+            }
+
+//                    style.setShrinkToFit(true);
+
+            if (downloadSettings.isPerUser()) {
+                generateReportPerUser(workbook, filterDto);
+            } else {
+                generateUsersReport(workbook, filterDto);
+            }
+
+            if (downloadSettings.isSummary()) {
+                generateSummaryReport(workbook, filterDto);
+            }
+
+
+        } catch (Exception e) {
+            System.out.println("exception " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     private void generateReportPerUser(XSSFWorkbook workbook, ReportFilterDto filterDto) {
         CellStyle style = workbook.createCellStyle();
@@ -146,73 +175,37 @@ public class DownloadReportConfigPanel extends SimplePanel<ReportFilterDto> {
 
         List<User> realizators = filterDto.getRealizators().isEmpty() ? getPageTemplate().getUserRepository().findAllEnabledUsers() : filterDto.getRealizators();
         for (User realizator : realizators) {
-            XSSFSheet sheet = workbook.createSheet(realizator.getFullName() + "(" + realizator.getId() +")");
 //                        sheet.setDefaultColumnWidth(30);
-            QAbstractTask task = QAbstractTask.abstractTask;
-            JPAQuery query = GizmoUtils.createWorkQuery(getPageTemplate().getEntityManager());
-            BooleanBuilder predicates = new BooleanBuilder(task.realizator.name.eq(realizator.getName()));
-            if (filterDto.getDateFrom() != null) {
-                predicates.and(task.date.goe(filterDto.getDateFrom()));
-            }
-            if (filterDto.getDateTo() != null) {
-                predicates.and(task.date.loe(filterDto.getDateTo()));
-            }
-            if (CollectionUtils.isNotEmpty(filterDto.getCustomerProjectPartDtos())) {
-                BooleanBuilder projectPredicate = new BooleanBuilder();
-                for (CustomerProjectPartDto project : filterDto.getCustomerProjectPartDtos()) {
-                    projectPredicate.or(AbstractTaskDataProvider.createPredicate(project));
-                }
-                predicates.and(projectPredicate);
-            }
+            List<Work> tasks = loadWork(realizator, filterDto);
 
-            query.where(predicates);
-            List<Work> tasks = query.select(task).fetch();
-            XSSFRow header = sheet.createRow(0);
-
-            XSSFCell dateHeaderCell = header.createCell(0, CellType.STRING);
-            dateHeaderCell.setCellValue("Date");
-            XSSFCell trackIdHeaderCell = header.createCell(1, CellType.STRING);
-            trackIdHeaderCell.setCellValue("TrackId");
-
-            header.createCell(2, CellType.STRING).setCellValue("Customer");
-            header.createCell(3, CellType.STRING).setCellValue("Project");
-            header.createCell(4, CellType.STRING).setCellValue("Part");
-            header.createCell(5, CellType.STRING).setCellValue("Work length");
-            header.createCell(6, CellType.STRING).setCellValue("Invoice length");
+            XSSFSheet sheet = workbook.createSheet(realizator.getFullName() + "(" + realizator.getId() +")");
+            createHeader(sheet);
             for (int i=0; i < tasks.size(); i++) {
                 Work workTask = tasks.get(i);
                 XSSFRow row = sheet.createRow(i+1);
-
-                XSSFCell date = row.createCell(0, CellType.NUMERIC);
+                XSSFCell date = appendCell(row, 0, CellType.NUMERIC, dateStype);
                 date.setCellValue(workTask.getDate());
-                date.setCellStyle(dateStype);
 
-                XSSFCell trackId = row.createCell(1, CellType.STRING);
+                XSSFCell trackId = appendCell(row,1, CellType.STRING, style);
                 trackId.setCellValue(workTask.getTrackId());
-                trackId.setCellStyle(style);
 
                 Part part = workTask.getPart();
-                XSSFCell partCell = row.createCell(4, CellType.STRING);
+                XSSFCell partCell = appendCell(row, 4, CellType.STRING, style);
                 partCell.setCellValue(part.getName());
-                partCell.setCellStyle(style);
 
                 Project project = part.getProject();
-                XSSFCell projectCell = row.createCell(3, CellType.STRING);
+                XSSFCell projectCell = appendCell(row, 3, CellType.STRING, style);
                 projectCell.setCellValue(project.getName());
-                projectCell.setCellStyle(style);
 
                 Customer customer = project.getCustomer();
-                XSSFCell customerCell = row.createCell(2, CellType.STRING);
+                XSSFCell customerCell = appendCell(row, 2, CellType.STRING, style);
                 customerCell.setCellValue(customer.getName());
-                customerCell.setCellStyle(style);
 
-                XSSFCell workLengthCell = row.createCell(5, CellType.NUMERIC);
+                XSSFCell workLengthCell = appendCell(row, 5, CellType.NUMERIC, style);
                 workLengthCell.setCellValue(workTask.getWorkLength());
-                workLengthCell.setCellStyle(style);
 
-                XSSFCell invoiceLengthCell = row.createCell(6, CellType.NUMERIC);
+                XSSFCell invoiceLengthCell = appendCell(row, 6, CellType.NUMERIC, style);
                 invoiceLengthCell.setCellValue(workTask.getInvoiceLength());
-                invoiceLengthCell.setCellStyle(style);
 
 
             }
@@ -223,18 +216,80 @@ public class DownloadReportConfigPanel extends SimplePanel<ReportFilterDto> {
         }
     }
 
+    private List<Work> loadWork(User realizator, ReportFilterDto filterDto) {
+        QAbstractTask task = QAbstractTask.abstractTask;
+        JPAQuery query = GizmoUtils.createWorkQuery(getPageTemplate().getEntityManager());
+        BooleanBuilder predicates = new BooleanBuilder(task.realizator.name.eq(realizator.getName()));
+        if (filterDto.getDateFrom() != null) {
+            predicates.and(task.date.goe(filterDto.getDateFrom()));
+        }
+        if (filterDto.getDateTo() != null) {
+            predicates.and(task.date.loe(filterDto.getDateTo()));
+        }
+        if (CollectionUtils.isNotEmpty(filterDto.getCustomerProjectPartDtos())) {
+            BooleanBuilder projectPredicate = new BooleanBuilder();
+            for (CustomerProjectPartDto project : filterDto.getCustomerProjectPartDtos()) {
+                projectPredicate.or(AbstractTaskDataProvider.createPredicate(project));
+            }
+            predicates.and(projectPredicate);
+        }
+
+        query.where(predicates);
+        return query.select(task).fetch();
+    }
+
+    private void createHeader(XSSFSheet sheet) {
+        XSSFRow header = sheet.createRow(0);
+
+        XSSFCell dateHeaderCell = header.createCell(0, CellType.STRING);
+        dateHeaderCell.setCellValue("Date");
+        XSSFCell trackIdHeaderCell = header.createCell(1, CellType.STRING);
+        trackIdHeaderCell.setCellValue("TrackId");
+
+        header.createCell(2, CellType.STRING).setCellValue("Customer");
+        header.createCell(3, CellType.STRING).setCellValue("Project");
+        header.createCell(4, CellType.STRING).setCellValue("Part");
+        header.createCell(5, CellType.STRING).setCellValue("Work length");
+        header.createCell(6, CellType.STRING).setCellValue("Invoice length");
+    }
+
+    private XSSFCell appendCell(XSSFRow row, int cellId, CellType cellType, CellStyle cellStyle) {
+        XSSFCell column = row.createCell(cellId, cellType);
+        column.setCellStyle(cellStyle);
+        return column;
+    }
+
     private void generateUsersReport(XSSFWorkbook workbook, ReportFilterDto filterDto) {
         CellStyle style = workbook.createCellStyle();
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
 
         CellStyle dateStype = workbook.createCellStyle();
         CreationHelper createHelper = workbook.getCreationHelper();
         dateStype.setDataFormat(
                 createHelper.createDataFormat().getFormat("dd/mm/yyyy"));
+        dateStype.setBorderBottom(BorderStyle.THIN);
+        dateStype.setBorderLeft(BorderStyle.THIN);
+        dateStype.setBorderRight(BorderStyle.THIN);
+        dateStype.setBorderTop(BorderStyle.THIN);
 
 
         XSSFSheet sheet = workbook.createSheet("Work log");
         sheet.setDefaultColumnWidth(30);
 
+
+//        sheet.getCTWorksheet().getSheetViews().setView(STSheetViewType.PAGE_LAYOUT);
+
+
+       List<Work> tasks = listLoggedWork(filterDto);
+       generateExcel(filterDto, sheet, tasks, style, dateStype);
+
+
+    }
+
+    private List<Work> listLoggedWork(ReportFilterDto filterDto) {
         QAbstractTask task = QAbstractTask.abstractTask;
         JPAQuery query = GizmoUtils.createWorkQuery(getPageTemplate().getEntityManager());
 
@@ -263,10 +318,7 @@ public class DownloadReportConfigPanel extends SimplePanel<ReportFilterDto> {
 
 
 
-        List<Work> tasks = query.select(task).fetch();
-        generateExcel(sheet, tasks, style, dateStype);
-
-
+        return query.select(task).fetch();
     }
 
     private void generateSummaryReport(XSSFWorkbook workbook, ReportFilterDto filterDto) {
@@ -334,25 +386,65 @@ public class DownloadReportConfigPanel extends SimplePanel<ReportFilterDto> {
         return all;
     }
 
-    private void generateExcel(XSSFSheet sheet, List<Work> tasks, CellStyle style, CellStyle dateStype) {
 
-        XSSFRow header = sheet.createRow(0);
 
-        XSSFCell dateHeaderCell = header.createCell(0, CellType.STRING);
-        dateHeaderCell.setCellValue("Date");
-        XSSFCell realizatorHeader = header.createCell(1, CellType.STRING);
-        realizatorHeader.setCellValue("Realizator");
-        XSSFCell trackIdHeaderCell = header.createCell(2, CellType.STRING);
-        trackIdHeaderCell.setCellValue("TrackId");
+    private void generateExcel(ReportFilterDto filterDto, XSSFSheet sheet, List<Work> tasks, CellStyle style, CellStyle dateStype) {
+        boolean isCutomerReport = downloadModel.getObject().isCustomerReport();
+        Map<String, CellDefinitionType> cellMap = new HashMap<>();
+        cellMap.put("Date", new CellDefinitionType(0, CellType.NUMERIC, dateStype));
+        cellMap.put("Realizator", new CellDefinitionType(1, CellType.STRING, style));
 
-        header.createCell(3, CellType.STRING).setCellValue("Customer");
-        header.createCell(4, CellType.STRING).setCellValue("Project");
-        header.createCell(5, CellType.STRING).setCellValue("Part");
-        header.createCell(6, CellType.STRING).setCellValue("Work length");
-        header.createCell(7, CellType.STRING).setCellValue("Invoice length");
+        if (!isCutomerReport) {
+            cellMap.put("TrackId", new CellDefinitionType(2, CellType.STRING, style));
+            cellMap.put("Customer", new CellDefinitionType(3, CellType.STRING, style));
+        }
+        cellMap.put("Project", new CellDefinitionType(4, CellType.STRING, style));
+        cellMap.put("Part", new CellDefinitionType(5, CellType.STRING, style));
+        cellMap.put("Work length", new CellDefinitionType(6, CellType.NUMERIC, style));
+        cellMap.put("Invoice length", new CellDefinitionType(7, CellType.NUMERIC, style));
+
+
+        int startRowNumber = isCutomerReport ? 5 : 0;
+
+        if (isCutomerReport) {
+            XSSFFont font = sheet.getWorkbook().createFont();
+            font.setBold(true);
+            font.setFontHeightInPoints((short) 16);
+            XSSFCellStyle customerStyle = sheet.getWorkbook().createCellStyle();
+            customerStyle.setFont(font);
+            customerStyle.setAlignment(HorizontalAlignment.CENTER);
+            customerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+
+            XSSFRow customer = sheet.createRow(0);
+
+            XSSFCell customerCell = customer.createCell(0, CellType.STRING);
+            customerCell.setCellValue("Work Report for " + filterDto.getCustomerProjectPartDtos().get(0).getCustomerName());
+            customerCell.setCellStyle(customerStyle);
+
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 7));
+
+
+
+
+            XSSFRow dates = sheet.createRow(1);
+            XSSFCell rangeCell = dates.createCell(0, CellType.STRING);
+            rangeCell.setCellValue("Dates " + filterDto.getDateFrom() + " - " + filterDto.getDateTo());
+            rangeCell.setCellStyle(customerStyle);
+            sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 7));
+        }
+
+        XSSFRow header = sheet.createRow(startRowNumber);
+        int hi=0;
+        for (String s : cellMap.keySet()) {
+            header.createCell(hi, CellType.STRING).setCellValue(s);
+            hi++;
+        }
+
         for (int i=0; i < tasks.size(); i++) {
             Work workTask = tasks.get(i);
-            XSSFRow row = sheet.createRow(i+1);
+            XSSFRow row = sheet.createRow(startRowNumber + i + 1);
+
 
             XSSFCell date = row.createCell(0, CellType.NUMERIC);
             date.setCellValue(workTask.getDate());
@@ -376,10 +468,12 @@ public class DownloadReportConfigPanel extends SimplePanel<ReportFilterDto> {
             projectCell.setCellValue(project.getName());
             projectCell.setCellStyle(style);
 
-            Customer customer = project.getCustomer();
-            XSSFCell customerCell = row.createCell(3, CellType.STRING);
-            customerCell.setCellValue(customer.getName());
-            customerCell.setCellStyle(style);
+            if (!isCutomerReport) {
+                Customer customer = project.getCustomer();
+                XSSFCell customerCell = row.createCell(3, CellType.STRING);
+                customerCell.setCellValue(customer.getName());
+                customerCell.setCellStyle(style);
+            }
 
             XSSFCell workLengthCell = row.createCell(6, CellType.NUMERIC);
             workLengthCell.setCellValue(workTask.getWorkLength());

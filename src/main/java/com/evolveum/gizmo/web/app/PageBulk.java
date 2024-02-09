@@ -49,6 +49,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -69,10 +70,6 @@ public class PageBulk extends PageAppTemplate {
     private static final String ID_PART = "part";
 
     private static final int MAX_BULK_CREATE = 20;
-
-    private IModel<List<User>> users = GizmoUtils.createUsersModel(this);
-    private IModel<List<CustomerProjectPartDto>> projects =
-            GizmoUtils.createCustomerProjectPartList(this, true, true, true);
 
     private IModel<BulkDto> model;
 
@@ -184,18 +181,18 @@ public class PageBulk extends PageAppTemplate {
                 part = optionalPart.get();
             }
 
-            LocalDate date = bulk.getFrom(); //GizmoUtils.clearTime(bulk.getFrom());
-            LocalDate to = bulk.getTo(); //GizmoUtils.clearTime(bulk.getTo());
-//            to = GizmoUtils.removeOneMilis(GizmoUtils.addOneDay(to));
+            LocalDate date = bulk.getFrom();
+            LocalDate to = bulk.getTo();
 
             int count = 0;
+            List<Work> works = new ArrayList<>();
             while (date.isBefore(to)) {
                 if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
                     date = date.plusDays(1);
                     continue;
                 }
                 Work work = createWork(bulk, part, date);
-                repository.save(work);
+                works.add(work);
 
                 count++;
                 date = date.plusDays(1);
@@ -204,6 +201,7 @@ public class PageBulk extends PageAppTemplate {
                     break;
                 }
             }
+            repository.saveAll(works);
             PageDashboard response = new PageDashboard();
             response.success(createStringResource("Message.workSavedSuccessfully").getString());
             if (count > MAX_BULK_CREATE) {

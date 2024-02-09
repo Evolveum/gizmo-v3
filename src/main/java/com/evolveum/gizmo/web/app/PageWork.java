@@ -258,7 +258,7 @@ public class PageWork extends PageAppTemplate {
                     .flatMap(Collection::stream)
                     .toList();
 
-            works.forEach(work -> getWorkRepository().save(work));
+            getWorkRepository().saveAll(works);
 
             PageDashboard response = new PageDashboard();
             response.success(createStringResource("Message.workSavedSuccessfully").getString());

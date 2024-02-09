@@ -25,10 +25,13 @@ public class DownloadSettingsDto implements Serializable {
     public static final String F_PER_USER = "perUser";
     public static final String F_SUMMARY = "summary";
     public static final String F_REPORT_NAME = "reportName";
+    public static final String F_CUSTOMER_REPORT = "customerReport";
 
     private boolean perUser = true;
     private boolean summary;
+    private boolean customerReport = true;
     private String reportName;
+
 
     public DownloadSettingsDto() {
         this.reportName = "Export_" + new Date(System.currentTimeMillis()) + ".xlsx";
@@ -36,5 +39,17 @@ public class DownloadSettingsDto implements Serializable {
 
     public boolean isSummary() {
         return summary;
+    }
+
+    public boolean isPerUser() {
+        return perUser;
+    }
+
+    public boolean isCustomerReport() {
+        return customerReport;
+    }
+
+    public void setCustomerReport(boolean customerReport) {
+        this.customerReport = customerReport;
     }
 }

@@ -45,7 +45,7 @@ public class ReportFilterDto implements Serializable {
 
 //    private boolean summary;
     private boolean workLog;
-    private boolean perUser;
+//    private boolean perUser;
 
     private LocalDate dateFrom;
     private LocalDate dateTo;
@@ -73,13 +73,13 @@ public class ReportFilterDto implements Serializable {
         this.workLog = workLog;
     }
 
-    public boolean isPerUser() {
-        return perUser;
-    }
-
-    public void setPerUser(boolean perUser) {
-        this.perUser = perUser;
-    }
+//    public boolean isPerUser() {
+//        return perUser;
+//    }
+//
+//    public void setPerUser(boolean perUser) {
+//        this.perUser = perUser;
+//    }
 
     public LocalDate getDateFrom() {
         return dateFrom;
