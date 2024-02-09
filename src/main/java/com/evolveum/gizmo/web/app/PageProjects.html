@@ -31,9 +31,16 @@
             </div>
         </div>
 
-        <div wicket:id="newProject"/>
+
     </form>
     <div wicket:id="table"/>
+
+    <wicket:fragment wicket:id="buttonsFragment" >
+        <button class="btn btn-success" wicket:id="newProject">
+            <i class="fa fa-plus"/>
+            <wicket:message key="PageProjects.newProject" />
+        </button>
+    </wicket:fragment>
 </wicket:extend>
 </body>
 </html>

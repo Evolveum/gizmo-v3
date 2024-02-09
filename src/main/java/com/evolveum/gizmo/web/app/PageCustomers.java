@@ -120,18 +120,6 @@ public class PageCustomers extends PageAppCustomers {
 
     @Override
     public Fragment createHeaderButtonsFragment(String fragmentId) {
-//        IconButton newCustomer = new IconButton(ID_NEW_CUSTOMER,
-//                createStringResource("PageCustomers.newCustomer"),
-//                createStringResource("fa-plus"),
-//                createStringResource("btn-success")) {
-//
-//            @Override
-//            protected void submitPerformed(AjaxRequestTarget target) {
-//                newCustomerPerformed(target);
-//            }
-//        };
-//        form.add(newCustomer);
-//
         Fragment fragment = new  Fragment(fragmentId, "buttonsFragment", this);
 
         AjaxLink<String> newCustomer = new AjaxLink<>(ID_NEW_CUSTOMER, createStringResource("PageCustomers.newCustomer")) {
