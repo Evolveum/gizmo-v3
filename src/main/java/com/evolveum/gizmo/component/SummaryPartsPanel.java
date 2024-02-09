@@ -37,6 +37,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
 
     private static final String ID_PART_REPEATER = "partRepeater";
     private static final String ID_PART = "part";
+    private static final String ID_USER = "user";
     private static final String ID_WORK = "work";
     private static final String ID_INVOICE = "invoice";
     private static final String ID_SUM_WORK = "sumWork";
@@ -45,7 +46,7 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
     public SummaryPartsPanel(String id, final SummaryPartsDataProvider provider, final IModel<ReportFilterDto> model) {
         super(id);
 
-        setModel(new LoadableDetachableModel<List<PartSummary>>() {
+        setModel(new LoadableDetachableModel<>() {
 
             @Override
             protected List<PartSummary> load() {
@@ -62,6 +63,10 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
 
             @Override
             protected void populateItem(final ListItem<PartSummary> item) {
+                Label user = new Label(ID_USER, new PropertyModel<>(item.getModel(), PartSummary.F_REALIZTOR));
+                user.setRenderBodyOnly(true);
+                item.add(user);
+
                 Label part = new Label(ID_PART, new PropertyModel<>(item.getModel(), PartSummary.F_NAME));
                 part.setRenderBodyOnly(true);
                 item.add(part);

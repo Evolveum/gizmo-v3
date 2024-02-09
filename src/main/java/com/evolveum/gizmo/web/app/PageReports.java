@@ -20,44 +20,24 @@ package com.evolveum.gizmo.web.app;
 import com.evolveum.gizmo.component.AjaxSubmitButton;
 import com.evolveum.gizmo.component.GizmoTabbedPanel;
 import com.evolveum.gizmo.component.SummaryPartsPanel;
-import com.evolveum.gizmo.component.VisibleEnableBehaviour;
 import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
-import com.evolveum.gizmo.component.form.IconButton;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.component.modal.DownloadReportConfigPanel;
 import com.evolveum.gizmo.component.modal.MainPopupDialog;
-import com.evolveum.gizmo.data.*;
-import com.evolveum.gizmo.data.provider.AbstractTaskDataProvider;
+import com.evolveum.gizmo.data.AbstractTask;
+import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
-import com.evolveum.gizmo.dto.CustomerProjectPartDto;
-import com.evolveum.gizmo.dto.PartSummary;
-import com.evolveum.gizmo.dto.ProjectSearchSettings;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.jpa.impl.JPAQuery;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -66,16 +46,11 @@ import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @MountPath("/app/reports")
@@ -93,10 +68,6 @@ public class PageReports extends PageAppTemplate {
     private static final String ID_EXPORT = "export";
 
     private IModel<ReportFilterDto> model;
-
-    private IModel<ProjectSearchSettings> projectSearchModel;
-
-    private LoadableModel<List<CustomerProjectPartDto>> availabelProjects;
 
     public PageReports(){
         model = new LoadableModel<>(false) {
@@ -120,12 +91,6 @@ public class PageReports extends PageAppTemplate {
             }
         };
 
-        projectSearchModel = new LoadableModel<>(false) {
-            @Override
-            protected ProjectSearchSettings load() {
-                return new ProjectSearchSettings();
-            }
-        };
     }
 
     @Override
@@ -238,11 +203,6 @@ public class PageReports extends PageAppTemplate {
                 SummaryPartsDataProvider partsProvider = new SummaryPartsDataProvider(PageReports.this);
                 return new SummaryPartsPanel(id, partsProvider, getFilterModel());
             }
-
-//            @Override
-//            public boolean isVisible() {
-//                return getFilterModel().getObject().isSummary();
-//            }
         });
         return tabs;
     }

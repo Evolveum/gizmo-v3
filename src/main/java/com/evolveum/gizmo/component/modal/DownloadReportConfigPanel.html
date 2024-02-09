@@ -16,26 +16,28 @@
   -->
 <html xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
-    <div class="form-group">
-        <label><wicket:message key="PageReports.reportName"/></label>
-        <input type="text" class="form-control float-right" wicket:id="reportName"/>
-    </div>
+    <form wicket:id="form">
+        <div class="form-group">
+            <label><wicket:message key="PageReports.reportName"/></label>
+            <input type="text" class="form-control float-right" wicket:id="reportName"/>
+        </div>
 
-   <div class="form-check form-check-inline">
-       <input class="form-check-input" type="checkbox" wicket:id="perUser"/>
-       <label class="form-check-label"><wicket:message key="DownloadReportConfigPanel.perUser"/></label>
-   </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" wicket:id="perUser"/>
+            <label class="form-check-label"><wicket:message key="DownloadReportConfigPanel.perUser"/></label>
+        </div>
 
-   <div class="form-check form-check-inline">
-       <input class="form-check-input" type="checkbox" wicket:id="showSummary"/>
-       <label class="form-check-label"><wicket:message key="DownloadReportConfigPanel.showSummary"/></label>
-   </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" wicket:id="showSummary"/>
+            <label class="form-check-label"><wicket:message key="DownloadReportConfigPanel.showSummary"/></label>
+        </div>
 
-    <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" wicket:id="customerReport"/>
-        <label class="form-check-label"><wicket:message key="DownloadReportConfigPanel.customerReport"/></label>
-    </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" wicket:id="customerReport"/>
+            <label class="form-check-label"><wicket:message key="DownloadReportConfigPanel.customerReport"/></label>
+        </div>
 
-    <a class="btn btn-primary btn-sm" wicket:id="export"><wicket:message key="DownloadReportConfigPanel.downloadReport"/> </a>
+        <a class="btn btn-primary btn-sm" wicket:id="export"><wicket:message key="DownloadReportConfigPanel.downloadReport"/> </a>
+    </form>
 </wicket:panel>
 </html>

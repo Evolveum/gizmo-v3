@@ -18,14 +18,19 @@
 package com.evolveum.gizmo.web.app;
 
 
-import com.evolveum.gizmo.component.AjaxButton;
 import com.evolveum.gizmo.component.SummaryChartPanel;
 import com.evolveum.gizmo.component.SummaryPanel;
 import com.evolveum.gizmo.component.calendar.CalendarPanel;
 import com.evolveum.gizmo.component.calendar.Event;
 import com.evolveum.gizmo.component.calendar.HeaderToolbar;
+import com.evolveum.gizmo.component.calendar.Plugins;
+import com.evolveum.gizmo.component.data.LinkColumn;
+import com.evolveum.gizmo.component.data.LinkIconColumn;
+import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.data.AbstractTask;
-import com.evolveum.gizmo.data.provider.AbstractTaskDataProvider;
+import com.evolveum.gizmo.data.Log;
+import com.evolveum.gizmo.data.Work;
+import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
 import com.evolveum.gizmo.dto.ReportFilterDto;
@@ -35,6 +40,8 @@ import com.evolveum.gizmo.repository.AbstractTaskRepository;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
+import com.evolveum.gizmo.util.GizmoUtils;
+import com.evolveum.gizmo.util.LoadableModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -47,20 +54,15 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
-import com.evolveum.gizmo.component.calendar.Plugins;
-import com.evolveum.gizmo.component.data.LinkColumn;
-import com.evolveum.gizmo.component.data.LinkIconColumn;
-import com.evolveum.gizmo.component.data.TablePanel;
-import com.evolveum.gizmo.data.Log;
-import com.evolveum.gizmo.data.Work;
-import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.util.LoadableModel;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lazyman
@@ -137,7 +139,7 @@ public class PageDashboard extends PageAppTemplate {
         next.setOutputMarkupId(true);
         add(next);
 
-        AbstractTaskDataProvider provider = new AbstractTaskDataProvider(this);
+        ReportDataProvider provider = new ReportDataProvider(this);
         provider.setFilter(filter.getObject());
 
         List<IColumn<AbstractTask, String>> columns = createColumns();

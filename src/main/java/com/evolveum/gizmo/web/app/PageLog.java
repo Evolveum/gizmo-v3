@@ -38,6 +38,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.wicketstuff.annotation.mount.MountPath;
 
@@ -71,6 +72,11 @@ public class PageLog extends PageAppTemplate {
     private IModel<Log> model;
 
     public PageLog() {
+        this(null);
+    }
+
+    public PageLog(PageParameters params) {
+        super(params);
         model = new LoadableModel<Log>(false) {
 
             @Override
@@ -82,23 +88,12 @@ public class PageLog extends PageAppTemplate {
         initLayout();
     }
 
-    public PageLog(IModel<Log> model) {
-        Validate.notNull(model, "Model must not be null.");
-        this.model = model;
-
-        initLayout();
-    }
-
     @Override
     protected IModel<String> createPageTitleModel() {
-        return new IModel<String>() {
-
-            @Override
-            public String getObject() {
-                Integer logId = getIntegerParam(LOG_ID);
-                String key = logId != null ? "page.title.edit" : "page.title";
-                return createStringResource(key).getString();
-            }
+        return () -> {
+            Integer logId = getIntegerParam(LOG_ID);
+            String key = logId != null ? "page.title.edit" : "page.title";
+            return createStringResource(key).getString();
         };
     }
 

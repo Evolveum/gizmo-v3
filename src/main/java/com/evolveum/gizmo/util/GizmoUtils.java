@@ -18,7 +18,7 @@
 package com.evolveum.gizmo.util;
 
 import com.evolveum.gizmo.data.*;
-import com.evolveum.gizmo.data.provider.AbstractTaskDataProvider;
+import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ProjectSearchSettings;
 import com.evolveum.gizmo.dto.ReportFilterDto;
@@ -463,7 +463,7 @@ public class GizmoUtils {
             return data;
         }
 
-        List<Predicate> predicates = AbstractTaskDataProvider.createPredicates(filter);
+        List<Predicate> predicates = ReportDataProvider.createPredicates(filter);
 
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);

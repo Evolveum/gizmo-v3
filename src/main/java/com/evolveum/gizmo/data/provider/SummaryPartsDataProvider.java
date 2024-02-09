@@ -46,7 +46,7 @@ public class SummaryPartsDataProvider implements Serializable {
     }
 
     public List<PartSummary> createSummary(ReportFilterDto filter) {
-        List<Predicate> list = AbstractTaskDataProvider.createPredicates(filter);
+        List<Predicate> list = ReportDataProvider.createPredicates(filter);
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);
         QLog log = task.as(QLog.class);
@@ -58,8 +58,8 @@ public class SummaryPartsDataProvider implements Serializable {
             bb.orAllOf(list.toArray(new Predicate[list.size()]));
             query.where(bb);
         }
-        query.groupBy(work.part.id, log.customer.id);
-        query.select(work.part.id, log.customer.id, task.workLength.sum(), work.invoiceLength.sum());
+        query.groupBy(work.realizator, work.part.id, log.customer.id);
+        query.select(work.part.id, log.customer.id, task.workLength.sum(), work.invoiceLength.sum(), work.realizator);
 
         List<Tuple> tuples = query.fetch();
         List<PartSummary> result = new ArrayList<>();
@@ -79,6 +79,7 @@ public class SummaryPartsDataProvider implements Serializable {
      * @return
      */
     private List<PartSummary> processSummaryResults(List<Tuple> tuples, List<PartSummary> result) {
+        //work.realizator, work.part.id, log.customer.id, task.workLength.sum(), work.invoiceLength.sum()
         List<Integer> partIds = new ArrayList<>();
         List<Integer> customerIds = new ArrayList<>();
         for (Tuple tuple : tuples) {
@@ -103,14 +104,14 @@ public class SummaryPartsDataProvider implements Serializable {
                 //part id
                 Part part = map.get(id);
                 String name = part != null ? GizmoUtils.describeProjectPart(part, " - ") : null;
-                PartSummary summary = new PartSummary(name, tuple.get(2, Double.class), tuple.get(3, Double.class));
+                PartSummary summary = new PartSummary(tuple.get(4, User.class), name, tuple.get(2, Double.class), tuple.get(3, Double.class));
                 result.add(summary);
             } else {
                 //customer id
                 id = tuple.get(1, Integer.class);
                 Customer customer = customerMap.get(id);
                 String name = customer != null ? customer.getName() : null;
-                PartSummary summary = new PartSummary(name, tuple.get(2, Double.class), tuple.get(3, Double.class));
+                PartSummary summary = new PartSummary(tuple.get(4, User.class), name, tuple.get(2, Double.class), tuple.get(3, Double.class));
                 result.add(summary);
             }
 

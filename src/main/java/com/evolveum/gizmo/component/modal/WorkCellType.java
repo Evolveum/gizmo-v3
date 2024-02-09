@@ -17,41 +17,35 @@
 
 package com.evolveum.gizmo.component.modal;
 
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
-
 import java.time.LocalDate;
 
-public class CellDefinitionType {
+enum WorkCellType {
+    DATE("Date", LocalDate.class, "getDate"),
+    REALIZATOR("Realizator", String.class, "getRealizator.getFullName"),
+    CUSTOMER("Customer", String.class, "getPart.getProject.getCustomer.getName"),
+    PROJECT("Project", String.class, "getPart.getProject.getName"),
+    PART("Part", String.class, "getPart.getName"),
+    TRACK_ID("Track ID", String.class, "getTrackId"),
+    DESCRIPTION("Description", String.class, "getDescription"),
+    WORK_LENGTH("Length", double.class, "getWorkLength"),
+    INVOICE_LENGTH("Invoice", double.class, "getInvoiceLength");
 
-    private int position;
-    private Class<?> cellType;
-    private CellStyle style;
-    private String cellHeaderName;
+    private String displayName;
+    private Class<?> type;
     private String getMethod;
 
-    public CellDefinitionType(String cellHeaderName, int i, Class<?> cellType, CellStyle style, String getMethod) {
-        this.position = i;
-        this.cellType = cellType;
-        this.style = style;
-        this.cellHeaderName = cellHeaderName;
+    WorkCellType(String displayName, Class<?> type, String getMethod) {
+        this.displayName = displayName;
+        this.type = type;
         this.getMethod = getMethod;
     }
 
     public String getDisplayName() {
-        return cellHeaderName;
+        return displayName;
     }
 
-    public int getPosition() {
-        return position;
-    }
-
-    public CellStyle getStyle() {
-        return style;
-    }
-
-    public CellType getCellType() {
-        return LocalDate.class.equals(cellType) || double.class.equals(cellType) ? CellType.NUMERIC : CellType.STRING;
+    public Class<?> getType() {
+        return type;
     }
 
     public String getGetMethod() {

@@ -56,7 +56,7 @@ public class SummaryDataProvider implements Serializable {
     public SummaryPanelDto createSummary(ReportFilterDto filter) {
         SummaryPanelDto dto = new SummaryPanelDto(filter);
 
-        List<Predicate> list = AbstractTaskDataProvider.createPredicates(filter);
+        List<Predicate> list = ReportDataProvider.createPredicates(filter);
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);
 

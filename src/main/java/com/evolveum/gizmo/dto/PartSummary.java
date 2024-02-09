@@ -17,17 +17,26 @@
 
 package com.evolveum.gizmo.dto;
 
+import com.evolveum.gizmo.data.User;
+
 /**
  * @author lazyman
  */
 public class PartSummary extends TaskLength implements Comparable<PartSummary> {
 
     public static final String F_NAME = "name";
+    public static final String F_REALIZTOR = "fullName";
     private String name;
+    private User realizator;
 
-    public PartSummary(String name, Double length, Double invoice) {
+    public PartSummary(User realizator, String name, Double length, Double invoice) {
         super(length, invoice);
         this.name = name;
+        this.realizator = realizator;
+    }
+
+    public String getFullName() {
+        return realizator.getFullName();
     }
 
     public String getName() {

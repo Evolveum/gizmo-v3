@@ -23,6 +23,7 @@
             <table class="table table-condensed table-striped table-bordered">
                 <thead>
                 <tr>
+                    <th><wicket:message key="SummaryPartsPanel.user"/></th>
                     <th><wicket:message key="SummaryPartsPanel.part"/></th>
                     <th><wicket:message key="SummaryPartsPanel.work"/></th>
                     <th><wicket:message key="SummaryPartsPanel.invoice"/></th>
@@ -30,6 +31,7 @@
                 </thead>
                 <tbody>
                 <tr wicket:id="partRepeater">
+                    <td><span wicket:id="user"/></td>
                     <td><span wicket:id="part"/></td>
                     <td><span wicket:id="work"/></td>
                     <td><span wicket:id="invoice"/></td>
