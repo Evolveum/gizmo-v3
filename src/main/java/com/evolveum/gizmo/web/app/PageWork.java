@@ -82,9 +82,6 @@ public class PageWork extends PageAppTemplate {
     private static final String ID_ADD = "add";
     private static final String ID_CUSTOMER_PROJECT_PART = "customerProjectPart";
 
-    private IModel<List<CustomerProjectPartDto>> projects =
-            GizmoUtils.createCustomerProjectPartList(this, true, true, true);
-
     private IModel<List<WorkDto>> model;
 
     public PageWork() {

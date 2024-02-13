@@ -19,19 +19,29 @@ package com.evolveum.gizmo.dto;
 
 import com.evolveum.gizmo.data.User;
 
+import java.time.LocalDate;
+
 /**
  * @author lazyman
  */
-public class PartSummary extends TaskLength implements Comparable<PartSummary> {
+public class UserSummary extends TaskLength implements Comparable<UserSummary> {
 
-    public static final String F_NAME = "name";
     public static final String F_REALIZTOR = "fullName";
-    private String name;
-    private User realizator;
+    public static final String F_MAX_DATE = "maxDate";
 
-    public PartSummary(User realizator, String name, Double length, Double invoice) {
-        super(length, invoice);
-        this.name = name;
+    public static final String F_TIME_OFF = "timeOff";
+    public static final String F_WORK = "work";
+
+    private User realizator;
+    private LocalDate maxDate;
+    private Double timeOff;
+    private Double work;
+
+    public UserSummary(User realizator, LocalDate maxDate, Double timeOff, Double all, Double work) {
+        super(all, all);
+        this.timeOff = timeOff;
+        this.work = work;
+        this.maxDate = maxDate;
         this.realizator = realizator;
     }
 
@@ -43,16 +53,20 @@ public class PartSummary extends TaskLength implements Comparable<PartSummary> {
         return realizator.getAllocation();
     }
 
-    public String getName() {
-        return name;
-    }
-
     @Override
-    public int compareTo(PartSummary o) {
+    public int compareTo(UserSummary o) {
         if (o == null) {
             return 0;
         }
 
-        return String.CASE_INSENSITIVE_ORDER.compare(name, o.getName());
+        return String.CASE_INSENSITIVE_ORDER.compare(realizator.getName(), o.realizator.getName());
+    }
+
+    public Double getTimeOff() {
+        return timeOff;
+    }
+
+    public Double getWork() {
+        return work;
     }
 }

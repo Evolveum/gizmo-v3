@@ -39,7 +39,7 @@ public class User implements Serializable {
     public static final String F_LDAP_DN = "ldapDn";
     public static final String F_ENABLED = "enabled";
     public static final String F_PASSWORD = "password";
-
+    public static final String F_ALLOCATION = "allocation";
     public static final String M_FULL_NAME = "fullName";
 
     private Integer id;
@@ -49,6 +49,7 @@ public class User implements Serializable {
     private String ldapDn;
     private String password;
     private boolean enabled;
+    private double allocation;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id")
@@ -85,6 +86,10 @@ public class User implements Serializable {
         return password;
     }
 
+    public double getAllocation() {
+        return allocation;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -111,6 +116,10 @@ public class User implements Serializable {
 
     public void setLdapDn(String ldapDn) {
         this.ldapDn = ldapDn;
+    }
+
+    public void setAllocation(double allocation) {
+        this.allocation = allocation;
     }
 
     @Override
@@ -144,6 +153,7 @@ public class User implements Serializable {
         sb.append(", familyName='").append(familyName).append('\'');
         sb.append(", enabled=").append(enabled);
         sb.append(", ldapDn='").append(ldapDn).append('\'');
+        sb.append(", allocation='").append(allocation);
         sb.append('}');
         return sb.toString();
     }

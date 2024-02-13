@@ -32,11 +32,13 @@ public class Part implements Serializable {
     public static final String F_PROJECT = "project";
     public static final String F_NAME = "name";
     public static final String F_DESCRIPTION = "description";
+    public static final String F_COLOR = "color";
 
     private Integer id;
     private String name;
     private String description;
     private Project project;
+    private String color;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "part_id")
@@ -60,6 +62,10 @@ public class Part implements Serializable {
         return description;
     }
 
+    public String getColor() {
+        return color;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -74,6 +80,10 @@ public class Part implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     @Override
@@ -100,6 +110,7 @@ public class Part implements Serializable {
         sb.append(", project=").append(project);
         sb.append(", name='").append(name).append('\'');
         sb.append(", description='").append(description).append('\'');
+        sb.append(", color='").append(color).append('\'');
         sb.append('}');
         return sb.toString();
     }

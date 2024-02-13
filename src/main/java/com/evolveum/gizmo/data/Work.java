@@ -32,12 +32,8 @@ import java.util.List;
 @PrimaryKeyJoinColumn(foreignKey = @ForeignKey(name = "fk_work_abstractTask"))
 public class Work extends AbstractTask {
 
-//    public static final String F_PART = "part";
-//    public static final String F_INVOICE_LENGTH = "invoiceLength";
-
     private Part part;
     private double invoiceLength;
-    private List<CustomerProjectPartDto> customerProjectPart = new ArrayList<>();
 
     public Work() {
         setType(TaskType.WORK);

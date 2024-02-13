@@ -7,25 +7,25 @@ CREATE DATABASE gizmo3 WITH OWNER = gizmo
 
 COMMENT ON DATABASE gizmo3 IS 'gizmo v3 database';
 
-CREATE TABLE g_EmailLog_Customer (
-  EmailLog_id     INT4 NOT NULL,
+CREATE TABLE g_emailLog_customer (
+  emailLog_id     INT4 NOT NULL,
   customerList_id INT4 NOT NULL,
-  PRIMARY KEY (EmailLog_id, customerList_id)
+  PRIMARY KEY (emailLog_id, customerList_id)
 );
 
-CREATE TABLE g_EmailLog_Project (
-  EmailLog_id    INT4 NOT NULL,
+CREATE TABLE g_emailLog_project (
+  emailLog_id    INT4 NOT NULL,
   projectList_id INT4 NOT NULL,
-  PRIMARY KEY (EmailLog_id, projectList_id)
+  PRIMARY KEY (emailLog_id, projectList_id)
 );
 
-CREATE TABLE g_EmailLog_User (
+CREATE TABLE g_emailLog_user (
   log_id  INT4 NOT NULL,
   user_id INT4 NOT NULL,
   PRIMARY KEY (log_id, user_id)
 );
 
-CREATE TABLE g_Notification_emails (
+CREATE TABLE g_notification_emails (
   Notification_id INT4 NOT NULL,
   emails          VARCHAR(255)
 );
@@ -115,6 +115,7 @@ CREATE TABLE g_part (
   description VARCHAR(3000),
   name        VARCHAR(255) NOT NULL,
   project_id  INT4         NOT NULL,
+  color       VARCHAR(255),
   PRIMARY KEY (id)
 );
 
@@ -125,6 +126,7 @@ CREATE TABLE g_project (
   description VARCHAR(3000),
   name        VARCHAR(255) NOT NULL,
   customer_id INT4         NOT NULL,
+  off         BOOLEAN      NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -136,6 +138,7 @@ CREATE TABLE g_user (
   ldapDn     VARCHAR(255),
   name       VARCHAR(255) NOT NULL,
   password   VARCHAR(255),
+  allocation FLOAT4 NOT NULL,
   PRIMARY KEY (id)
 );
 

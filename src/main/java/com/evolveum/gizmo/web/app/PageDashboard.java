@@ -19,7 +19,6 @@ package com.evolveum.gizmo.web.app;
 
 
 import com.evolveum.gizmo.component.SummaryChartPanel;
-import com.evolveum.gizmo.component.SummaryPanel;
 import com.evolveum.gizmo.component.calendar.CalendarPanel;
 import com.evolveum.gizmo.component.calendar.Event;
 import com.evolveum.gizmo.component.calendar.HeaderToolbar;
@@ -55,7 +54,6 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -73,7 +71,6 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_BTN_PREVIOUS = "previous";
     private static final String ID_BTN_NEXT = "next";
     private static final String ID_MONTH = "month";
-    private static final String ID_SUMMARY = "summary";
     private static final String ID_SUMMARY_PARTS = "summaryParts";
     private static final String ID_TABLE = "table";
 
@@ -90,18 +87,14 @@ public class PageDashboard extends PageAppTemplate {
             @Override
             protected ReportFilterDto load() {
                 GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
-                ReportFilterDto dto = session.getDashboardFilter();
-                if (dto == null) {
-                    dto = new ReportFilterDto();
-                    dto.setDateFrom(GizmoUtils.createWorkDefaultFrom());
-                    dto.setDateTo(GizmoUtils.createWorkDefaultTo());
+                ReportFilterDto dto = new ReportFilterDto();
+                dto.setDateFrom(GizmoUtils.createWorkDefaultFrom());
+                dto.setDateTo(GizmoUtils.createWorkDefaultTo());
 
-                    GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
-                    dto.getRealizators().add(principal.getUser());
+                GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
+                dto.getRealizators().add(principal.getUser());
 
-                    session.setDashboardFilter(dto);
-                }
-
+                session.setDashboardFilter(dto);
                 return dto;
             }
         };
@@ -217,8 +210,7 @@ public class PageDashboard extends PageAppTemplate {
             String lenghtAsString = StringUtils.join(new Object[]{length.getLength(), length.getInvoice()}, '/');
             LocalDate startDay = entry.getKey();
             Date day = Date.from(startDay.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-            boolean isWeekend = DayOfWeek.SATURDAY == startDay.getDayOfWeek() || DayOfWeek.SUNDAY == startDay.getDayOfWeek();
-            boolean isFullDay = length.getLength() >= 8;
+            boolean isFullDay = length.getLength() >= (8 * getFilterModel().getObject().getRealizators().get(0).getAllocation());
             com.evolveum.gizmo.component.calendar.Event event = new Event(Integer.toString(i), lenghtAsString, day, isFullDay ? "green" : "red");
             events.add(event);
         }
@@ -272,10 +264,6 @@ public class PageDashboard extends PageAppTemplate {
     private void handleCalendatNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
         GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
         session.setDashboardFilter(workFilter);
-        SummaryPanel summaryPanel = (SummaryPanel) get(ID_SUMMARY);
-        if (summaryPanel != null) {
-            ((LoadableModel) summaryPanel.getModel()).reset();
-        }
         target.add(PageDashboard.this);
     }
 
@@ -355,7 +343,7 @@ public class PageDashboard extends PageAppTemplate {
             repository.deleteById(task.getId());
 
             success(createStringResource("Message.successfullyDeleted").getString());
-            target.add(getFeedbackPanel(), get(ID_TABLE), get(ID_SUMMARY), get(ID_SUMMARY_PARTS));
+            target.add(getFeedbackPanel(), get(ID_TABLE), get(ID_CALENDAR), get(ID_SUMMARY_PARTS));
         } catch (Exception ex) {
             handleGuiException(this, "Message.couldntSaveWork", ex, target);
         }

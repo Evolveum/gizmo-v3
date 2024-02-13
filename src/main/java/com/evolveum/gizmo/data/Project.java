@@ -18,8 +18,8 @@
 package com.evolveum.gizmo.data;
 
 import com.evolveum.gizmo.util.GizmoUtils;
-
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.Set;
 
@@ -43,6 +43,7 @@ public class Project implements Serializable {
     private boolean closed;
     private boolean commercial;
     private Set<Part> parts;
+    private boolean off;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_id")
@@ -80,6 +81,10 @@ public class Project implements Serializable {
         return parts;
     }
 
+    public boolean isOff() {
+        return off;
+    }
+
     public void setParts(Set<Part> parts) {
         this.parts = parts;
     }
@@ -108,6 +113,10 @@ public class Project implements Serializable {
         this.commercial = commercial;
     }
 
+    public void setOff(boolean off) {
+        this.off = off;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -134,6 +143,7 @@ public class Project implements Serializable {
         sb.append(", customer=").append(customer);
         sb.append(", closed=").append(closed);
         sb.append(", commercial=").append(commercial);
+        sb.append(", off=").append(off);
         sb.append('}');
         return sb.toString();
     }

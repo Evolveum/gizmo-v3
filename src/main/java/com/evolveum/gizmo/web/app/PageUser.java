@@ -54,6 +54,7 @@ public class PageUser extends PageAppUsers {
     private static final String ID_PASSWORD = "password";
     private static final String ID_SAVE = "save";
     private static final String ID_CANCEL = "cancel";
+    private static final String ID_ALLOCATION = "allocation";
 
     private IModel<User> model;
 
@@ -97,6 +98,9 @@ public class PageUser extends PageAppUsers {
         TextField<String> ldapDn = new TextField<>(ID_LDAP_DN, new PropertyModel<>(model, User.F_LDAP_DN));
         ldapDn.setEnabled(false);
         form.add(ldapDn);
+
+        TextField<String> allocation = new TextField<>(ID_ALLOCATION, new PropertyModel<>(model, User.F_ALLOCATION));
+        form.add(allocation);
 
         AjaxCheckBox enabled = new AjaxCheckBox(ID_ENABLED, new PropertyModel<>(model, User.F_ENABLED)) {
             @Override

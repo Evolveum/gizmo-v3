@@ -581,8 +581,8 @@ public class GizmoUtils {
         }
     }
 
-    public static JPAQuery createWorkQuery(EntityManager entityManager) {
-        JPAQuery query = new JPAQuery(entityManager);
+    public static JPAQuery<Work> createWorkQuery(EntityManager entityManager) {
+        JPAQuery<Work> query = new JPAQuery(entityManager);
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);
         query.from(QAbstractTask.abstractTask).leftJoin(work.part.project);

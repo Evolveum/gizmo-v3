@@ -18,26 +18,36 @@
 package com.evolveum.gizmo.component.modal;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 enum WorkCellType {
-    DATE("Date", LocalDate.class, "getDate"),
-    REALIZATOR("Realizator", String.class, "getRealizator.getFullName"),
-    CUSTOMER("Customer", String.class, "getPart.getProject.getCustomer.getName"),
-    PROJECT("Project", String.class, "getPart.getProject.getName"),
-    PART("Part", String.class, "getPart.getName"),
-    TRACK_ID("Track ID", String.class, "getTrackId"),
-    DESCRIPTION("Description", String.class, "getDescription"),
-    WORK_LENGTH("Length", double.class, "getWorkLength"),
-    INVOICE_LENGTH("Invoice", double.class, "getInvoiceLength");
+    DATE("Date", LocalDate.class, "getDate", new ReportType[]{ReportType.GENERIC, ReportType.CUSTOMER}),
+    REALIZATOR("Realizator", String.class, "getRealizator.getFullName", new ReportType[]{ReportType.GENERIC, ReportType.CUSTOMER}),
+    CUSTOMER("Customer", String.class, "getPart.getProject.getCustomer.getName", new ReportType[]{ReportType.GENERIC}),
+    PROJECT("Project", String.class, "getPart.getProject.getName", new ReportType[]{ReportType.CUSTOMER, ReportType.GENERIC}),
+    PART("Part", String.class, "getPart.getName", new ReportType[]{ReportType.CUSTOMER, ReportType.GENERIC}),
+    TRACK_ID("Track ID", String.class, "getTrackId", new ReportType[]{ReportType.GENERIC}),
+    DESCRIPTION("Description", String.class, "getDescription", new ReportType[]{ReportType.CUSTOMER, ReportType.GENERIC}),
+    WORK_LENGTH("Length", double.class, "getWorkLength", new ReportType[]{ReportType.CUSTOMER, ReportType.GENERIC, ReportType.INTERNAL}),
+//    INVOICE_LENGTH("Invoice", double.class, "getInvoiceLength", new ReportType[]{ReportType.CUSTOMER}),
+
+    USER("Realizator", String.class, "getFullName", new ReportType[]{ReportType.SUMMARY}),
+    PART_NAME("Project", String.class, "getName", new ReportType[]{ReportType.SUMMARY}),
+    SUMMARY_WORK_LENGTH("Work", String.class, "getLength", new ReportType[]{ReportType.SUMMARY}),
+    SUMMARY_INVOICE_LENGTH("Invoice", String.class, "getInvoice", new ReportType[]{ReportType.SUMMARY})
+    ;
 
     private String displayName;
     private Class<?> type;
     private String getMethod;
+    private ReportType[] reportType;
 
-    WorkCellType(String displayName, Class<?> type, String getMethod) {
+    WorkCellType(String displayName, Class<?> type, String getMethod, ReportType[] reportType) {
         this.displayName = displayName;
         this.type = type;
         this.getMethod = getMethod;
+        this.reportType = reportType;
     }
 
     public String getDisplayName() {
@@ -50,5 +60,13 @@ enum WorkCellType {
 
     public String getGetMethod() {
         return getMethod;
+    }
+
+    public ReportType[] getReportType() {
+        return reportType;
+    }
+
+    public static List<WorkCellType> getCellsForReport(ReportType reportType) {
+        return Arrays.stream(values()).filter(r -> Arrays.stream(r.reportType).anyMatch(type -> ReportType.ALL == type || type == reportType)).toList();
     }
 }

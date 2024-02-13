@@ -17,9 +17,9 @@
 
 package com.evolveum.gizmo.component;
 
-import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
-import com.evolveum.gizmo.dto.PartSummary;
+import com.evolveum.gizmo.data.provider.SummaryUserDataProvider;
 import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.dto.UserSummary;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
@@ -33,23 +33,22 @@ import java.util.List;
 /**
  * @author lazyman
  */
-public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
+public class SummaryUsersPanel extends SimplePanel<List<UserSummary>> {
 
     private static final String ID_PART_REPEATER = "partRepeater";
-    private static final String ID_PART = "part";
+    private static final String ID_MAX_DATE = "maxDate";
     private static final String ID_USER = "user";
     private static final String ID_WORK = "work";
-    private static final String ID_INVOICE = "invoice";
-    private static final String ID_SUM_WORK = "sumWork";
-    private static final String ID_SUM_INVOICE = "sumInvoice";
+    private static final String ID_TIME_OFF = "timeOff";
+    private static final String ID_ALL = "all";
 
-    public SummaryPartsPanel(String id, final SummaryPartsDataProvider provider, final IModel<ReportFilterDto> model) {
+    public SummaryUsersPanel(String id, final SummaryUserDataProvider provider, final IModel<ReportFilterDto> model) {
         super(id);
 
         setModel(new LoadableDetachableModel<>() {
 
             @Override
-            protected List<PartSummary> load() {
+            protected List<UserSummary> load() {
                 return provider.createSummary(model.getObject());
             }
         });
@@ -59,72 +58,44 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
     }
 
     private void initPanelLayout() {
-        ListView repeater = new ListView<PartSummary>(ID_PART_REPEATER, getModel()) {
+        ListView<UserSummary> repeater = new ListView<UserSummary>(ID_PART_REPEATER, getModel()) {
 
             @Override
-            protected void populateItem(final ListItem<PartSummary> item) {
-                Label user = new Label(ID_USER, new PropertyModel<>(item.getModel(), PartSummary.F_REALIZTOR));
+            protected void populateItem(final ListItem<UserSummary> item) {
+                Label user = new Label(ID_USER, new PropertyModel<>(item.getModel(), UserSummary.F_REALIZTOR));
                 user.setRenderBodyOnly(true);
                 item.add(user);
 
-                Label part = new Label(ID_PART, new PropertyModel<>(item.getModel(), PartSummary.F_NAME));
+                Label part = new Label(ID_MAX_DATE, new PropertyModel<>(item.getModel(), UserSummary.F_MAX_DATE));
                 part.setRenderBodyOnly(true);
                 item.add(part);
 
                 Label work = new Label(ID_WORK, (IModel<String>) () -> {
-                    PartSummary part1 = item.getModelObject();
-                    Double hours = part1.getLength();
+                    UserSummary part1 = item.getModelObject();
+                    Double hours = part1.getWork();
                     return createLength(hours, part1.getUserAllocation());
                 });
                 work.setRenderBodyOnly(true);
                 item.add(work);
 
-                Label invoice = new Label(ID_INVOICE, (IModel<String>) () -> {
-                    PartSummary part12 = item.getModelObject();
-                    Double hours = part12.getInvoice();
+                Label timeOff = new Label(ID_TIME_OFF, (IModel<String>) () -> {
+                    UserSummary part1 = item.getModelObject();
+                    Double hours = part1.getTimeOff();
+                    return createLength(hours, part1.getUserAllocation());
+                });
+                timeOff.setRenderBodyOnly(true);
+                item.add(timeOff);
+
+                Label all = new Label(ID_ALL, (IModel<String>) () -> {
+                    UserSummary part12 = item.getModelObject();
+                    Double hours = part12.getLength();
                     return createLength(hours, part12.getUserAllocation());
                 });
-                invoice.setRenderBodyOnly(true);
-                item.add(invoice);
+                all.setRenderBodyOnly(true);
+                item.add(all);
             }
         };
         add(repeater);
-
-        Label sumWork = new Label(ID_SUM_WORK, createSumWorkModel());
-        sumWork.setRenderBodyOnly(true);
-        add(sumWork);
-
-        Label sumInvoice = new Label(ID_SUM_INVOICE, createSumInvoiceModel());
-        sumInvoice.setRenderBodyOnly(true);
-        add(sumInvoice);
-    }
-
-    private IModel<String> createSumWorkModel() {
-        return () -> {
-            double sum = 0d;
-            List<PartSummary> list = getModelObject();
-            for (PartSummary part : list) {
-                sum += part.getLength();
-            }
-
-            return createLength(sum, 1);
-        };
-    }
-
-    private IModel<String> createSumInvoiceModel() {
-        return new IModel<String>() {
-
-            @Override
-            public String getObject() {
-                double sum = 0d;
-                List<PartSummary> list = getModelObject();
-                for (PartSummary part : list) {
-                    sum += part.getInvoice();
-                }
-
-                return createLength(sum, 1);
-            }
-        };
     }
 
     private String createLength(Double hours, double allocation) {

@@ -18,6 +18,9 @@
 package com.evolveum.gizmo.web.app;
 
 import com.evolveum.gizmo.component.*;
+import com.evolveum.gizmo.component.modal.DownloadReportConfigPanel;
+import com.evolveum.gizmo.component.modal.MainPopupDialog;
+import com.evolveum.gizmo.component.modal.ProjectPartPanel;
 import com.evolveum.gizmo.data.Customer;
 import com.evolveum.gizmo.data.Part;
 import com.evolveum.gizmo.data.Project;
@@ -25,8 +28,10 @@ import com.evolveum.gizmo.repository.CustomerRepository;
 import com.evolveum.gizmo.repository.PartRepository;
 import com.evolveum.gizmo.repository.ProjectRepository;
 import com.evolveum.gizmo.util.LoadableModel;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
 import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -55,6 +60,8 @@ public class PageProject extends PageAppProjects {
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
     private static final String ID_TABS = "tabs";
+
+    private static final String ID_PART_MODAL = "partModal";
 
     private IModel<Project> model;
 
@@ -108,8 +115,13 @@ public class PageProject extends PageAppProjects {
     }
 
     private void initLayout() {
+        MainPopupDialog confirmDownload = new MainPopupDialog(ID_PART_MODAL);
+        confirmDownload.setOutputMarkupId(true);
+        add(confirmDownload);
+
         Form<Project> form = new Form<>(ID_FORM);
         add(form);
+
 
 
         initButtons(form);
@@ -212,14 +224,25 @@ public class PageProject extends PageAppProjects {
     }
 
     private void editPartPerformed(AjaxRequestTarget target, Part part) {
-//        ProjectPartModal modal = (ProjectPartModal) get(ID_DIALOG_FORM + ":" + ID_PROJECT_PART);
-//        target.add(modal);
-//        modal.show(target);
-//
-//        modal.setPart(part);
+
+        ProjectPartPanel content = new ProjectPartPanel(ModalDialog.CONTENT_ID, () -> part) {
+
+                @Override
+                protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {
+                    savePartPerformed(target, model);
+                }
+            };
+
+        content.add(AttributeModifier.append("class", "modal-content"));
+        MainPopupDialog partModal = (MainPopupDialog) get(ID_PART_MODAL);
+        partModal.setContent(content);
+        partModal.open(target);
+
     }
 
     private void savePartPerformed(AjaxRequestTarget target, IModel<Part> model) {
+        MainPopupDialog partModal = (MainPopupDialog) get(ID_PART_MODAL);
+        partModal.close(target);
         try {
             PartRepository repository = getProjectPartRepository();
             Part part = model.getObject();

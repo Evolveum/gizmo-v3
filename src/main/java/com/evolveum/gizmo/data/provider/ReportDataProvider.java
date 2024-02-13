@@ -17,8 +17,14 @@
 
 package com.evolveum.gizmo.data.provider;
 
+import com.evolveum.gizmo.data.AbstractTask;
+import com.evolveum.gizmo.data.QAbstractTask;
+import com.evolveum.gizmo.data.QLog;
+import com.evolveum.gizmo.data.QWork;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.dto.WorkType;
+import com.evolveum.gizmo.web.PageTemplate;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -27,12 +33,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import com.evolveum.gizmo.data.AbstractTask;
-import com.evolveum.gizmo.data.QAbstractTask;
-import com.evolveum.gizmo.data.QLog;
-import com.evolveum.gizmo.data.QWork;
-import com.evolveum.gizmo.dto.WorkType;
-import com.evolveum.gizmo.web.PageTemplate;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -122,13 +122,32 @@ public class ReportDataProvider extends SortableDataProvider<AbstractTask, Strin
         }
 
         List<CustomerProjectPartDto> allFilter = filter.getCustomerProjectPartDtos();
-//        allFilter.addAll();
-//        allFilter.addAll(filter.getCustomer());
-//        allFilter.addAll(filter.getProject());
         p = createProjectListPredicate(allFilter);
         if (p != null) {
             list.add(p);
         }
+
+        if (filter.getDateFrom() != null) {
+            list.add(task.date.goe(filter.getDateFrom()));
+        }
+
+        if (filter.getDateTo() != null) {
+            list.add(task.date.loe(filter.getDateTo()));
+        }
+
+        return list;
+    }
+
+    public static List<Predicate> createTimeOffPredicates(ReportFilterDto filter) {
+        QAbstractTask task = QAbstractTask.abstractTask;
+        if (filter == null) {
+            return null;
+        }
+
+        List<Predicate> list = new ArrayList<>();
+
+        QWork work = task.as(QWork.class);
+        list.add(work.part.project.off.isTrue());
 
         if (filter.getDateFrom() != null) {
             list.add(task.date.goe(filter.getDateFrom()));

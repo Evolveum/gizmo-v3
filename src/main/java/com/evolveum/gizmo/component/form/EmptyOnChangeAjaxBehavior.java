@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2023 Evolveum
+ *  Copyright (C) 2024 Evolveum
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,14 +15,20 @@
  *
  */
 
-.table-summary {
-  text-align: center;
+package com.evolveum.gizmo.component.form;
 
-  th {
-    text-align: center;
-  }
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.ajax.form.OnChangeAjaxBehavior;
 
-  td.info {
-    font-weight: bold;
-  }
+public class EmptyOnChangeAjaxBehavior extends AjaxFormComponentUpdatingBehavior {
+
+    public EmptyOnChangeAjaxBehavior() {
+            super("change");
+    }
+
+    @Override
+    protected void onUpdate(AjaxRequestTarget target) {
+
+    }
 }

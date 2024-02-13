@@ -20,6 +20,7 @@ package com.evolveum.gizmo.web.app;
 import com.evolveum.gizmo.component.AjaxSubmitButton;
 import com.evolveum.gizmo.component.GizmoTabbedPanel;
 import com.evolveum.gizmo.component.SummaryPartsPanel;
+import com.evolveum.gizmo.component.SummaryUsersPanel;
 import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
@@ -30,6 +31,7 @@ import com.evolveum.gizmo.data.AbstractTask;
 import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
+import com.evolveum.gizmo.data.provider.SummaryUserDataProvider;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.security.GizmoPrincipal;
@@ -66,6 +68,8 @@ public class PageReports extends PageAppTemplate {
 
     private static final String ID_PREVIEW = "preview";
     private static final String ID_EXPORT = "export";
+
+    public static final String ID_CONFIRM_DOWNLOAD = "confirmDownload";
 
     private IModel<ReportFilterDto> model;
 
@@ -157,7 +161,7 @@ public class PageReports extends PageAppTemplate {
     }
 
     private void showDownloadModal(Form form) {
-        MainPopupDialog confirmDownload = new MainPopupDialog("confirmDownload");
+        MainPopupDialog confirmDownload = new MainPopupDialog(ID_CONFIRM_DOWNLOAD);
         confirmDownload.setOutputMarkupId(true);
         add(confirmDownload);
 
@@ -202,6 +206,13 @@ public class PageReports extends PageAppTemplate {
             public WebMarkupContainer getPanel(String id) {
                 SummaryPartsDataProvider partsProvider = new SummaryPartsDataProvider(PageReports.this);
                 return new SummaryPartsPanel(id, partsProvider, getFilterModel());
+            }
+        });
+        tabs.add(new AbstractTab(createStringResource("PageReports.userSummary")) {
+            @Override
+            public WebMarkupContainer getPanel(String id) {
+                SummaryUserDataProvider partsProvider = new SummaryUserDataProvider(PageReports.this);
+                return new SummaryUsersPanel(id, partsProvider, getFilterModel());
             }
         });
         return tabs;

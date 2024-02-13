@@ -18,31 +18,24 @@
 package com.evolveum.gizmo.web.app;
 
 import com.evolveum.gizmo.component.AjaxSubmitButton;
-import com.evolveum.gizmo.component.SummaryPanel;
-import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.calendar.*;
 import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
+import com.evolveum.gizmo.data.Part;
 import com.evolveum.gizmo.data.QAbstractTask;
-import com.evolveum.gizmo.data.QLog;
 import com.evolveum.gizmo.data.QWork;
 import com.evolveum.gizmo.data.User;
-import com.evolveum.gizmo.dto.CustomerProjectPartDto;
-import com.evolveum.gizmo.dto.ProjectSearchSettings;
+import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.dto.ReportFilterDto;
-import com.evolveum.gizmo.dto.WorkType;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
@@ -186,26 +179,30 @@ public class PageCalendar extends PageAppTemplate {
 
     private List<Event> createEvents() {
 
+
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);
 
         JPAQuery query = new JPAQuery(getEntityManager());
         query.from(QAbstractTask.abstractTask)
-                .join(work.realizator)
-                .leftJoin(work.part);
+//                .join(work.realizator)
+                .leftJoin(work.part.project);
         query.where(createPredicate());
-        query.orderBy(task.date.asc());
+        query.orderBy(work.date.asc());
 
-        List<Tuple> vacations = query.select(QAbstractTask.abstractTask.workLength, QAbstractTask.abstractTask.realizator.name, QAbstractTask.abstractTask.date)
+        List<Tuple> vacations = query.select(work.workLength, work.realizator, work.date, work.part)
                 .fetch();
 
         List<Event> events = new ArrayList<>();
         for (Tuple tuple : vacations) {
-            String username = tuple.get(QAbstractTask.abstractTask.realizator.name);
-            double length = tuple.get(QAbstractTask.abstractTask.workLength);
-            LocalDate date = tuple.get(QAbstractTask.abstractTask.date);
+            User user = tuple.get(work.realizator);
+            double workLength = tuple.get(work.workLength);
+            double length = workLength / 8 * user.getAllocation();
+            LocalDate date = tuple.get(work.date);
+            Part part = tuple.get(work.part);
+            String color = part.getColor() == null ? null : part.getColor();
             Date vacationDate = Date.from(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-            Event event = new Event(username, username + " (" + length + ")", vacationDate, null).display("block");
+            Event event = new Event(user.getName(), user.getFullName() + " (" + length + "MD)", vacationDate, color).display("block");
             events.add(event);
         }
 
@@ -218,7 +215,8 @@ public class PageCalendar extends PageAppTemplate {
             return null;
         }
 
-        List<Predicate> list = createPredicates(filter);
+
+        List<Predicate> list = ReportDataProvider.createPredicates(filter);
         if (list.isEmpty()) {
             return null;
         }
@@ -227,91 +225,91 @@ public class PageCalendar extends PageAppTemplate {
         return bb.orAllOf(list.toArray(new Predicate[list.size()]));
     }
 
-    public static List<Predicate> createPredicates(ReportFilterDto filter) {
-        QAbstractTask task = QAbstractTask.abstractTask;
-        if (filter == null) {
-            return null;
-        }
+//    public static List<Predicate> createPredicates(ReportFilterDto filter) {
+//        QAbstractTask task = QAbstractTask.abstractTask;
+//        if (filter == null) {
+//            return null;
+//        }
+//
+//        List<Predicate> list = new ArrayList<>();
+//        Predicate p = createListPredicate(filter.getRealizators(), task.realizator);
+//        if (p != null) {
+//            list.add(p);
+//        }
+//
+//        if (!WorkType.ALL.equals(filter.getWorkType())) {
+//            list.add(task.type.eq(filter.getWorkType().getType()));
+//        }
+//
+//        ProjectSearchSettings settings = filter.getProjectSearchSettings();
+//        p = createProjectListPredicate(settings.getCustomerProjectPartDtoList());
+//        if (p != null) {
+//            list.add(p);
+//        }
+//
+//        if (filter.getDateFrom() != null) {
+//            list.add(task.date.goe(filter.getDateFrom()));
+//        }
+//
+//        if (filter.getDateTo() != null) {
+//            list.add(task.date.loe(filter.getDateTo()));
+//        }
+//
+//        return list;
+//    }
 
-        List<Predicate> list = new ArrayList<>();
-        Predicate p = createListPredicate(filter.getRealizators(), task.realizator);
-        if (p != null) {
-            list.add(p);
-        }
+//    private static Predicate createProjectListPredicate(List<CustomerProjectPartDto> list) {
+//        if (list == null || list.isEmpty()) {
+//            return null;
+//        }
+//
+//        if (list.size() == 1) {
+//            return createPredicate(list.get(0));
+//        }
+//
+//        BooleanBuilder bb = new BooleanBuilder();
+//        for (CustomerProjectPartDto dto : list) {
+//            bb.or(createPredicate(dto));
+//        }
+//
+//        return bb;
+//    }
 
-        if (!WorkType.ALL.equals(filter.getWorkType())) {
-            list.add(task.type.eq(filter.getWorkType().getType()));
-        }
+//    public static Predicate createPredicate(CustomerProjectPartDto dto) {
+//        BooleanBuilder bb = new BooleanBuilder();
+//
+//        QAbstractTask task = QAbstractTask.abstractTask;
+//        QLog log = task.as(QLog.class);
+//        bb.or(log.customer.id.eq(dto.getCustomerId()));
+//
+//        QWork work = task.as(QWork.class);
+//        if (dto.getPartId() != null) {
+//            bb.or(work.part.id.eq(dto.getPartId()));
+//        } else if (dto.getProjectId() != null) {
+//            bb.or(work.part.project.id.eq(dto.getProjectId()));
+//        } else if (dto.getCustomerId() != null) {
+//            bb.or(work.part.project.customer.id.eq(dto.getCustomerId()));
+//        }
+//
+//        return bb;
+//    }
 
-        ProjectSearchSettings settings = filter.getProjectSearchSettings();
-        p = createProjectListPredicate(settings.getCustomerProjectPartDtoList());
-        if (p != null) {
-            list.add(p);
-        }
-
-        if (filter.getDateFrom() != null) {
-            list.add(task.date.goe(filter.getDateFrom()));
-        }
-
-        if (filter.getDateTo() != null) {
-            list.add(task.date.loe(filter.getDateTo()));
-        }
-
-        return list;
-    }
-
-    private static Predicate createProjectListPredicate(List<CustomerProjectPartDto> list) {
-        if (list == null || list.isEmpty()) {
-            return null;
-        }
-
-        if (list.size() == 1) {
-            return createPredicate(list.get(0));
-        }
-
-        BooleanBuilder bb = new BooleanBuilder();
-        for (CustomerProjectPartDto dto : list) {
-            bb.or(createPredicate(dto));
-        }
-
-        return bb;
-    }
-
-    public static Predicate createPredicate(CustomerProjectPartDto dto) {
-        BooleanBuilder bb = new BooleanBuilder();
-
-        QAbstractTask task = QAbstractTask.abstractTask;
-        QLog log = task.as(QLog.class);
-        bb.or(log.customer.id.eq(dto.getCustomerId()));
-
-        QWork work = task.as(QWork.class);
-        if (dto.getPartId() != null) {
-            bb.or(work.part.id.eq(dto.getPartId()));
-        } else if (dto.getProjectId() != null) {
-            bb.or(work.part.project.id.eq(dto.getProjectId()));
-        } else if (dto.getCustomerId() != null) {
-            bb.or(work.part.project.customer.id.eq(dto.getCustomerId()));
-        }
-
-        return bb;
-    }
-
-    private static <T> Predicate createListPredicate(List<T> list, EntityPathBase<T> base) {
-        if (list == null || list.isEmpty()) {
-            return null;
-        }
-
-        if (list.size() == 1) {
-            return base.eq(list.get(0));
-        }
-
-        BooleanExpression expr = base.eq(list.get(0));
-        for (int i = 1; i < list.size(); i++) {
-            expr = expr.or(base.eq(list.get(i)));
-        }
-
-        return expr;
-    }
+//    private static <T> Predicate createListPredicate(List<T> list, EntityPathBase<T> base) {
+//        if (list == null || list.isEmpty()) {
+//            return null;
+//        }
+//
+//        if (list.size() == 1) {
+//            return base.eq(list.get(0));
+//        }
+//
+//        BooleanExpression expr = base.eq(list.get(0));
+//        for (int i = 1; i < list.size(); i++) {
+//            expr = expr.or(base.eq(list.get(i)));
+//        }
+//
+//        return expr;
+//    }
 
     private void previousClicked(AjaxRequestTarget target) {
         ReportFilterDto workFilter = model.getObject();
@@ -334,7 +332,7 @@ public class PageCalendar extends PageAppTemplate {
 
     private void handleCalendatNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
         GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
-        session.setDashboardFilter(workFilter);
+        session.setReportFilterDto(workFilter);
 
         target.add(PageCalendar.this);
     }
