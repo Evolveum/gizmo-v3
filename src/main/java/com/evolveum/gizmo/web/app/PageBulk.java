@@ -33,7 +33,9 @@ import com.evolveum.gizmo.repository.WorkRepository;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
+import com.evolveum.gizmo.util.HolidayDay;
 import com.evolveum.gizmo.util.LoadableModel;
+import com.evolveum.gizmo.util.WorkingDaysProvider;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.behavior.AttributeAppender;
@@ -187,10 +189,11 @@ public class PageBulk extends PageAppTemplate {
             int count = 0;
             List<Work> works = new ArrayList<>();
             while (date.isBefore(to)) {
-                if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY || !GizmoUtils.isNotHoliday(date)) {
                     date = date.plusDays(1);
                     continue;
                 }
+
                 Work work = createWork(bulk, part, date);
                 works.add(work);
 

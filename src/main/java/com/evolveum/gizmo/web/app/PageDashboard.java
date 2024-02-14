@@ -25,6 +25,7 @@ import com.evolveum.gizmo.component.calendar.HeaderToolbar;
 import com.evolveum.gizmo.component.calendar.Plugins;
 import com.evolveum.gizmo.component.data.LinkColumn;
 import com.evolveum.gizmo.component.data.LinkIconColumn;
+import com.evolveum.gizmo.component.data.ProgressPanel;
 import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.data.AbstractTask;
 import com.evolveum.gizmo.data.Log;
@@ -32,15 +33,16 @@ import com.evolveum.gizmo.data.Work;
 import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
-import com.evolveum.gizmo.dto.ReportFilterDto;
-import com.evolveum.gizmo.dto.SummaryPanelDto;
-import com.evolveum.gizmo.dto.TaskLength;
+import com.evolveum.gizmo.data.provider.SummaryUserDataProvider;
+import com.evolveum.gizmo.dto.*;
 import com.evolveum.gizmo.repository.AbstractTaskRepository;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
+import com.evolveum.gizmo.util.HolidayDay;
 import com.evolveum.gizmo.util.LoadableModel;
+import com.evolveum.gizmo.util.WorkingDaysProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -54,9 +56,12 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -78,6 +83,7 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_BTN_NEW_BULK = "newBulk";
 
     private static final String ID_CALENDAR = "calendar";
+    private static final String ID_PROGRESS_BAR = "progressBar";
 
     private IModel<ReportFilterDto> filter;
 
@@ -87,6 +93,9 @@ public class PageDashboard extends PageAppTemplate {
             @Override
             protected ReportFilterDto load() {
                 GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
+                if (session.getDashboardFilter() != null) {
+                    return session.getDashboardFilter();
+                }
                 ReportFilterDto dto = new ReportFilterDto();
                 dto.setDateFrom(GizmoUtils.createWorkDefaultFrom());
                 dto.setDateTo(GizmoUtils.createWorkDefaultTo());
@@ -131,6 +140,10 @@ public class PageDashboard extends PageAppTemplate {
         };
         next.setOutputMarkupId(true);
         add(next);
+
+        ProgressPanel progress = new ProgressPanel(ID_PROGRESS_BAR, loadProgressModel());
+        progress.setOutputMarkupId(true);
+        add(progress);
 
         ReportDataProvider provider = new ReportDataProvider(this);
         provider.setFilter(filter.getObject());
@@ -178,6 +191,42 @@ public class PageDashboard extends PageAppTemplate {
         return fragment;
     }
 
+    private IModel<ProgressDto> loadProgressModel() {
+        return new LoadableModel<>(true) {
+
+            @Override
+            protected ProgressDto load() {
+                LocalDate firstDay = filter.getObject().getDateFrom();
+                LocalDate lastDay = filter.getObject().getDateTo();
+                long totalDates = firstDay.datesUntil(lastDay)
+                        .filter(date -> isNotWeekend(date))
+                        .filter(date -> GizmoUtils.isNotHoliday(date))
+                        .count();
+
+                SummaryUserDataProvider summaryPerUser = new SummaryUserDataProvider(PageDashboard.this);
+                ReportFilterDto filter = new ReportFilterDto();
+                ReportFilterDto originalFilter = getFilterModel().getObject();
+                filter.setRealizators(originalFilter.getRealizators());
+                filter.setDateFrom(originalFilter.getDateFrom());
+                filter.setDateTo(originalFilter.getDateTo());
+                List<UserSummary> userSummary = summaryPerUser.createSummary(filter);
+                if (userSummary.isEmpty()) {
+                    return new ProgressDto(totalDates, 0);
+                }
+                double currentLength = userSummary.get(0).getLength() / (8 * filter.getRealizators().get(0).getAllocation());
+                return new ProgressDto(totalDates, currentLength);
+            }
+        };
+    }
+
+    private boolean isNotWeekend(LocalDate date) {
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        return dayOfWeek != DayOfWeek.SATURDAY
+                && dayOfWeek != DayOfWeek.SUNDAY;
+    }
+
+
+
     private IModel<com.evolveum.gizmo.component.calendar.FullCalendar> createCalendarModel() {
         return () -> {
 
@@ -214,6 +263,9 @@ public class PageDashboard extends PageAppTemplate {
             com.evolveum.gizmo.component.calendar.Event event = new Event(Integer.toString(i), lenghtAsString, day, isFullDay ? "green" : "red");
             events.add(event);
         }
+
+
+
         return events;
     }
 
@@ -223,12 +275,6 @@ public class PageDashboard extends PageAppTemplate {
 
     private void newBulkPerformed() {
         setResponsePage(PageBulk.class);
-    }
-
-    private void refreshComponents(AjaxRequestTarget target) {
-        target.add(get(ID_TABLE));
-        target.add(get(ID_CALENDAR));
-        target.add(get(ID_SUMMARY_PARTS));
     }
 
     private IModel<SummaryPanelDto> createSummaryModel() {
@@ -246,9 +292,9 @@ public class PageDashboard extends PageAppTemplate {
         ReportFilterDto workFilter = filter.getObject();
         LocalDate defaultFrom = workFilter.getDateFrom();
         workFilter.setDateFrom(defaultFrom.minusMonths(1));
-        LocalDate defaultTo = workFilter.getDateTo();
-        workFilter.setDateTo(defaultTo.minusMonths(1));
-        handleCalendatNavigation(target, workFilter);
+
+        workFilter.setDateTo(workFilter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
+        handleCalendarNavigation(target, workFilter);
     }
 
     private void nextClicked(AjaxRequestTarget target) {
@@ -256,12 +302,12 @@ public class PageDashboard extends PageAppTemplate {
         LocalDate defaultFrom = workFilter.getDateFrom();
         workFilter.setDateFrom(defaultFrom.plusMonths(1));
 
-        LocalDate defaultTo = workFilter.getDateTo();
-        workFilter.setDateTo(defaultTo.plusMonths(1));
-        handleCalendatNavigation(target, workFilter);
+
+        workFilter.setDateTo(workFilter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
+        handleCalendarNavigation(target, workFilter);
     }
 
-    private void handleCalendatNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
+    private void handleCalendarNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
         GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
         session.setDashboardFilter(workFilter);
         target.add(PageDashboard.this);
@@ -343,7 +389,7 @@ public class PageDashboard extends PageAppTemplate {
             repository.deleteById(task.getId());
 
             success(createStringResource("Message.successfullyDeleted").getString());
-            target.add(getFeedbackPanel(), get(ID_TABLE), get(ID_CALENDAR), get(ID_SUMMARY_PARTS));
+            target.add(getFeedbackPanel(), get(ID_PROGRESS_BAR), get(ID_TABLE), get(ID_CALENDAR), get(ID_SUMMARY_PARTS));
         } catch (Exception ex) {
             handleGuiException(this, "Message.couldntSaveWork", ex, target);
         }

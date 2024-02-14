@@ -154,6 +154,12 @@ public class GizmoUtils {
         return LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
     }
 
+    public static boolean isNotHoliday(LocalDate date) {
+        WorkingDaysProvider provider = new WorkingDaysProvider();
+        List<HolidayDay> holidays = provider.getPublicHolidaysFor(date.getYear(), date.getMonthValue());
+        return holidays.stream().noneMatch(holiday -> LocalDate.of(date.getYear(), holiday.getMonth(), holiday.getDay()).isEqual(date));
+    }
+
     public static LocalDate createWorkDefaultTo() {
         return LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
     }

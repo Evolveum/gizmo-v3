@@ -85,7 +85,13 @@ package com.evolveum.gizmo.component.calendar;
 //            }
 //        ]
 
+import com.evolveum.gizmo.util.HolidayDay;
+import com.evolveum.gizmo.util.WorkingDaysProvider;
+
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -103,6 +109,20 @@ public class FullCalendar implements Serializable {
         this.headerToolbar = headerToolbar;
         this.initialDate = initialDate;
         this.events = events;
+        appendHolidays();
+    }
+
+    private void appendHolidays() {
+        WorkingDaysProvider provider = new WorkingDaysProvider();
+        LocalDate from = initialDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+        List<HolidayDay> holidays = provider.getPublicHolidaysFor(from.getYear(), from.getMonthValue());
+        int i = events.size();
+        for (HolidayDay holiday : holidays) {
+            LocalDate date = LocalDate.of(from.getYear(), holiday.getMonth(), holiday.getDay());
+            Date day = Date.from(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            com.evolveum.gizmo.component.calendar.Event event = new Event(Integer.toString(i++), holiday.getDisplayName(), day, "yellow");
+            events.add(event);
+        }
     }
 
     public List<Plugins> getPlugins() {
