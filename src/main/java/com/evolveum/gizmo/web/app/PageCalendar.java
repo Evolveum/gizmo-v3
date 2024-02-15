@@ -44,6 +44,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -315,8 +316,8 @@ public class PageCalendar extends PageAppTemplate {
         ReportFilterDto workFilter = model.getObject();
         LocalDate defaultFrom = workFilter.getDateFrom();
         workFilter.setDateFrom(defaultFrom.minusMonths(1));
-        LocalDate defaultTo = workFilter.getDateTo();
-        workFilter.setDateTo(defaultTo.minusMonths(1));
+
+        workFilter.setDateTo(workFilter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
         handleCalendatNavigation(target, workFilter);
     }
 
@@ -325,8 +326,7 @@ public class PageCalendar extends PageAppTemplate {
         LocalDate defaultFrom = workFilter.getDateFrom();
         workFilter.setDateFrom(defaultFrom.plusMonths(1));
 
-        LocalDate defaultTo = workFilter.getDateTo();
-        workFilter.setDateTo(defaultTo.plusMonths(1));
+        workFilter.setDateTo(workFilter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
         handleCalendatNavigation(target, workFilter);
     }
 
