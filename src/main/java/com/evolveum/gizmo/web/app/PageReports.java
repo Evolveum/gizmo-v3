@@ -24,6 +24,7 @@ import com.evolveum.gizmo.component.SummaryUsersPanel;
 import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
+import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.component.modal.DownloadReportConfigPanel;
 import com.evolveum.gizmo.component.modal.MainPopupDialog;
@@ -52,6 +53,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
 
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,7 +109,12 @@ public class PageReports extends PageAppTemplate {
         return model;
     }
 
-
+    private void setDateTo(AjaxRequestTarget target) {
+        ReportFilterDto filterDto = getFilterModel().getObject();
+        filterDto.setDateTo(filterDto.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
+        LocalDateTextField dateTo = (LocalDateTextField) get(ID_FORM + ":" + ID_TO);
+        target.add(dateTo);
+    }
 
     private void initLayout() {
         Form<ReportFilterDto> form = new Form<>(ID_FORM);
@@ -116,7 +123,14 @@ public class PageReports extends PageAppTemplate {
 
         LocalDateTextField from = new LocalDateTextField(ID_FROM, new PropertyModel<>(getFilterModel(), ReportFilterDto.F_DATE_FROM), "dd/MM/yyyy");
         from.setOutputMarkupId(true);
-        from.add(new DateRangePickerBehavior());
+        from.add(new EmptyOnChangeAjaxBehavior());
+        from.add(new DateRangePickerBehavior() {
+
+            @Override
+            protected void onEvent(AjaxRequestTarget target) {
+                setDateTo(target);
+            }
+        });
         form.add(from);
 
         LocalDateTextField to = new LocalDateTextField(ID_TO, new PropertyModel<>(getFilterModel(), ReportFilterDto.F_DATE_TO), "dd/MM/yyyy");

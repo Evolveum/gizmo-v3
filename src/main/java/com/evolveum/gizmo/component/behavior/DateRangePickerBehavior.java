@@ -56,6 +56,7 @@ public class DateRangePickerBehavior extends AjaxEventBehavior {
 //                "\"startDate\": \""+ component.getDefaultModelObject().format(formatter) + "\", "+
 //                "\"endDate\": \"" + endDate.format(formatter) + "\"," +
                 "\"singleDatePicker\": true, " +
+                "\"showDropdowns\": true, " +
                 "\"locale\": { " +
                     "\"format\":\"DD/MM/YYYY\", " +
                     "\"firstDay\":1" +
