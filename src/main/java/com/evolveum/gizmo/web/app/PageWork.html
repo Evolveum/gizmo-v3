@@ -22,8 +22,15 @@
     <form role="form" wicket:id="form">
         <div class="d-flex flex-wrap">
             <div class="card col-6" wicket:id="works">
+                <div class="card-header border-transparent">
+                    <h3 class="card-title">New work for blabla</h3>
+                    <div class="card-tools">
+                        <button wicket:id="removeWork" type="button" class="btn btn-tool">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
                 <div class="card-body">
-
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label><wicket:message key="PageWork.date"/></label>

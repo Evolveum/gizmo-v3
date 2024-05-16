@@ -18,6 +18,7 @@
 package com.evolveum.gizmo.web.app;
 
 import com.evolveum.gizmo.component.VisibleEnableBehaviour;
+import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.component.form.IconButton;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
@@ -81,6 +82,7 @@ public class PageWork extends PageAppTemplate {
     private static final String ID_SAVE = "save";
     private static final String ID_ADD = "add";
     private static final String ID_CUSTOMER_PROJECT_PART = "customerProjectPart";
+    private static final String ID_REMOVE_WORK = "removeWork";
 
     private IModel<List<WorkDto>> model;
 
@@ -137,6 +139,10 @@ public class PageWork extends PageAppTemplate {
         return true;
     }
 
+    private void removeWork(WorkDto workToRemove, AjaxRequestTarget target) {
+        model.getObject().remove(workToRemove);
+        target.add(PageWork.this);
+    }
     private void addNewWork(AjaxRequestTarget target) {
         model.getObject().add(new WorkDto());
         target.add(PageWork.this);
@@ -165,8 +171,6 @@ public class PageWork extends PageAppTemplate {
     }
 
     private void initLayout() {
-
-
         Form<Work> form = new Form<>(ID_FORM);
         add(form);
 
@@ -188,6 +192,7 @@ public class PageWork extends PageAppTemplate {
                 isMultiProjectEnabled(),
                 GizmoUtils.createCustomerProjectPartList(this, true, true, true),
                 GizmoUtils.createCustomerProjectPartRenderer());
+        partCombo.add(new EmptyOnChangeAjaxBehavior());
         item.add(partCombo);
 
         LocalDateTextField from = new LocalDateTextField(ID_DATE, new PropertyModel<>(workModel, WorkDto.F_DATE), "dd/MM/yyyy");
@@ -198,18 +203,37 @@ public class PageWork extends PageAppTemplate {
         TextField<Double> invoice = new TextField<>(ID_INVOICE, new PropertyModel<>(workModel, WorkDto.F_INVOICE_LENGTH), Double.class);
         invoice.add(new RangeValidator<>(0.0, 2000.0));
         invoice.setOutputMarkupId(true);
+        invoice.add(new EmptyOnChangeAjaxBehavior());
         item.add(invoice);
 
         TextField<Double> length = new TextField<>(ID_LENGTH, new PropertyModel<>(workModel, WorkDto.F_WORK_LENGTH));
         length.add(new RangeValidator<>(0.0, 2000.0));
         length.setType(Double.class);
+        length.add(new EmptyOnChangeAjaxBehavior());
         item.add(length);
 
         TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(workModel, WorkDto.F_DESCRIPTION));
+        description.add(new EmptyOnChangeAjaxBehavior());
         item.add(description);
 
         TextField<String> trackId = new TextField<>(ID_TRACK_ID, new PropertyModel<>(workModel, WorkDto.F_TRACK_ID));
+        trackId.add(new EmptyOnChangeAjaxBehavior());
         item.add(trackId);
+
+        AjaxButton removeWork = new AjaxButton(ID_REMOVE_WORK) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                removeWork(item.getModelObject(), target);
+            }
+        };
+        removeWork.add(new VisibleEnableBehaviour() {
+            @Override
+            public boolean isVisible() {
+                return model.getObject().size() > 1;
+            }
+        });
+        item.add(removeWork);
     }
 
     protected boolean isMultiProjectEnabled() {

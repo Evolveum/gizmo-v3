@@ -28,9 +28,6 @@ import java.util.List;
 
 public class MultiselectDropDownInput<T> extends ListMultipleChoice<T> {
 
-    private static final String ID_INPUT = "input";
-
-    private IModel<List<User>> choices;
     private boolean multiple = true;
 
     public MultiselectDropDownInput(String id, IModel<List<T>> model, IModel<List<T>> choices, IChoiceRenderer<T> renderer) {
