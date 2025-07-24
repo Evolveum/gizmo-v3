@@ -70,6 +70,7 @@ public class PageAppTemplate extends PageTemplate {
             protected List<NavigationMenuItem> load() {
                 List<NavigationMenuItem> menuItems = new ArrayList<>();
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.dashboard"), PageDashboard.class));
+                menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.workReport"), PageWorkReport.class));
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.customers"), PageCustomers.class));
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.projects"), PageProjects.class));
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.users"), PageUsers.class));

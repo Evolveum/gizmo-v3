@@ -28,58 +28,19 @@ import java.util.Locale;
 
 public class ReportFilterDto implements Serializable {
 
-//    public static final String F_SUMMARY = "summary";
-    public static final String F_WORKLOG = "worklog";
-    public static final String F_PER_USER = "perUser";
-//    public static final String F_SHOW_SUMMARY = "showSummary";
     public static final String F_DATE_FROM = "dateFrom";
     public static final String F_DATE_TO = "dateTo";
-//    public static final String F_CUSTOM_PROJECT_PART = "customerProjectPart";
     public static final String F_PROJECT_SEARCH_SETTINGS = "projectSearchSettings";
     public static final String F_CUSTOMER = "customer";
-    public static final String F_PROJECT = "project";
-    public static final String F_PROJECTS = "projects";
     public static final String F_REALIZATORS = "realizators";
-    public static final String F_WORK_TYPE = "workType";
     public static final String F_MONTH_YEAR = "monthYear";
-
-//    private boolean summary;
-    private boolean workLog;
-//    private boolean perUser;
 
     private LocalDate dateFrom;
     private LocalDate dateTo;
 
     private ProjectSearchSettings projectSearchSettings = new ProjectSearchSettings();
-//    private List<CustomerProjectPartDto> customerProjectPart = new ArrayList<>();
-//    private List<CustomerProjectPartDto> customer = new ArrayList<>();
-//    private List<CustomerProjectPartDto> project = new ArrayList<>();
     private List<User> realizators;
     private WorkType workType = WorkType.ALL;
-
-//    public boolean isSummary() {
-//        return summary;
-//    }
-//
-//    public void setSummary(boolean summary) {
-//        this.summary = summary;
-//    }
-
-    public boolean isWorkLog() {
-        return workLog;
-    }
-
-    public void setWorkLog(boolean workLog) {
-        this.workLog = workLog;
-    }
-
-//    public boolean isPerUser() {
-//        return perUser;
-//    }
-//
-//    public void setPerUser(boolean perUser) {
-//        this.perUser = perUser;
-//    }
 
     public LocalDate getDateFrom() {
         return dateFrom;
@@ -101,59 +62,6 @@ public class ReportFilterDto implements Serializable {
        return projectSearchSettings.getCustomerProjectPartDtoList();
 
     }
-//
-//    public void setCustomerProjectPartDtos(List<CustomerProjectPartDto> customerProjectPartDtos) {
-//        this.customerProjectPart = customerProjectPartDtos;
-//    }
-//
-//    public List<CustomerProjectPartDto> getCustomerProjectPart() {
-//        return customerProjectPart;
-//    }
-//
-//    public List<CustomerProjectPartDto> getProject() {
-//        return project;
-//    }
-//
-//    public void setProject(List<CustomerProjectPartDto> project) {
-//        this.project = project;
-//    }
-//
-//    public List<CustomerProjectPartDto> getCustomer() {
-//        return customer;
-//    }
-//
-//    public void setCustomer(List<CustomerProjectPartDto> customer) {
-//        this.customer = customer;
-//    }
-
-    public ProjectSearchSettings getProjectSearchSettings() {
-        return projectSearchSettings;
-    }
-
-    public void setProjectSearchSettings(ProjectSearchSettings projectSearchSettings) {
-        this.projectSearchSettings = projectSearchSettings;
-    }
-
-    //    public CustomerProjectPartDto getProject() {
-//        List<CustomerProjectPartDto> projects = getCustomerProjectPartDtos();
-//        if (projects.isEmpty()) {
-//            return null;
-//        }
-//
-//        return projects.get(0);
-//    }
-
-
-
-//    public void setProject(CustomerProjectPartDto project) {
-//        List<CustomerProjectPartDto> projects = getCustomerProjectPartDtos();
-//        projects.clear();
-//
-//        if (project != null) {
-//            projects.add(project);
-//        }
-//    }
-
 
     public List<User> getRealizators() {
         if (realizators == null) {

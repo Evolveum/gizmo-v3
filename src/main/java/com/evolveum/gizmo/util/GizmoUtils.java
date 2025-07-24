@@ -22,6 +22,7 @@ import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ProjectSearchSettings;
 import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.repository.CustomerRepository;
 import com.evolveum.gizmo.repository.UserRepository;
 import com.evolveum.gizmo.web.PageTemplate;
@@ -469,50 +470,46 @@ public class GizmoUtils {
             return data;
         }
 
-        List<Predicate> predicates = ReportDataProvider.createPredicates(filter);
-
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);
 
         JPAQuery query = new JPAQuery(entityManager);
         query.from(task).leftJoin(work.part.project);
-        if (!predicates.isEmpty()) {
-            BooleanBuilder where = new BooleanBuilder();
-            where.orAllOf(predicates.toArray(new Predicate[predicates.size()]));
-            query.where(where);
-        }
+
+        query.where(ReportDataProvider.createPredicates(filter));
+
         query.orderBy(task.date.asc());
 
         return query.fetch();
 //        return query.list(task);
     }
 
-    public static IColumn<AbstractTask, String> createAbstractTaskRealizatorColumn(PageTemplate page) {
+    public static IColumn<WorkDto, String> createAbstractTaskRealizatorColumn(PageTemplate page) {
         return new PropertyColumn<>(page.createStringResource("AbstractTask.realizator"),
                 StringUtils.join(new Object[]{AbstractTask.F_REALIZATOR, User.M_FULL_NAME}, '.'));
     }
 
-    public static IColumn<AbstractTask, String> createWorkInvoiceColumn(PageTemplate page) {
+    public static IColumn<WorkDto, String> createWorkInvoiceColumn(PageTemplate page) {
         return new AbstractColumn<>(page.createStringResource("Task.length")) {
 
             @Override
-            public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId,
-                                     IModel<AbstractTask> rowModel) {
+            public void populateItem(Item<ICellPopulator<WorkDto>> cellItem, String componentId,
+                                     IModel<WorkDto> rowModel) {
                 cellItem.add(new Label(componentId, createInvoiceModel(rowModel)));
             }
         };
     }
 
-    private static IModel<String> createInvoiceModel(final IModel<AbstractTask> rowModel) {
-        return (IModel<String>) () -> {
-            AbstractTask task = rowModel.getObject();
+    private static IModel<String> createInvoiceModel(final IModel<WorkDto> rowModel) {
+        return () -> {
+            WorkDto task = rowModel.getObject();
             double length = task.getWorkLength();
-            double invoice = 0;
+            double invoice = task.getInvoiceLength();
 
-            if (task instanceof Work) {
-                Work work = (Work) task;
-                invoice = work.getInvoiceLength();
-            }
+//            if (task instanceof Work) {
+//                Work work = (Work) task;
+//                invoice = work.getInvoiceLength();
+//            }
 
             String roundedLength = String.format("%.2g%n", length);
             String roundedInvoice = String.format("%.2g%n", invoice);
@@ -521,26 +518,32 @@ public class GizmoUtils {
         };
     }
 
-    public static IColumn<AbstractTask, String> createWorkProjectColumn(PageTemplate page) {
+    public static IColumn<WorkDto, String> createWorkProjectColumn(PageTemplate page) {
         return new AbstractColumn<>(page.createStringResource("Work.part")) {
 
             @Override
-            public void populateItem(Item<ICellPopulator<AbstractTask>> cellItem, String componentId,
-                                     IModel<AbstractTask> rowModel) {
+            public void populateItem(Item<ICellPopulator<WorkDto>> cellItem, String componentId,
+                                     IModel<WorkDto> rowModel) {
                 cellItem.add(new Label(componentId, createProjectModel(rowModel)));
             }
         };
     }
 
-    private static IModel<String> createProjectModel(final IModel<AbstractTask> rowModel) {
+    private static IModel<String> createProjectModel(final IModel<WorkDto> rowModel) {
         return (IModel<String>) () -> {
-            AbstractTask task = rowModel.getObject();
-            if (!(task instanceof Work)) {
-                return null;
-            }
-
-            Work work = (Work) task;
-            return GizmoUtils.describeProjectPart(work.getPart(), " - ");
+            WorkDto task = rowModel.getObject();
+            CustomerProjectPartDto customerProjectPartDto = task.getCustomerProjectPart().iterator().next();
+//            if (!(task instanceof Work)) {
+//                return null;
+//            }
+//
+//            Work work = (Work) task;
+//            return GizmoUtils.describeProjectPart(task.getPart(), " - ");
+//            return "N/A";
+            return StringUtils.join(new Object[]{
+                    customerProjectPartDto.getCustomerName(),
+                    customerProjectPartDto.getProjectName(),
+                    customerProjectPartDto.getPartName()}, "/");
         };
     }
 

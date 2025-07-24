@@ -34,6 +34,7 @@ import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryUserDataProvider;
 import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
@@ -117,6 +118,7 @@ public class PageReports extends PageAppTemplate {
     }
 
     private void initLayout() {
+
         Form<ReportFilterDto> form = new Form<>(ID_FORM);
         form.setOutputMarkupId(true);
         add(form);
@@ -209,8 +211,8 @@ public class PageReports extends PageAppTemplate {
                 ReportDataProvider provider = new ReportDataProvider(PageReports.this);
                 provider.setFilter(model.getObject());
 
-                List<IColumn<AbstractTask, String>> columns = createColumns();
-                TablePanel<AbstractTask> table = new TablePanel<>(id, provider, columns, 50);
+                List<IColumn<WorkDto, String>> columns = createColumns();
+                TablePanel<WorkDto> table = new TablePanel<>(id, provider, columns, 50);
                 table.setOutputMarkupId(true);
                 return table;
             }
@@ -243,8 +245,8 @@ public class PageReports extends PageAppTemplate {
         target.add(get(ID_DETAILS));
     }
 
-    private List<IColumn<AbstractTask, String>> createColumns() {
-        List<IColumn<AbstractTask, String>> columns = new ArrayList<>();
+    private List<IColumn<WorkDto, String>> createColumns() {
+        List<IColumn<WorkDto, String>> columns = new ArrayList<>();
 
         columns.add(new PropertyColumn<>(createStringResource("AbstractTask.date"), AbstractTask.F_DATE));
         columns.add(GizmoUtils.createWorkInvoiceColumn(this));

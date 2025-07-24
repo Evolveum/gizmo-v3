@@ -28,6 +28,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDat
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationToolbar;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -57,7 +58,13 @@ public class TablePanel<T> extends Panel {
     }
 
     private void initLayout(List<IColumn<T, String>> columns, ISortableDataProvider provider, int rowsPerPage) {
-        DataTable<T, String> table = new DataTable<>(ID_TABLE, columns, provider, rowsPerPage);
+        DataTable<T, String> table = new DataTable<>(ID_TABLE, columns, provider, rowsPerPage) {
+
+            @Override
+            protected Item<T> newRowItem(String id, int index, IModel model) {
+                return new MyRowItem<>(id, index, model);
+            }
+        };
 
         table.setOutputMarkupId(true);
 

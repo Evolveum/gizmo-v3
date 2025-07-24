@@ -184,9 +184,8 @@ public class PageCalendar extends PageAppTemplate {
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);
 
-        JPAQuery query = new JPAQuery(getEntityManager());
+        JPAQuery<Event> query = new JPAQuery<>(getEntityManager());
         query.from(QAbstractTask.abstractTask)
-//                .join(work.realizator)
                 .leftJoin(work.part.project);
         query.where(createPredicate());
         query.orderBy(work.date.asc());
@@ -212,105 +211,8 @@ public class PageCalendar extends PageAppTemplate {
 
     private Predicate createPredicate() {
         ReportFilterDto filter = model.getObject();
-        if (filter == null) {
-            return null;
-        }
-
-
-        List<Predicate> list = ReportDataProvider.createPredicates(filter);
-        if (list.isEmpty()) {
-            return null;
-        }
-
-        BooleanBuilder bb = new BooleanBuilder();
-        return bb.orAllOf(list.toArray(new Predicate[list.size()]));
+        return ReportDataProvider.createPredicates(filter);
     }
-
-//    public static List<Predicate> createPredicates(ReportFilterDto filter) {
-//        QAbstractTask task = QAbstractTask.abstractTask;
-//        if (filter == null) {
-//            return null;
-//        }
-//
-//        List<Predicate> list = new ArrayList<>();
-//        Predicate p = createListPredicate(filter.getRealizators(), task.realizator);
-//        if (p != null) {
-//            list.add(p);
-//        }
-//
-//        if (!WorkType.ALL.equals(filter.getWorkType())) {
-//            list.add(task.type.eq(filter.getWorkType().getType()));
-//        }
-//
-//        ProjectSearchSettings settings = filter.getProjectSearchSettings();
-//        p = createProjectListPredicate(settings.getCustomerProjectPartDtoList());
-//        if (p != null) {
-//            list.add(p);
-//        }
-//
-//        if (filter.getDateFrom() != null) {
-//            list.add(task.date.goe(filter.getDateFrom()));
-//        }
-//
-//        if (filter.getDateTo() != null) {
-//            list.add(task.date.loe(filter.getDateTo()));
-//        }
-//
-//        return list;
-//    }
-
-//    private static Predicate createProjectListPredicate(List<CustomerProjectPartDto> list) {
-//        if (list == null || list.isEmpty()) {
-//            return null;
-//        }
-//
-//        if (list.size() == 1) {
-//            return createPredicate(list.get(0));
-//        }
-//
-//        BooleanBuilder bb = new BooleanBuilder();
-//        for (CustomerProjectPartDto dto : list) {
-//            bb.or(createPredicate(dto));
-//        }
-//
-//        return bb;
-//    }
-
-//    public static Predicate createPredicate(CustomerProjectPartDto dto) {
-//        BooleanBuilder bb = new BooleanBuilder();
-//
-//        QAbstractTask task = QAbstractTask.abstractTask;
-//        QLog log = task.as(QLog.class);
-//        bb.or(log.customer.id.eq(dto.getCustomerId()));
-//
-//        QWork work = task.as(QWork.class);
-//        if (dto.getPartId() != null) {
-//            bb.or(work.part.id.eq(dto.getPartId()));
-//        } else if (dto.getProjectId() != null) {
-//            bb.or(work.part.project.id.eq(dto.getProjectId()));
-//        } else if (dto.getCustomerId() != null) {
-//            bb.or(work.part.project.customer.id.eq(dto.getCustomerId()));
-//        }
-//
-//        return bb;
-//    }
-
-//    private static <T> Predicate createListPredicate(List<T> list, EntityPathBase<T> base) {
-//        if (list == null || list.isEmpty()) {
-//            return null;
-//        }
-//
-//        if (list.size() == 1) {
-//            return base.eq(list.get(0));
-//        }
-//
-//        BooleanExpression expr = base.eq(list.get(0));
-//        for (int i = 1; i < list.size(); i++) {
-//            expr = expr.or(base.eq(list.get(i)));
-//        }
-//
-//        return expr;
-//    }
 
     private void previousClicked(AjaxRequestTarget target) {
         ReportFilterDto workFilter = model.getObject();

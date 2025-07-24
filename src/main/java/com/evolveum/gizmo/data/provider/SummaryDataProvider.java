@@ -17,6 +17,7 @@
 
 package com.evolveum.gizmo.data.provider;
 
+import com.evolveum.gizmo.data.AbstractTask;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
@@ -56,21 +57,31 @@ public class SummaryDataProvider implements Serializable {
     public SummaryPanelDto createSummary(ReportFilterDto filter) {
         SummaryPanelDto dto = new SummaryPanelDto(filter);
 
-        List<Predicate> list = ReportDataProvider.createPredicates(filter);
         QAbstractTask task = QAbstractTask.abstractTask;
-        QWork work = task.as(QWork.class);
 
-        JPAQuery query = new JPAQuery(page.getEntityManager());
-        query.from(task).leftJoin(work.part.project);
-        if (!list.isEmpty()) {
-            BooleanBuilder bb = new BooleanBuilder();
-            bb.orAllOf(list.toArray(new Predicate[list.size()]));
-            query.where(bb);
-        }
+
+        JPAQuery<?> query = ReportDataProvider.query(task, page.getEntityManager(), filter);
+
+//        JPAQuery query = new JPAQuery(page.getEntityManager());
+//        QWork work = task.as(QWork.class);
+//        query.from(task).leftJoin(work.part.project);
+//
+//        BooleanBuilder predicates = ReportDataProvider.createPredicates(filter);
+//
+//        if (predicates != null) {
+//            query.where(predicates);
+//        }
+//        if (!list.isEmpty()) {
+//            BooleanBuilder bb = new BooleanBuilder();
+//            bb.orAllOf(list.toArray(new Predicate[list.size()]));
+//            query.where(bb);
+//        }
+
+        QWork work = task.as(QWork.class);
         query.groupBy(createDateTruncExpression(work));
         query.select(createDateTruncExpression(work), task.workLength.sum(), work.invoiceLength.sum());
 
-        List<Tuple> tuples = query.fetch();
+        List<Tuple> tuples = (List<Tuple>) query.fetch();
 //        List<Tuple> tuples = query.list(createDateTruncExpression(work),
 //                task.workLength.sum(), work.invoiceLength.sum());
         if (tuples != null) {

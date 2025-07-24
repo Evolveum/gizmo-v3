@@ -84,11 +84,7 @@ public class SummaryUserDataProvider implements Serializable {
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);
 
-        List<Predicate> list = ReportDataProvider.createPredicates(filter);
-        BooleanBuilder allWork = new BooleanBuilder();
-        if (!list.isEmpty()) {
-            allWork.orAllOf(list.toArray(new Predicate[list.size()]));
-        }
+        BooleanBuilder allWork = ReportDataProvider.createPredicates(filter);
 
         NumberExpression<Double> timeOffCondition = createTimeOffCondition(filter, work);
         NumberExpression<Double> allWorkCondition = createAllWorkCondition(allWork, work);

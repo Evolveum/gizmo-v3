@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class WorkDto implements Serializable {
+public class WorkDto implements Editable {
 
     public static final String F_DATE = "date";
     public static final String F_TRACK_ID = "trackId";
@@ -40,6 +40,7 @@ public class WorkDto implements Serializable {
     public static final String F_CUSTOMER_PROJECT_PART = "customerProjectPart";
 
 
+    private Integer id;
     private User realizator;
     private double invoiceLength;
     private double workLength;
@@ -48,6 +49,8 @@ public class WorkDto implements Serializable {
     private String description;
     private List<CustomerProjectPartDto> customerProjectPart = new ArrayList<>();
 
+    private boolean editable;
+
     public WorkDto() {
         GizmoPrincipal principal = SecurityUtils.getPrincipalUser();
 
@@ -55,7 +58,27 @@ public class WorkDto implements Serializable {
         this.date = LocalDate.now();
     }
 
+//    public WorkDto(AbstractTask work) {
+//        this.realizator = work.getRealizator();
+////        this.invoiceLength = work.getWorkLength();
+//        this.workLength = work.getWorkLength();
+//        this.date = work.getDate();
+//        this.trackId = work.getTrackId();
+//        this.description = work.getDescription();
+//
+//        Part part = work.getPart();
+//        if (part != null) {
+//            Project project = part.getProject();
+//            Customer customer = project.getCustomer();
+//            customerProjectPart.clear();
+//            customerProjectPart.add(new CustomerProjectPartDto(
+//                    customer.getName(), project.getName(), part.getName(),
+//                    customer.getId(), project.getId(), part.getId()));
+//        }
+//    }
+
     public WorkDto(Work work) {
+        this.id = work.getId();
         this.realizator = work.getRealizator();
         this.invoiceLength = work.getInvoiceLength();
         this.workLength = work.getWorkLength();
@@ -152,5 +175,20 @@ public class WorkDto implements Serializable {
         preparedWork.setTrackId(trackId);
         preparedWork.setDescription(description);
         return preparedWork;
+    }
+
+
+    public Integer getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isEditable() {
+        return editable;
+    }
+
+    @Override
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 }

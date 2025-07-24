@@ -46,18 +46,20 @@ public class SummaryPartsDataProvider implements Serializable {
     }
 
     public List<PartSummary> createSummary(ReportFilterDto filter) {
-        List<Predicate> list = ReportDataProvider.createPredicates(filter);
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);
         QLog log = task.as(QLog.class);
 
         JPAQuery query = new JPAQuery(page.getEntityManager());
         query.from(task).leftJoin(work.part.project);
-        if (!list.isEmpty()) {
-            BooleanBuilder bb = new BooleanBuilder();
-            bb.orAllOf(list.toArray(new Predicate[list.size()]));
-            query.where(bb);
-        }
+
+        query.where(ReportDataProvider.createPredicates(filter));
+
+//        if (!list.isEmpty()) {
+//            BooleanBuilder bb = new BooleanBuilder();
+//            bb.orAllOf(list.toArray(new Predicate[list.size()]));
+//            query.where(bb);
+//        }
         query.groupBy(work.realizator, work.part.id, log.customer.id);
         query.select(work.part.id, log.customer.id, task.workLength.sum(), work.invoiceLength.sum(), work.realizator);
 

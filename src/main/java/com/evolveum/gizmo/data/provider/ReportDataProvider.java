@@ -17,12 +17,10 @@
 
 package com.evolveum.gizmo.data.provider;
 
-import com.evolveum.gizmo.data.AbstractTask;
-import com.evolveum.gizmo.data.QAbstractTask;
-import com.evolveum.gizmo.data.QLog;
-import com.evolveum.gizmo.data.QWork;
+import com.evolveum.gizmo.data.*;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.dto.WorkType;
 import com.evolveum.gizmo.web.PageTemplate;
 import com.querydsl.core.BooleanBuilder;
@@ -30,18 +28,20 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.jpa.impl.JPAQuery;
+import jakarta.persistence.EntityManager;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author lazyman
  */
-public class ReportDataProvider extends SortableDataProvider<AbstractTask, String> {
+public class ReportDataProvider extends SortableDataProvider<WorkDto, String> {
 
     private PageTemplate page;
     private ReportFilterDto filter;
@@ -51,39 +51,52 @@ public class ReportDataProvider extends SortableDataProvider<AbstractTask, Strin
     }
 
     @Override
-    public Iterator<? extends AbstractTask> iterator(long first, long count) {
-        QAbstractTask task = QAbstractTask.abstractTask;
-        QWork work = task.as(QWork.class);
+    public Iterator<WorkDto> iterator(long first, long count) {
 
-        JPAQuery query = new JPAQuery(page.getEntityManager());
-        query.from(QAbstractTask.abstractTask).leftJoin(work.part.project);
-        query.where(createPredicate());
-        query.orderBy(task.date.asc());
+
+        QAbstractTask task = QAbstractTask.abstractTask;
+
+        JPAQuery<?> query = query(task, page.getEntityManager(), filter);
+        query.orderBy(task.date.desc());
 
         query.offset(first);
         query.limit(count);
 
         List<AbstractTask> found = query.select(task).fetch();
         if (found != null) {
-            return found.iterator();
+            return convertToDto(found);
         }
 
-        return new ArrayList<AbstractTask>().iterator();
+        return Collections.emptyIterator();
+    }
+
+    private Iterator<WorkDto> convertToDto(List<AbstractTask> task) {
+        return task.stream().map(t -> new WorkDto((Work) t)).iterator();
+    }
+
+    public static JPAQuery<?> query(QAbstractTask task, EntityManager entityManager, ReportFilterDto filter) {
+        JPAQuery<?> query = new JPAQuery<>(entityManager);
+        QWork work = task.as(QWork.class);
+        query.from(QAbstractTask.abstractTask).leftJoin(work.part.project);
+        query.where(createPredicates(filter));
+        return query;
     }
 
     @Override
     public long size() {
-        JPAQuery query = new JPAQuery(page.getEntityManager());
         QAbstractTask task = QAbstractTask.abstractTask;
-        QWork work = task.as(QWork.class);
-        query.from(QAbstractTask.abstractTask).leftJoin(work.part.project);
-        query.where(createPredicate());
+        JPAQuery<?> query = query(task, page.getEntityManager(), filter);
+//        JPAQuery query = new JPAQuery(page.getEntityManager());
+//        QAbstractTask task = QAbstractTask.abstractTask;
+//        QWork work = task.as(QWork.class);
+//        query.from(QAbstractTask.abstractTask).leftJoin(work.part.project);
+//        query.where(createPredicates(filter));
 
         return query.select(task).fetchCount();
     }
 
     @Override
-    public IModel<AbstractTask> model(AbstractTask object) {
+    public IModel<WorkDto> model(WorkDto object) {
         return new Model<>(object);
     }
 
@@ -91,21 +104,8 @@ public class ReportDataProvider extends SortableDataProvider<AbstractTask, Strin
         this.filter = filter;
     }
 
-    private Predicate createPredicate() {
-        if (filter == null) {
-            return null;
-        }
 
-        List<Predicate> list = createPredicates(filter);
-        if (list.isEmpty()) {
-            return null;
-        }
-
-        BooleanBuilder bb = new BooleanBuilder();
-        return bb.orAllOf(list.toArray(new Predicate[list.size()]));
-    }
-
-    public static List<Predicate> createPredicates(ReportFilterDto filter) {
+    public static BooleanBuilder createPredicates(ReportFilterDto filter) {
         QAbstractTask task = QAbstractTask.abstractTask;
         if (filter == null) {
             return null;
@@ -135,7 +135,19 @@ public class ReportDataProvider extends SortableDataProvider<AbstractTask, Strin
             list.add(task.date.loe(filter.getDateTo()));
         }
 
-        return list;
+        BooleanBuilder allWork = new BooleanBuilder();
+
+        if (list.isEmpty()) {
+            return null;
+        }
+
+
+//        if (!list.isEmpty()) {
+            allWork.orAllOf(list.toArray(new Predicate[0]));
+//        }
+
+        return allWork;
+
     }
 
     public static List<Predicate> createTimeOffPredicates(ReportFilterDto filter) {
