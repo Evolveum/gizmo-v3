@@ -305,7 +305,6 @@
         </repository>
     </repositories>
 
-
     <build>
         <finalName>gizmo</finalName>
         <resources>
