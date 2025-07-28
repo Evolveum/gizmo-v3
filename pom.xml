@@ -41,7 +41,7 @@
 <!--        <wicket.bootstrap.version>2.0.13</wicket.bootstrap.version>-->
         <apache.poi.version>5.2.2</apache.poi.version>
         <spring-boot.version>3.1.5</spring-boot.version>
-        <wicket.chartjs.version>0.3</wicket.chartjs.version>
+        <wicket.chartjs.version>0.6-SNAPSHOT</wicket.chartjs.version>
     </properties>
 
     <dependencies>
@@ -293,6 +293,18 @@
             <version>1.3.2</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>evolveum</id>
+            <url>https://nexus.evolveum.com/nexus/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>evolveum-snapshots</id>
+            <url>https://nexus.evolveum.com/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
 
     <build>
         <finalName>gizmo</finalName>
