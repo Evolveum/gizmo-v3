@@ -1,11 +1,11 @@
-CREATE DATABASE gizmo3 WITH OWNER = gizmo
+CREATE DATABASE gizmo4 WITH OWNER = gizmo
   ENCODING = 'UTF8'
   TABLESPACE = pg_default
   LC_COLLATE = 'en_US.UTF-8'
   LC_CTYPE = 'en_US.UTF-8'
   CONNECTION LIMIT = -1;
 
-COMMENT ON DATABASE gizmo3 IS 'gizmo v3 database';
+COMMENT ON DATABASE gizmo4 IS 'gizmo v3 database';
 
 CREATE TABLE g_emailLog_customer (
   emailLog_id     INT4 NOT NULL,
@@ -115,7 +115,7 @@ CREATE TABLE g_part (
   description VARCHAR(3000),
   name        VARCHAR(255) NOT NULL,
   project_id  INT4         NOT NULL,
-  color       VARCHAR(255),
+--   color       VARCHAR(255),
   PRIMARY KEY (id)
 );
 
@@ -126,7 +126,7 @@ CREATE TABLE g_project (
   description VARCHAR(3000),
   name        VARCHAR(255) NOT NULL,
   customer_id INT4         NOT NULL,
-  off         BOOLEAN      NOT NULL,
+--   off         BOOLEAN      NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -138,7 +138,7 @@ CREATE TABLE g_user (
   ldapDn     VARCHAR(255),
   name       VARCHAR(255) NOT NULL,
   password   VARCHAR(255),
-  allocation FLOAT4 NOT NULL,
+--   allocation FLOAT4 NOT NULL,
   PRIMARY KEY (id)
 );
 
