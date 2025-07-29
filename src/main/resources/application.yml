@@ -12,7 +12,7 @@ spring:
   thymeleaf:
     cache: false
   datasource:
-    url: jdbc:postgresql://localhost:5432/gizmo3
+    url: jdbc:postgresql://localhost:5432/gizmo4
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: password
