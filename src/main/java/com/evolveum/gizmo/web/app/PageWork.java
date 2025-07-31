@@ -27,16 +27,16 @@ import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.repository.PartRepository;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
+import com.evolveum.gizmo.web.component.TimeField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.TextArea;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Fragment;
@@ -58,11 +58,14 @@ import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author lazyman
@@ -75,6 +78,8 @@ public class PageWork extends PageAppTemplate {
     private static final String ID_FORM = "form";
     private static final String ID_DATE = "date";
     private static final String ID_LENGTH = "length";
+    private static final String ID_FROM = "from";
+    private static final String ID_TO = "to";
     private static final String ID_INVOICE = "invoice";
     private static final String ID_DESCRIPTION = "description";
     private static final String ID_TRACK_ID = "trackId";
@@ -211,6 +216,11 @@ public class PageWork extends PageAppTemplate {
         length.setType(Double.class);
         length.add(new EmptyOnChangeAjaxBehavior());
         item.add(length);
+
+        item.add(new TimeField(ID_FROM, new PropertyModel<>(workModel, WorkDto.F_FROM)));
+        item.add(new TimeField(ID_TO, new PropertyModel<>(workModel, WorkDto.F_TO)));
+
+
 
         TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(workModel, WorkDto.F_DESCRIPTION));
         description.add(new EmptyOnChangeAjaxBehavior());

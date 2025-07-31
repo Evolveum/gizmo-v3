@@ -22,6 +22,7 @@ import com.evolveum.gizmo.util.GizmoUtils;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 /**
  * @author lazyman
@@ -34,6 +35,8 @@ public class AbstractTask implements Serializable {
     public static final String F_REALIZATOR = "realizator";
     public static final String F_WORK_LENGTH = "workLength";
     public static final String F_DATE = "date";
+    public static final String F_FROM = "from";
+    public static final String F_TO = "to";
     public static final String F_DESCRIPTION = "description";
     public static final String F_TRACK_ID = "trackId";
     public static final String F_TYPE = "type";
@@ -46,6 +49,8 @@ public class AbstractTask implements Serializable {
     private double workLength;
 
     private LocalDate date;
+    private LocalTime from;
+    private LocalTime to;
     private String description;
     private String trackId;
 
@@ -69,6 +74,16 @@ public class AbstractTask implements Serializable {
     @Column(nullable = false)
     public LocalDate getDate() {
         return date;
+    }
+
+    @Column(name = "from_time", nullable = false)
+    public LocalTime getFrom() {
+        return from;
+    }
+
+    @Column(name = "to_time", nullable = false)
+    public LocalTime getTo() {
+        return to;
     }
 
     @Column(length = GizmoUtils.DESCRIPTION_SIZE)
@@ -105,6 +120,10 @@ public class AbstractTask implements Serializable {
     public void setWorkLength(double workLength) {
         this.workLength = workLength;
     }
+
+    public void setFrom(LocalTime from){this.from = from; }
+
+    public void setTo(LocalTime to){ this.to = to; }
 
     public void setDate(LocalDate date) {
         this.date = date;

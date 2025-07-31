@@ -23,3 +23,7 @@ ADD COLUMN off BOOLEAN NOT NULL DEFAULT false;
 
 ALTER TABLE g_user
 ADD COLUMN allocation FLOAT4 NOT NULL DEFAULT 1;
+
+ALTER TABLE g_abstract_task
+    ADD COLUMN from_time TIME,
+    ADD COLUMN to_time TIME;

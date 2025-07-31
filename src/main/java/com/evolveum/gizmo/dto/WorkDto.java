@@ -24,6 +24,7 @@ import com.evolveum.gizmo.security.SecurityUtils;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +37,8 @@ public class WorkDto implements Editable {
     public static final String F_TRACK_ID = "trackId";
     public static final String F_DESCRIPTION = "description";
     public static final String F_WORK_LENGTH = "workLength";
+    public static final String F_FROM = "from";
+    public static final String F_TO = "to";
     public static final String F_INVOICE_LENGTH = "invoiceLength";
     public static final String F_CUSTOMER_PROJECT_PART = "customerProjectPart";
 
@@ -44,10 +47,14 @@ public class WorkDto implements Editable {
     private User realizator;
     private double invoiceLength;
     private double workLength;
+    private LocalTime from;
+    private LocalTime to;
     private LocalDate date;
+
     private String trackId;
     private String description;
     private List<CustomerProjectPartDto> customerProjectPart = new ArrayList<>();
+
 
     private boolean editable;
 
@@ -56,6 +63,8 @@ public class WorkDto implements Editable {
 
         this.realizator = principal.getUser();
         this.date = LocalDate.now();
+        this.from = LocalTime.now();
+        this.to = LocalTime.now();
     }
 
 //    public WorkDto(AbstractTask work) {
@@ -83,6 +92,8 @@ public class WorkDto implements Editable {
         this.invoiceLength = work.getInvoiceLength();
         this.workLength = work.getWorkLength();
         this.date = work.getDate();
+        this.from = work.getFrom();
+        this.to = work.getTo();
         this.trackId = work.getTrackId();
         this.description = work.getDescription();
 
@@ -105,6 +116,10 @@ public class WorkDto implements Editable {
         return workLength;
     }
 
+    public LocalTime getFrom(){ return from;}
+
+    public LocalTime getTo(){ return to;}
+
 
     public void setInvoiceLength(double invoiceLength) {
         this.invoiceLength = invoiceLength;
@@ -113,6 +128,11 @@ public class WorkDto implements Editable {
     public void setWorkLength(double workLength) {
         this.workLength = workLength;
     }
+
+    public void setFrom(LocalTime from){ this.from = from;}
+
+    public void setTo(LocalTime to){ this.to = to;}
+
 
     public List<CustomerProjectPartDto> getCustomerProjectPart() {
         return customerProjectPart;
@@ -170,6 +190,9 @@ public class WorkDto implements Editable {
         preparedWork.setPart(part);
         preparedWork.setInvoiceLength(invoiceLength/ customerProjectPart.size());
         preparedWork.setWorkLength(workLength/ customerProjectPart.size());
+        preparedWork.setFrom(from);
+        preparedWork.setTo(to);
+        preparedWork.setTo(to);
         preparedWork.setDate(date);
         preparedWork.setRealizator(realizator);
         preparedWork.setTrackId(trackId);

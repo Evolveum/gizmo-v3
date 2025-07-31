@@ -14,8 +14,8 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/gizmo4
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: password
+    username: evolveum
+    password: 0512
 
   jpa:
     database-platform: com.evolveum.gizmo.util.GizmoPostgreSQLDialect
