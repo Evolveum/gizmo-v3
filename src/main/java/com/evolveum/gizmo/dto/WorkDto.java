@@ -192,7 +192,6 @@ public class WorkDto implements Editable {
         preparedWork.setWorkLength(workLength/ customerProjectPart.size());
         preparedWork.setFrom(from);
         preparedWork.setTo(to);
-        preparedWork.setTo(to);
         preparedWork.setDate(date);
         preparedWork.setRealizator(realizator);
         preparedWork.setTrackId(trackId);

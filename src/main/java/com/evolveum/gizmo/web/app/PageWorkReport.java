@@ -340,6 +340,7 @@ public class PageWorkReport extends PageAppTemplate {
 
         columns.add(new EditablePropertyColumn<>(createStringResource("AbstractTask.date"), AbstractTask.F_DATE));
         columns.add(GizmoUtils.createWorkInvoiceColumn(this));
+        columns.add(GizmoUtils.createWorkTimeRangeColumn(this));
         columns.add(GizmoUtils.createWorkProjectColumn(this));
         columns.add(new EditablePropertyColumn<>(createStringResource("AbstractTask.trackId"), AbstractTask.F_TRACK_ID));
         columns.add(new EditablePropertyColumn<>(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));

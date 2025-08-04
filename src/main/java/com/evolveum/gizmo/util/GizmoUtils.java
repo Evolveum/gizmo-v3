@@ -46,6 +46,8 @@ import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +59,8 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
@@ -597,5 +601,34 @@ public class GizmoUtils {
         query.from(QAbstractTask.abstractTask).leftJoin(work.part.project);
         return query;
     }
+
+    public static IColumn<WorkDto, String> createWorkTimeRangeColumn(PageTemplate page) {
+        return new AbstractColumn<>(page.createStringResource("AbstractTask.from")) {
+
+            @Override
+            public void populateItem(Item<ICellPopulator<WorkDto>> cellItem, String componentId,
+                                     IModel<WorkDto> rowModel) {
+                cellItem.add(new Label(componentId, createTimeRangeModel(rowModel)));
+            }
+        };
+    }
+    private static IModel<String> createTimeRangeModel(IModel<WorkDto> rowModel) {
+        return new LoadableDetachableModel<>() {
+            @Override
+            protected String load() {
+                WorkDto work = rowModel.getObject();
+                LocalTime from = work.getFrom();
+                LocalTime to = work.getTo();
+
+                if (from == null || to == null) {
+                    return "";
+                }
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                return from.format(formatter) + " – " + to.format(formatter);
+            }
+        };
+    }
+
 
 }

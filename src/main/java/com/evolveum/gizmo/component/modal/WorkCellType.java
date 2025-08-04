@@ -18,11 +18,14 @@
 package com.evolveum.gizmo.component.modal;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
 enum WorkCellType {
     DATE("Date", LocalDate.class, "getDate", new ReportType[]{ReportType.GENERIC, ReportType.CUSTOMER}),
+    FROM("From", LocalTime.class, "getFrom", new ReportType[]{ReportType.GENERIC, ReportType.CUSTOMER}),
+    TO("To", LocalTime.class, "getTo", new ReportType[]{ReportType.GENERIC, ReportType.CUSTOMER}),
     REALIZATOR("Realizator", String.class, "getRealizator.getFullName", new ReportType[]{ReportType.GENERIC, ReportType.CUSTOMER}),
     CUSTOMER("Customer", String.class, "getPart.getProject.getCustomer.getName", new ReportType[]{ReportType.GENERIC}),
     PROJECT("Project", String.class, "getPart.getProject.getName", new ReportType[]{ReportType.CUSTOMER, ReportType.GENERIC}),
