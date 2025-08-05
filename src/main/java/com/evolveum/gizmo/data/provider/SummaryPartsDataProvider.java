@@ -107,6 +107,7 @@ public class SummaryPartsDataProvider implements Serializable {
                 Part part = map.get(id);
                 String name = part != null ? GizmoUtils.describeProjectPart(part, " - ") : null;
                 PartSummary summary = new PartSummary(tuple.get(4, User.class), name, tuple.get(2, Double.class), tuple.get(3, Double.class));
+                summary.setColor(part.getColor());
                 result.add(summary);
             } else {
                 //customer id
@@ -118,6 +119,7 @@ public class SummaryPartsDataProvider implements Serializable {
             }
 
         }
+
 
         return result;
     }

@@ -23,6 +23,7 @@ import com.evolveum.gizmo.component.form.FormGroup;
 import com.evolveum.gizmo.component.form.IconButton;
 import com.evolveum.gizmo.data.Part;
 import com.evolveum.gizmo.dto.WorkDto;
+import com.evolveum.gizmo.util.ColorUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
@@ -53,7 +54,10 @@ public class ProjectPartPanel extends SimplePanel<Part> {
 
     public ProjectPartPanel(String id, IModel<Part> partModel) {
         super(id, partModel);
-
+        Part part = getModel().getObject();
+        if (part.getColor() == null || part.getColor().isBlank()) {
+            part.setColor(ColorUtils.getRandomFromPalette());
+        }
 //        this.partModel = partModel;
 
 //        header(createTitle());
@@ -81,7 +85,13 @@ public class ProjectPartPanel extends SimplePanel<Part> {
         TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(getModel(), Part.F_DESCRIPTION));
         form.add(description);
 
-        TextField<String> color = new TextField<>(ID_COLOR, new PropertyModel<>(getModel(), Part.F_COLOR));
+        TextField<String> color = new TextField<>(ID_COLOR, new PropertyModel<>(getModel(), Part.F_COLOR)) {
+            @Override
+            protected void onComponentTag(org.apache.wicket.markup.ComponentTag tag) {
+                super.onComponentTag(tag);
+                tag.put("type", "color");
+            }
+        };
         form.add(color);
 
 
@@ -99,7 +109,7 @@ public class ProjectPartPanel extends SimplePanel<Part> {
         form.add(cancel);
 
         IconButton save = new IconButton(ID_SAVE,
-                createStringResource("GizmoApplication.button.cancel"),
+                createStringResource("GizmoApplication.button.save"),
                 createStringResource("fa fa-times"),
                 createStringResource("btn-default")) {
 

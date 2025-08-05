@@ -28,6 +28,7 @@ public class PartSummary extends TaskLength implements Comparable<PartSummary> {
     public static final String F_REALIZTOR = "fullName";
     private String name;
     private User realizator;
+    private String color;
 
     public PartSummary(User realizator, String name, Double length, Double invoice) {
         super(length, invoice);
@@ -47,6 +48,12 @@ public class PartSummary extends TaskLength implements Comparable<PartSummary> {
         return name;
     }
 
+    public String getColor() {
+        return color;
+    }
+    public void setColor(String color) {
+        this.color = color;
+    }
     @Override
     public int compareTo(PartSummary o) {
         if (o == null) {

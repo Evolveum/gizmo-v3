@@ -69,23 +69,32 @@ public class SummaryChartPanel extends SimplePanel<ReportFilterDto> {
     }
 
     private ChartDataset createDataset(List<PartSummary> partSummaries) {
-
         ChartDataset dataset = new ChartDataset();
-        partSummaries.stream().map(s -> s.getLength() / 8).
-        forEach(s -> {
-                    dataset.addData(s);
-                });
 
+        partSummaries.stream()
+                .map(s -> s.getLength() / 8)
+                .forEach(dataset::addData);
 
-        partSummaries.stream().map(s -> {
-                    Color color = new Color((int)(Math.random() * 0x1000000));
-                    String rgba = "rgba( " + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ", 0.2)";
-                    return rgba;
-                }).forEach(s -> {
-                    dataset.addBackgroudColor(s);
-                });
+        partSummaries.stream()
+                .map(s -> hexToRgba(s.getColor(), 1))
+                .forEach(dataset::addBackgroudColor);
+
         return dataset;
     }
+
+    private String hexToRgba(String hex, double alpha) {
+        if (hex == null || !hex.matches("#?[0-9a-fA-F]{6}")) {
+            return "rgba(200, 200, 200, " + alpha + ")";
+        }
+
+        hex = hex.replace("#", "");
+        int r = Integer.parseInt(hex.substring(0, 2), 16);
+        int g = Integer.parseInt(hex.substring(2, 4), 16);
+        int b = Integer.parseInt(hex.substring(4, 6), 16);
+
+        return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
+    }
+
 
     private ChartOptions createChartOptions() {
         ChartOptions options = new ChartOptions();

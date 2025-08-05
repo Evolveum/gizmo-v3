@@ -37,4 +37,8 @@ public interface PartRepository extends JpaRepository<Part, Integer>, QuerydslPr
 
     @Query("from Part p where p.project.closed = false")
     List<Part> findOpenedProjectParts();
+
+    @Query("SELECT p FROM Part p WHERE p.color IS NULL OR p.color = ''")
+    List<Part> findAllWithoutColor();
+
 }

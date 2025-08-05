@@ -29,6 +29,7 @@ import com.evolveum.gizmo.repository.PartRepository;
 import com.evolveum.gizmo.repository.ProjectRepository;
 import com.evolveum.gizmo.util.LoadableModel;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
@@ -251,7 +252,11 @@ public class PageProject extends PageAppProjects {
             repository.saveAndFlush(part);
 
             success(getString("Message.projectPartSavedSuccessfully"));
-            target.add(getFeedbackPanel(), get(ID_TABS));
+            target.add(getFeedbackPanel());
+            Form<?> form = (Form<?>) get(ID_FORM);
+            GizmoTabbedPanel<?> tabs = (GizmoTabbedPanel<?>) form.get(ID_TABS);
+            Component panel = tabs.get("panel");
+            target.add(panel);
         } catch (Exception ex) {
             handleGuiException(this, "Message.couldntSaveProjectPart", ex, target);
         }
