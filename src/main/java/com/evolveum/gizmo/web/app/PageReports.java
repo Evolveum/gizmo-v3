@@ -51,8 +51,15 @@ import org.apache.wicket.extensions.markup.html.tabs.ITab;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.Model;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -66,6 +73,10 @@ public class PageReports extends PageAppTemplate {
     private static final String ID_TO = "to";
     private static final String ID_REALIZATOR = "realizator";
     private static final String ID_CUSTOMER = "customer";
+
+    private static final String ID_BTN_PREVIOUS = "previous";
+    private static final String ID_BTN_NEXT = "next";
+    private static final String ID_MONTH = "month";
 
     private static final String ID_DETAILS = "details";
 
@@ -122,6 +133,30 @@ public class PageReports extends PageAppTemplate {
         Form<ReportFilterDto> form = new Form<>(ID_FORM);
         form.setOutputMarkupId(true);
         add(form);
+
+        Label month = new Label(ID_MONTH, new PropertyModel<>(model, ReportFilterDto.F_MONTH_YEAR));
+        month.setOutputMarkupId(true);
+        form.add(month);
+
+        AjaxLink<String> prev = new AjaxLink<>(ID_BTN_PREVIOUS, createStringResource("fa-chevron")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                previousClicked(target);
+            }
+        };
+        prev.setOutputMarkupId(true);
+        form.add(prev);
+
+        AjaxLink<String> next = new AjaxLink<>(ID_BTN_NEXT, createStringResource("fa-chevron")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                nextClicked(target);
+            }
+        };
+        next.setOutputMarkupId(true);
+        form.add(next);
 
         LocalDateTextField from = new LocalDateTextField(ID_FROM, new PropertyModel<>(getFilterModel(), ReportFilterDto.F_DATE_FROM), "dd/MM/yyyy");
         from.setOutputMarkupId(true);
@@ -243,6 +278,31 @@ public class PageReports extends PageAppTemplate {
 
 
         target.add(get(ID_DETAILS));
+    }
+
+    private void previousClicked(AjaxRequestTarget target) {
+        ReportFilterDto workFilter = model.getObject();
+        LocalDate defaultFrom = workFilter.getDateFrom();
+        workFilter.setDateFrom(defaultFrom.minusMonths(1));
+
+        workFilter.setDateTo(workFilter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
+        handleCalendarNavigation(target, workFilter);
+    }
+
+    private void nextClicked(AjaxRequestTarget target) {
+        ReportFilterDto workFilter = model.getObject();
+        LocalDate defaultFrom = workFilter.getDateFrom();
+        workFilter.setDateFrom(defaultFrom.plusMonths(1));
+
+
+        workFilter.setDateTo(workFilter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
+        handleCalendarNavigation(target, workFilter);
+    }
+
+    private void handleCalendarNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
+        GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
+        session.setDashboardFilter(workFilter);
+        target.add(PageReports.this);
     }
 
     private List<IColumn<WorkDto, String>> createColumns() {
