@@ -5,10 +5,14 @@ import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
+import com.evolveum.gizmo.component.modal.DownloadOverviewReportConfigPanel;
 import com.evolveum.gizmo.component.modal.DownloadReportConfigPanel;
+import com.evolveum.gizmo.component.modal.DownloadTimeoffReportConfigPanel;
 import com.evolveum.gizmo.component.modal.MainPopupDialog;
 import com.evolveum.gizmo.data.AbstractTask;
 import com.evolveum.gizmo.data.User;
+import com.evolveum.gizmo.data.provider.ReportDataProvider;
+import com.evolveum.gizmo.data.provider.SummaryUserDataProvider;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
@@ -22,18 +26,13 @@ import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-
+import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
-
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-
-import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
-import com.evolveum.gizmo.data.provider.ReportDataProvider;
-
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -186,6 +185,8 @@ public class ReportOverviewTab extends SimplePanel {
 
         columns.add(new PropertyColumn<>(createStringResource("AbstractTask.date"), AbstractTask.F_DATE));
         columns.add(GizmoUtils.createWorkInvoiceColumn(getPageTemplate()));
+        columns.add(GizmoUtils.createWorkTimeRangeColumn(getPageTemplate()));
+        columns.add(GizmoUtils.createWorkInvoiceColumn(getPageTemplate()));
         columns.add(GizmoUtils.createAbstractTaskRealizatorColumn(getPageTemplate()));
         columns.add(GizmoUtils.createWorkProjectColumn(getPageTemplate()));
         columns.add(new PropertyColumn<>(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));
@@ -200,7 +201,7 @@ public class ReportOverviewTab extends SimplePanel {
         confirmDownload.setOutputMarkupId(true);
         add(confirmDownload);
 
-        DownloadReportConfigPanel content = new DownloadReportConfigPanel(ModalDialog.CONTENT_ID, getFilterModel());
+        DownloadOverviewReportConfigPanel content = new DownloadOverviewReportConfigPanel(ModalDialog.CONTENT_ID, getFilterModel());
         content.add(AttributeModifier.append("class", "modal-content"));
         confirmDownload.setContent(content);
 

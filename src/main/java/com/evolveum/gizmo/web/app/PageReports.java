@@ -61,7 +61,7 @@ public class PageReports extends PageAppTemplate {
         tabs.add(new AbstractTab(createStringResource("PageReports.tab.partsummary")) {
             @Override
             public WebMarkupContainer getPanel(String panelId) {
-                return new ReportSalesTab(panelId);
+                return new ReportProjectTab(panelId);
             }
         });
         GizmoTabbedPanel<ITab> tabbedPanel = new GizmoTabbedPanel<>(ID_TABS, tabs);

@@ -1,12 +1,14 @@
 package com.evolveum.gizmo.component.modal;
+
 import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
-import com.evolveum.gizmo.data.provider.SummaryUserDataProvider;
+import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
+import com.evolveum.gizmo.dto.PartSummary;
 import com.evolveum.gizmo.dto.ReportFilterDto;
-import com.evolveum.gizmo.dto.UserSummary;
 import com.evolveum.gizmo.util.LoadableModel;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
@@ -22,14 +24,18 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
-public class DownloadTimeoffReportConfigPanel extends SimplePanel<ReportFilterDto>{
+
+
+public class DownloadProjectReportConfigPanel extends SimplePanel<ReportFilterDto> {
+
     private static final String ID_REPORT_NAME = "reportName";
 
     private IModel<DownloadSettingsDto> downloadModel;
 
-    public DownloadTimeoffReportConfigPanel(String id, IModel<ReportFilterDto> model) {
+    public DownloadProjectReportConfigPanel(String id, IModel<ReportFilterDto> model) {
         super(id, model);
     }
+
     @Override
     protected void initLayout() {
         downloadModel = new LoadableModel<>(false) {
@@ -78,7 +84,7 @@ public class DownloadTimeoffReportConfigPanel extends SimplePanel<ReportFilterDt
         LocalDate from = filter != null ? filter.getDateFrom() : null;
         LocalDate to = filter != null ? filter.getDateTo() : null;
         String range = (from != null ? from.toString() : "") + "_" + (to != null ? to.toString() : "");
-        return ("user-summary-" + range + ".xlsx").replaceAll("__", "_");
+        return ("project-summary-" + range + ".xlsx").replaceAll("__", "_");
     }
 
     private IModel<File> createDownloadReportModel() {
@@ -87,46 +93,65 @@ public class DownloadTimeoffReportConfigPanel extends SimplePanel<ReportFilterDt
             @Override
             public File getObject() {
                 File tempFile = new File("export.xlsx");
-                generateUserSummaryExcel(tempFile, getModelObject());
+                generateProjectSummaryExcel(tempFile, getModelObject());
                 return tempFile;
             }
         };
     }
-    private void generateUserSummaryExcel(File tempFile, ReportFilterDto filter) {
+
+    private void generateProjectSummaryExcel(File tempFile, ReportFilterDto filter) {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            XSSFSheet sheet = createSheet("User summary", workbook);
+            XSSFSheet sheet = createSheet("Project summary", workbook);
 
             CellStyle header = createHeaderStyle(workbook);
-            CellStyle dateStyle = createDateStyle(workbook);
-            CellStyle textStyle = createDefaultCellStyle(workbook);
+            CellStyle text = createDefaultCellStyle(workbook);
 
             int rowIdx = 0;
             XSSFRow head = sheet.createRow(rowIdx++);
             createHeaderCell(head, 0, "User", header);
-            createHeaderCell(head, 1, "Last report", header);
+            createHeaderCell(head, 1, "Part", header);
             createHeaderCell(head, 2, "Work", header);
-            createHeaderCell(head, 3, "Time off", header);
+            createHeaderCell(head, 3, "Invoice", header);
 
-            SummaryUserDataProvider provider = new SummaryUserDataProvider(getPageTemplate());
-            List<UserSummary> rows = provider.createSummary(filter);
+            SummaryPartsDataProvider provider = new SummaryPartsDataProvider(getPageTemplate());
+            List<PartSummary> rows = provider.createSummary(filter);
 
-            for (UserSummary s : rows) {
+            double sumWork = 0d;
+            double sumInvoice = 0d;
+
+            for (PartSummary s : rows) {
                 XSSFRow r = sheet.createRow(rowIdx++);
-                createTextCell(r, 0, s.getFullName(), textStyle);
 
-                LocalDate max = s.getMaxDate();
-                XSSFCell c = r.createCell(1, CellType.NUMERIC);
-                c.setCellValue(java.sql.Date.valueOf(max));
-                c.setCellStyle(dateStyle);
+                String userName = s.getFullName();
+                createTextCell(r, 0, userName, text);
+
+                String partName = s.getName();
+                createTextCell(r, 1, partName, text);
 
                 double allocation = s.getUserAllocation();
-                createTextCell(r, 2, formatLength(s.getWork(), allocation), textStyle);
-                createTextCell(r, 3, formatLength(s.getTimeOff(), allocation), textStyle);
+                double workH = s.getLength();
+                double invoiceH = s.getInvoice();
+                sumWork += workH;
+                sumInvoice += invoiceH;
+
+                createTextCell(r, 2, formatLength(workH, allocation), text);
+                createTextCell(r, 3, formatLength(invoiceH, allocation), text);
             }
 
-            for (int c = 0; c <= 3; c++) {
-                sheet.autoSizeColumn(c);
-            }
+            CellStyle sumStyle = createHeaderStyle(workbook);
+            XSSFRow sum = sheet.createRow(rowIdx);
+            sheet.addMergedRegion(new CellRangeAddress(rowIdx, rowIdx, 0, 1));
+            XSSFCell label = sum.createCell(0, CellType.STRING);
+            label.setCellValue("Summary");
+            label.setCellStyle(sumStyle);
+            XSSFCell sumWorkCell = sum.createCell(2, CellType.STRING);
+            sumWorkCell.setCellValue(formatLength(sumWork, 1));
+            sumWorkCell.setCellStyle(sumStyle);
+            XSSFCell sumInvoiceCell = sum.createCell(3, CellType.STRING);
+            sumInvoiceCell.setCellValue(formatLength(sumInvoice, 1));
+            sumInvoiceCell.setCellStyle(sumStyle);
+
+            for (int c = 0; c <= 3; c++) sheet.autoSizeColumn(c);
 
             try (FileOutputStream os = new FileOutputStream(tempFile)) {
                 workbook.write(os);
@@ -164,13 +189,6 @@ public class DownloadTimeoffReportConfigPanel extends SimplePanel<ReportFilterDt
         style.setBorderTop(BorderStyle.THIN);
         style.setWrapText(true);
         return style;
-    }
-
-    private CellStyle createDateStyle(XSSFWorkbook wb) {
-        CellStyle dateStyle = createDefaultCellStyle(wb);
-        CreationHelper ch = wb.getCreationHelper();
-        dateStyle.setDataFormat(ch.createDataFormat().getFormat("dd/mm/yyyy"));
-        return dateStyle;
     }
 
     private void createHeaderCell(XSSFRow row, int col, String text, CellStyle style) {

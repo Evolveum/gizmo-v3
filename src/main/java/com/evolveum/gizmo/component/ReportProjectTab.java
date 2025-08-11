@@ -4,7 +4,9 @@ import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
+import com.evolveum.gizmo.component.modal.DownloadProjectReportConfigPanel;
 import com.evolveum.gizmo.component.modal.DownloadReportConfigPanel;
+import com.evolveum.gizmo.component.modal.DownloadTimeoffReportConfigPanel;
 import com.evolveum.gizmo.component.modal.MainPopupDialog;
 import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
@@ -31,7 +33,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReportSalesTab extends SimplePanel{
+public class ReportProjectTab extends SimplePanel{
     private static final String ID_FORM = "form";
     private static final String ID_FROM = "from";
     private static final String ID_TO = "to";
@@ -42,7 +44,7 @@ public class ReportSalesTab extends SimplePanel{
     private static final String ID_BTN_NEXT = "next";
     private static final String ID_MONTH = "month";
 
-    private static final String ID_SUMMARY = "summary"; // miesto pôvodnej tabuľky
+    private static final String ID_SUMMARY = "summary";
 
     private static final String ID_PREVIEW = "preview";
     private static final String ID_EXPORT = "export";
@@ -53,7 +55,7 @@ public class ReportSalesTab extends SimplePanel{
     private Form<?> form;
     private SummaryPartsPanel summaryPanel;
 
-    public ReportSalesTab(String id) {
+    public ReportProjectTab(String id) {
         super(id);
         setOutputMarkupId(true);
 
@@ -176,7 +178,7 @@ public class ReportSalesTab extends SimplePanel{
         confirmDownload.setOutputMarkupId(true);
         add(confirmDownload);
 
-        DownloadReportConfigPanel content = new DownloadReportConfigPanel(ModalDialog.CONTENT_ID, getFilterModel());
+        DownloadProjectReportConfigPanel content = new DownloadProjectReportConfigPanel(ModalDialog.CONTENT_ID, getFilterModel());
         content.add(AttributeModifier.append("class", "modal-content"));
         confirmDownload.setContent(content);
 

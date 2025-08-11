@@ -44,11 +44,15 @@ public class SummaryUsersPanel extends SimplePanel<List<UserSummary>> {
     public SummaryUsersPanel(String id, final SummaryUserDataProvider provider, final IModel<ReportFilterDto> model) {
         super(id);
 
-        setModel(new LoadableDetachableModel<>() {
-
+        setModel(new LoadableDetachableModel<List<UserSummary>>() {
             @Override
             protected List<UserSummary> load() {
-                return provider.createSummary(model.getObject());
+                try {
+                    List<UserSummary> data = provider.createSummary(model.getObject());
+                    return data != null ? data : java.util.Collections.emptyList();
+                } catch (Exception e) {
+                    return java.util.Collections.emptyList();
+                }
             }
         });
 
