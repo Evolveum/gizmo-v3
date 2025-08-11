@@ -69,4 +69,7 @@ public class UserSummary extends TaskLength implements Comparable<UserSummary> {
     public Double getWork() {
         return work;
     }
+
+    public LocalDate getMaxDate() { return maxDate; }
+
 }

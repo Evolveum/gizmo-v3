@@ -40,7 +40,6 @@ public class SummaryUsersPanel extends SimplePanel<List<UserSummary>> {
     private static final String ID_USER = "user";
     private static final String ID_WORK = "work";
     private static final String ID_TIME_OFF = "timeOff";
-    private static final String ID_ALL = "all";
 
     public SummaryUsersPanel(String id, final SummaryUserDataProvider provider, final IModel<ReportFilterDto> model) {
         super(id);
@@ -86,13 +85,6 @@ public class SummaryUsersPanel extends SimplePanel<List<UserSummary>> {
                 timeOff.setRenderBodyOnly(true);
                 item.add(timeOff);
 
-                Label all = new Label(ID_ALL, (IModel<String>) () -> {
-                    UserSummary part12 = item.getModelObject();
-                    Double hours = part12.getLength();
-                    return createLength(hours, part12.getUserAllocation());
-                });
-                all.setRenderBodyOnly(true);
-                item.add(all);
             }
         };
         add(repeater);

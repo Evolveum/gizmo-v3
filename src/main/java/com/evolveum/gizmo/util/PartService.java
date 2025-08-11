@@ -15,13 +15,13 @@ public class PartService {
         this.partRepository = partRepository;
     }
 
-    @PostConstruct
-    public void assignColorsIfMissing() {
-        List<Part> parts = partRepository.findAllWithoutColor();
-        for (Part part : parts) {
-            part.setColor(ColorUtils.getRandomFromPalette());
-            partRepository.save(part);
-        }
-    }
+    //@PostConstruct
+    //public void assignColorsIfMissing() {
+        //List<Part> parts = partRepository.findAllWithoutColor();
+        //for (Part part : parts) {
+            //part.setColor(ColorUtils.getRandomFromPalette());
+           // partRepository.save(part);
+        //}
+    //}
 }
 
