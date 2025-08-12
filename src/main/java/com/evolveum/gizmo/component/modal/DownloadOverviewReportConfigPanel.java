@@ -14,6 +14,9 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.behavior.AttributeAppender;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,6 +66,12 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
                 })
                 .setCacheDuration(Duration.ofMillis(0))
                 .setDeleteAfterDownload(true);
+
+        exportExcel.add(new AttributeAppender(
+                "onclick",
+                Model.of("$('.modal.show').modal('hide');"),
+                ";"
+        ));
         form.add(exportExcel);
     }
 

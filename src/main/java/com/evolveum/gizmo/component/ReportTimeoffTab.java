@@ -37,7 +37,6 @@ public class ReportTimeoffTab extends SimplePanel {
     private static final String ID_FROM = "from";
     private static final String ID_TO = "to";
     private static final String ID_REALIZATOR = "realizator";
-    private static final String ID_CUSTOMER = "customer";
 
     private static final String ID_BTN_PREVIOUS = "previous";
     private static final String ID_BTN_NEXT = "next";

@@ -12,11 +12,13 @@ import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 
 import java.io.File;
@@ -65,6 +67,11 @@ public class DownloadProjectReportConfigPanel extends SimplePanel<ReportFilterDt
                 })
                 .setCacheDuration(Duration.ofMillis(0))
                 .setDeleteAfterDownload(true);
+        exportExcel.add(new AttributeAppender(
+                "onclick",
+                Model.of("$('.modal.show').modal('hide');"),
+                ";"
+        ));
         form.add(exportExcel);
     }
 
