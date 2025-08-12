@@ -1,7 +1,7 @@
 package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.SimplePanel;
-import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
+import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ReportFilterDto;
@@ -13,11 +13,12 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serial;
+import java.text.Normalizer;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Locale;
 
 public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterDto> {
 
@@ -40,30 +42,54 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
         Form<Void> form = new Form<>("form");
         add(form);
 
-        TextField<String> reportName = new TextField<>(ID_REPORT_NAME, new PropertyModel<>(this, "dummy")) {
+        IModel<String> nameModel = new LoadableDetachableModel<>() {
+            @Override
+            protected String load() {
+                return defaultFileName(getModelObject());
+            }
+        };
+
+        TextField<String> reportName = new TextField<>(ID_REPORT_NAME, nameModel) {
             @Override public String getInputName() { return ID_REPORT_NAME; }
         };
-        reportName.setDefaultModel(new PropertyModel<>(new Object(){ public String reportName = defaultFileName(getModelObject()); }, "reportName"));
         reportName.setOutputMarkupId(true);
-        reportName.add(new EmptyOnChangeAjaxBehavior());
         form.add(reportName);
 
         DownloadLink exportExcel = new DownloadLink("export",
                 createDownloadModel(),
                 () -> {
-                    Object m = reportName.getDefaultModelObject();
-                    String name = m != null ? m.toString() : null;
-                    return (name == null || name.isBlank()) ? defaultFileName(getModelObject()) : name;
+                    String name = nameModel.getObject();
+                    return defaultFileName(getModelObject());
                 })
                 .setCacheDuration(Duration.ofMillis(0))
                 .setDeleteAfterDownload(true);
         form.add(exportExcel);
     }
+
     private String defaultFileName(ReportFilterDto f) {
-        LocalDate from = f != null ? f.getDateFrom() : null;
-        LocalDate to = f != null ? f.getDateTo() : null;
-        String range = (from != null ? from.toString() : "") + "_" + (to != null ? to.toString() : "");
-        return ("overview-" + range + ".xlsx").replaceAll("__", "_");
+        LocalDate from = f.getDateFrom();
+        LocalDate to   = f.getDateTo();
+
+        String realizatorPart = "";
+        if (f.getRealizators().size() == 1) {
+            User u = f.getRealizators().getFirst();
+            String last = u.getFamilyName();
+            realizatorPart = "-" + slug(last);
+        }
+        String range = (from.toString()) + "_" + (to.toString());
+        return ("overview" + realizatorPart + "-" + range + ".xlsx")
+                .replaceAll("__", "_")
+                .replaceAll("--", "-");
+    }
+
+    private static String slug(String s) {
+        if (s == null || s.isBlank()) return "";
+        String noDia = Normalizer.normalize(s, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        String cleaned = noDia.replaceAll("[^A-Za-z0-9._-]+", "-")
+                .replaceAll("[-_]{2,}", "-")
+                .replaceAll("(^-|-$)", "");
+        return cleaned.toLowerCase(Locale.ROOT);
     }
 
     private IModel<File> createDownloadModel() {
@@ -110,7 +136,7 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
                 createTextCell(r, 1, String.valueOf(dto.getWorkLength()), text);
                 LocalTime from = dto.getFrom();
                 LocalTime to = dto.getTo();
-                String range = (from != null ? tf.format(from) : "") + ((from != null || to != null) ? " - " : "") + (to != null ? tf.format(to) : "");
+                String range = (tf.format(from)) + (" - ") + (tf.format(to));
                 createTextCell(r, 2, range, text);
                 String fullName = dto.getRealizator() != null ? dto.getRealizator().getFullName() : "";
                 createTextCell(r, 3, fullName, text);
@@ -130,11 +156,9 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
     private String buildProjectCell(List<CustomerProjectPartDto> list) {
         if (list == null || list.isEmpty()) return "";
         return list.stream()
-                .map(cpp -> safe(cpp.getCustomerName()) + " / " + safe(cpp.getProjectName()) + " / " + safe(cpp.getPartName()))
+                .map(cpp -> cpp.getCustomerName() + " / " + cpp.getProjectName() + " / " + cpp.getPartName())
                 .collect(Collectors.joining("\n"));
     }
-
-    private String safe(String s) { return s == null ? "" : s; }
 
     private List<WorkDto> fetchAllRows(ReportFilterDto filter) {
         ReportDataProvider provider = new ReportDataProvider(getPageTemplate());

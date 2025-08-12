@@ -1,10 +1,9 @@
 package com.evolveum.gizmo.component.modal;
 import com.evolveum.gizmo.component.SimplePanel;
-import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
+import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.provider.SummaryUserDataProvider;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.dto.UserSummary;
-import com.evolveum.gizmo.util.LoadableModel;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
@@ -12,87 +11,89 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serial;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
+import java.text.Normalizer;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
-public class DownloadTimeoffReportConfigPanel extends SimplePanel<ReportFilterDto>{
-    private static final String ID_REPORT_NAME = "reportName";
+import java.util.Locale;
 
-    private IModel<DownloadSettingsDto> downloadModel;
+public class DownloadTimeoffReportConfigPanel extends SimplePanel<ReportFilterDto>{
+
+    private static final String ID_REPORT_NAME = "reportName";
 
     public DownloadTimeoffReportConfigPanel(String id, IModel<ReportFilterDto> model) {
         super(id, model);
     }
     @Override
     protected void initLayout() {
-        downloadModel = new LoadableModel<>(false) {
-            @Override
-            protected DownloadSettingsDto load() {
-                DownloadSettingsDto s = new DownloadSettingsDto();
-                try {
-                    Method m = s.getClass().getMethod("setReportName", String.class);
-                    m.invoke(s, defaultFileName(getModelObject()));
-                } catch (Exception ignore) {}
-                return s;
-            }
-        };
-
-        Form<DownloadSettingsDto> form = new Form<>("form");
+        Form<Void> form = new Form<>("form");
         add(form);
 
-        TextField<String> reportName = new TextField<>(ID_REPORT_NAME,
-                new PropertyModel<>(downloadModel, DownloadSettingsDto.F_REPORT_NAME));
-        reportName.setOutputMarkupId(true);
-        reportName.add(new EmptyOnChangeAjaxBehavior());
-        form.add(reportName);
-
-        IModel<String> fileNameModel = new IModel<>() {
-            @Override public String getObject() {
-                try {
-                    Method g = downloadModel.getObject().getClass().getMethod("getReportName");
-                    Object v = g.invoke(downloadModel.getObject());
-                    String name = v != null ? v.toString() : null;
-                    return (name == null || name.isBlank()) ? defaultFileName(getModelObject()) : name;
-                } catch (Exception e) {
-                    return defaultFileName(getModelObject());
-                }
+        IModel<String> nameModel = new LoadableDetachableModel<>() {
+            @Override
+            protected String load() {
+                return defaultFileName(getModelObject());
             }
         };
 
+        TextField<String> reportName = new TextField<>(ID_REPORT_NAME, nameModel) {
+            @Override public String getInputName() { return ID_REPORT_NAME; }
+        };
+        reportName.setOutputMarkupId(true);
+        form.add(reportName);
+
         DownloadLink exportExcel = new DownloadLink("export",
-                createDownloadReportModel(),
-                fileNameModel)
+                createDownloadModel(),
+                () -> {
+                    String name = nameModel.getObject();
+                    return defaultFileName(getModelObject());
+                })
                 .setCacheDuration(Duration.ofMillis(0))
                 .setDeleteAfterDownload(true);
         form.add(exportExcel);
     }
 
     private String defaultFileName(ReportFilterDto filter) {
-        LocalDate from = filter != null ? filter.getDateFrom() : null;
-        LocalDate to = filter != null ? filter.getDateTo() : null;
-        String range = (from != null ? from.toString() : "") + "_" + (to != null ? to.toString() : "");
-        return ("user-summary-" + range + ".xlsx").replaceAll("__", "_");
+        LocalDate from = filter.getDateFrom();
+        LocalDate to = filter.getDateTo();
+        String realizatorPart = "";
+        if (filter.getRealizators().size() == 1) {
+            User u = filter.getRealizators().getFirst();
+            String last = u.getFamilyName();
+            realizatorPart = "-" + slug(last);
+        }
+        String range = (from.toString() + "_" + (to.toString()));
+        return ("user-summary-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_");
     }
 
-    private IModel<File> createDownloadReportModel() {
+    private static String slug(String s) {
+        if (s == null || s.isBlank()) return "";
+        String noDia = Normalizer.normalize(s, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        String cleaned = noDia.replaceAll("[^A-Za-z0-9._-]+", "-")
+                .replaceAll("[-_]{2,}", "-")
+                .replaceAll("(^-|-$)", "");
+        return cleaned.toLowerCase(Locale.ROOT);
+    }
+
+    private IModel<File> createDownloadModel() {
         return new IModel<>() {
             @Serial private static final long serialVersionUID = 1L;
-            @Override
-            public File getObject() {
-                File tempFile = new File("export.xlsx");
-                generateUserSummaryExcel(tempFile, getModelObject());
-                return tempFile;
+            @Override public File getObject() {
+                File tmp = new File("export.xlsx");
+                generateExcel(tmp, getModelObject());
+                return tmp;
             }
         };
     }
-    private void generateUserSummaryExcel(File tempFile, ReportFilterDto filter) {
+
+    private void generateExcel(File tempFile, ReportFilterDto filter) {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = createSheet("User summary", workbook);
 

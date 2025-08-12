@@ -2,7 +2,9 @@ package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
+import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
+import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.PartSummary;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.util.LoadableModel;
@@ -14,6 +16,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
 
 import java.io.File;
@@ -21,16 +24,16 @@ import java.io.FileOutputStream;
 import java.io.Serial;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
+import java.text.Normalizer;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
 
 public class DownloadProjectReportConfigPanel extends SimplePanel<ReportFilterDto> {
 
     private static final String ID_REPORT_NAME = "reportName";
-
-    private IModel<DownloadSettingsDto> downloadModel;
 
     public DownloadProjectReportConfigPanel(String id, IModel<ReportFilterDto> model) {
         super(id, model);
@@ -38,68 +41,68 @@ public class DownloadProjectReportConfigPanel extends SimplePanel<ReportFilterDt
 
     @Override
     protected void initLayout() {
-        downloadModel = new LoadableModel<>(false) {
-            @Override
-            protected DownloadSettingsDto load() {
-                DownloadSettingsDto s = new DownloadSettingsDto();
-                try {
-                    Method m = s.getClass().getMethod("setReportName", String.class);
-                    m.invoke(s, defaultFileName(getModelObject()));
-                } catch (Exception ignore) {}
-                return s;
-            }
-        };
-
-        Form<DownloadSettingsDto> form = new Form<>("form");
+        Form<Void> form = new Form<>("form");
         add(form);
 
-        TextField<String> reportName = new TextField<>(ID_REPORT_NAME,
-                new PropertyModel<>(downloadModel, DownloadSettingsDto.F_REPORT_NAME));
-        reportName.setOutputMarkupId(true);
-        reportName.add(new EmptyOnChangeAjaxBehavior());
-        form.add(reportName);
-
-        IModel<String> fileNameModel = new IModel<>() {
-            @Override public String getObject() {
-                try {
-                    Method g = downloadModel.getObject().getClass().getMethod("getReportName");
-                    Object v = g.invoke(downloadModel.getObject());
-                    String name = v != null ? v.toString() : null;
-                    return (name == null || name.isBlank()) ? defaultFileName(getModelObject()) : name;
-                } catch (Exception e) {
-                    return defaultFileName(getModelObject());
-                }
+        IModel<String> nameModel = new LoadableDetachableModel<>() {
+            @Override
+            protected String load() {
+                return defaultFileName(getModelObject());
             }
         };
 
+        TextField<String> reportName = new TextField<>(ID_REPORT_NAME, nameModel) {
+            @Override public String getInputName() { return ID_REPORT_NAME; }
+        };
+        reportName.setOutputMarkupId(true);
+        form.add(reportName);
+
         DownloadLink exportExcel = new DownloadLink("export",
-                createDownloadReportModel(),
-                fileNameModel)
+                createDownloadModel(),
+                () -> {
+                    String name = nameModel.getObject();
+                    return defaultFileName(getModelObject());
+                })
                 .setCacheDuration(Duration.ofMillis(0))
                 .setDeleteAfterDownload(true);
         form.add(exportExcel);
     }
 
-    private String defaultFileName(ReportFilterDto filter) {
-        LocalDate from = filter != null ? filter.getDateFrom() : null;
-        LocalDate to = filter != null ? filter.getDateTo() : null;
-        String range = (from != null ? from.toString() : "") + "_" + (to != null ? to.toString() : "");
-        return ("project-summary-" + range + ".xlsx").replaceAll("__", "_");
-    }
-
-    private IModel<File> createDownloadReportModel() {
+    private IModel<File> createDownloadModel() {
         return new IModel<>() {
             @Serial private static final long serialVersionUID = 1L;
-            @Override
-            public File getObject() {
-                File tempFile = new File("export.xlsx");
-                generateProjectSummaryExcel(tempFile, getModelObject());
-                return tempFile;
+            @Override public File getObject() {
+                File tmp = new File("export.xlsx");
+                generateExcel(tmp, getModelObject());
+                return tmp;
             }
         };
     }
 
-    private void generateProjectSummaryExcel(File tempFile, ReportFilterDto filter) {
+    private String defaultFileName(ReportFilterDto filter) {
+        LocalDate from = filter.getDateFrom();
+        LocalDate to = filter.getDateTo();
+        String projectPart = "";
+        if (filter.getCustomerProjectPartDtos().size() == 1) {
+            CustomerProjectPartDto u = filter.getCustomerProjectPartDtos().getFirst();
+            String project = u.getProjectName();
+            projectPart = "-" + slug(project);
+        }
+        String range = (from.toString() + "_" + (to.toString()));
+        return ("part-summary-" + projectPart + "-" + range + ".xlsx").replaceAll("__", "_");
+    }
+
+    private static String slug(String s) {
+        if (s == null || s.isBlank()) return "";
+        String noDia = Normalizer.normalize(s, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        String cleaned = noDia.replaceAll("[^A-Za-z0-9._-]+", "-")
+                .replaceAll("[-_]{2,}", "-")
+                .replaceAll("(^-|-$)", "");
+        return cleaned.toLowerCase(Locale.ROOT);
+    }
+
+    private void generateExcel(File tempFile, ReportFilterDto filter) {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = createSheet("Project summary", workbook);
 
