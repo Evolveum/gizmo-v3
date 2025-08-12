@@ -1,40 +1,52 @@
 package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.SimplePanel;
+import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
+import com.evolveum.gizmo.data.AbstractTask;
+import com.evolveum.gizmo.data.QAbstractTask;
 import com.evolveum.gizmo.data.User;
+import com.evolveum.gizmo.data.Work;
 import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ReportFilterDto;
-import com.evolveum.gizmo.dto.WorkDto;
+import com.evolveum.gizmo.util.GizmoUtils;
+import com.evolveum.gizmo.util.LoadableModel;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.jpa.impl.JPAQuery;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.behavior.AttributeAppender;
-
+import org.apache.wicket.model.PropertyModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serial;
-import java.text.Normalizer;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Locale;
 
 public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterDto> {
 
+    private static final String ID_PER_USER = "perUser";
     private static final String ID_REPORT_NAME = "reportName";
+    private TextField<String> reportNameField;
+    private IModel<DownloadSettingsDto> downloadModel;
 
     public DownloadOverviewReportConfigPanel(String id, IModel<ReportFilterDto> model) {
         super(id, model);
@@ -42,26 +54,37 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
 
     @Override
     protected void initLayout() {
-        Form<Void> form = new Form<>("form");
+        downloadModel = new LoadableModel<>(true) {
+            @Override
+            protected DownloadSettingsDto load() {
+                DownloadSettingsDto dto = new DownloadSettingsDto();
+                dto.setReportName(defaultFileName(getModelObject()));
+                return dto;
+            }
+
+        };
+
+        Form<DownloadSettingsDto> form = new Form<>("form");
         add(form);
 
-        IModel<String> nameModel = new LoadableDetachableModel<>() {
+        reportNameField = new TextField<>(ID_REPORT_NAME,
+                new PropertyModel<>(downloadModel, DownloadSettingsDto.F_REPORT_NAME));
+        reportNameField.setOutputMarkupId(true);
+        form.add(reportNameField);
+
+        AjaxCheckBox perUser = new AjaxCheckBox(ID_PER_USER,
+                new PropertyModel<>(downloadModel, DownloadSettingsDto.F_PER_USER)) {
             @Override
-            protected String load() {
-                return defaultFileName(getModelObject());
+            protected void onUpdate(AjaxRequestTarget target) {
+                target.add(reportNameField);
             }
         };
-
-        TextField<String> reportName = new TextField<>(ID_REPORT_NAME, nameModel) {
-            @Override public String getInputName() { return ID_REPORT_NAME; }
-        };
-        reportName.setOutputMarkupId(true);
-        form.add(reportName);
+        form.add(perUser);
 
         DownloadLink exportExcel = new DownloadLink("export",
-                createDownloadModel(),
+                createDownloadReportModel(),
                 () -> {
-                    String name = nameModel.getObject();
+                    DownloadSettingsDto s = downloadModel.getObject();
                     return defaultFileName(getModelObject());
                 })
                 .setCacheDuration(Duration.ofMillis(0))
@@ -75,148 +98,229 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
         form.add(exportExcel);
     }
 
-    private String defaultFileName(ReportFilterDto f) {
-        LocalDate from = f.getDateFrom();
-        LocalDate to   = f.getDateTo();
-
+    private String defaultFileName(ReportFilterDto filter) {
+        LocalDate from = filter.getDateFrom();
+        LocalDate to = filter.getDateTo();
         String realizatorPart = "";
-        if (f.getRealizators().size() == 1) {
-            User u = f.getRealizators().getFirst();
+        if (filter.getRealizators().size() == 1) {
+            User u = filter.getRealizators().getFirst();
             String last = u.getFamilyName();
             realizatorPart = "-" + slug(last);
         }
-        String range = (from.toString()) + "_" + (to.toString());
-        return ("overview" + realizatorPart + "-" + range + ".xlsx")
-                .replaceAll("__", "_")
-                .replaceAll("--", "-");
+        String range = (from.toString() + "_" + (to.toString()));
+        return ("user-summary-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_");
     }
 
     private static String slug(String s) {
         if (s == null || s.isBlank()) return "";
-        String noDia = Normalizer.normalize(s, Normalizer.Form.NFD)
+        String noDia = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
         String cleaned = noDia.replaceAll("[^A-Za-z0-9._-]+", "-")
                 .replaceAll("[-_]{2,}", "-")
                 .replaceAll("(^-|-$)", "");
-        return cleaned.toLowerCase(Locale.ROOT);
+        return cleaned.toLowerCase(java.util.Locale.ROOT);
     }
 
-    private IModel<File> createDownloadModel() {
+    private IModel<File> createDownloadReportModel() {
         return new IModel<>() {
-            @Serial private static final long serialVersionUID = 1L;
-            @Override public File getObject() {
-                File tmp = new File("export.xlsx");
-                generateExcel(tmp, getModelObject());
-                return tmp;
+            @Serial
+            private static final long serialVersionUID = 1L;
+            @Override
+            public File getObject() {
+                File tempFile = new File("overview.xlsx");
+                generateExcelReport(tempFile, downloadModel.getObject());
+                return tempFile;
             }
         };
     }
 
-    private void generateExcel(File file, ReportFilterDto filter) {
-        try (XSSFWorkbook wb = new XSSFWorkbook()) {
-            XSSFSheet sheet = createSheet("Overview", wb);
-            CellStyle header = createHeaderStyle(wb);
-            CellStyle dateStyle = createDateStyle(wb);
-            CellStyle text = createDefaultCellStyle(wb);
+    private void generateExcelReport(File tempFile, DownloadSettingsDto downloadSettings) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            ReportFilterDto filterDto = getModelObject();
 
-            int row = 0;
-            XSSFRow h = sheet.createRow(row++);
-            createHeaderCell(h, 0, "Date", header);
-            createHeaderCell(h, 1, "Invoice", header);
-            createHeaderCell(h, 2, "Time range", header);
-            createHeaderCell(h, 3, "Realizator", header);
-            createHeaderCell(h, 4, "Project", header);
-            createHeaderCell(h, 5, "Description", header);
-            createHeaderCell(h, 6, "Track ID", header);
-
-            List<WorkDto> rows = fetchAllRows(filter);
-            DateTimeFormatter tf = DateTimeFormatter.ofPattern("HH:mm");
-
-            for (WorkDto dto : rows) {
-                XSSFRow r = sheet.createRow(row++);
-                LocalDate d = dto.getDate();
-                if (d != null) {
-                    XSSFCell c = r.createCell(0, CellType.NUMERIC);
-                    c.setCellValue(java.sql.Date.valueOf(d));
-                    c.setCellStyle(dateStyle);
-                } else {
-                    createTextCell(r, 0, "", text);
-                }
-                createTextCell(r, 1, String.valueOf(dto.getWorkLength()), text);
-                LocalTime from = dto.getFrom();
-                LocalTime to = dto.getTo();
-                String range = (tf.format(from)) + (" - ") + (tf.format(to));
-                createTextCell(r, 2, range, text);
-                String fullName = dto.getRealizator() != null ? dto.getRealizator().getFullName() : "";
-                createTextCell(r, 3, fullName, text);
-                String project = buildProjectCell(dto.getCustomerProjectPart());
-                createTextCell(r, 4, project, text);
-                createTextCell(r, 5, dto.getDescription(), text);
-                createTextCell(r, 6, dto.getTrackId(), text);
+            if (downloadSettings.isPerUser()) {
+                generateReportPerUser(workbook, filterDto);
+            } else {
+                generateUsersReport(workbook, "Overview report", filterDto, ReportType.GENERIC);
             }
 
-            for (int c = 0; c <= 6; c++) sheet.autoSizeColumn(c);
-            try (FileOutputStream os = new FileOutputStream(file)) { wb.write(os); }
+            try (FileOutputStream os = new FileOutputStream(tempFile)) {
+                workbook.write(os);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private String buildProjectCell(List<CustomerProjectPartDto> list) {
-        if (list == null || list.isEmpty()) return "";
-        return list.stream()
-                .map(cpp -> cpp.getCustomerName() + " / " + cpp.getProjectName() + " / " + cpp.getPartName())
-                .collect(Collectors.joining("\n"));
-    }
-
-    private List<WorkDto> fetchAllRows(ReportFilterDto filter) {
-        ReportDataProvider provider = new ReportDataProvider(getPageTemplate());
-        provider.setFilter(filter);
-        long size = provider.size();
-        List<WorkDto> out = new ArrayList<>((int)Math.min(size, Integer.MAX_VALUE));
-        final long page = 500;
-        for (long first = 0; first < size; first += page) {
-            Iterator<? extends WorkDto> it = provider.iterator(first, Math.min(page, size - first));
-            while (it.hasNext()) out.add(it.next());
+    private void generateReportPerUser(XSSFWorkbook workbook, ReportFilterDto filterDto) {
+        List<User> realizators = filterDto.getRealizators().isEmpty() ?
+                getPageTemplate().getUserRepository().findAllEnabledUsers() : filterDto.getRealizators();
+        for (User realizator : realizators) {
+            List<AbstractTask> tasks = loadWork(realizator, filterDto);
+            if (tasks.isEmpty()) continue;
+            String sheetName = realizator.getFullName() + "(" + realizator.getId() + ")";
+            generateExcel(workbook, sheetName, tasks, ReportType.GENERIC);
         }
-        provider.detach();
-        return out;
     }
 
-    private XSSFSheet createSheet(String name, XSSFWorkbook wb) {
-        XSSFSheet sheet = wb.createSheet(name);
-        sheet.setDefaultColumnWidth(20);
-        sheet.getPrintSetup().setLandscape(true);
-        sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A4_PAPERSIZE);
-        return sheet;
+    private List<AbstractTask> loadWork(User realizator, ReportFilterDto filterDto) {
+        QAbstractTask task = QAbstractTask.abstractTask;
+        JPAQuery<Work> query = GizmoUtils.createWorkQuery(getPageTemplate().getEntityManager());
+        BooleanBuilder predicates = new BooleanBuilder(task.realizator.name.eq(realizator.getName()));
+
+        if (filterDto.getDateFrom() != null) {
+            predicates.and(task.date.goe(filterDto.getDateFrom()));
+        }
+        if (filterDto.getDateTo() != null) {
+            predicates.and(task.date.loe(filterDto.getDateTo()));
+        }
+        if (CollectionUtils.isNotEmpty(filterDto.getCustomerProjectPartDtos())) {
+            BooleanBuilder projectPredicate = new BooleanBuilder();
+            for (CustomerProjectPartDto project : filterDto.getCustomerProjectPartDtos()) {
+                projectPredicate.or(ReportDataProvider.createPredicate(project));
+            }
+            predicates.and(projectPredicate);
+        }
+        query.where(predicates);
+        return query.select(task).fetch();
     }
-    private CellStyle createHeaderStyle(XSSFWorkbook wb) {
-        CellStyle style = wb.createCellStyle();
+
+    private void generateUsersReport(XSSFWorkbook workbook, String sheetName,
+                                     ReportFilterDto filterDto, ReportType reportType) {
+        List<AbstractTask> tasks = listLoggedWork(filterDto);
+        generateExcel(workbook, sheetName, tasks, reportType);
+    }
+
+    private List<AbstractTask> listLoggedWork(ReportFilterDto filterDto) {
+        QAbstractTask task = QAbstractTask.abstractTask;
+        JPAQuery<Work> query = GizmoUtils.createWorkQuery(getPageTemplate().getEntityManager());
+        List<Predicate> predicates = new ArrayList<>();
+
+        Predicate p = createListPredicate(filterDto.getRealizators(), task.realizator);
+        if (p != null) predicates.add(p);
+        if (filterDto.getDateFrom() != null) predicates.add(task.date.goe(filterDto.getDateFrom()));
+        if (filterDto.getDateTo() != null) predicates.add(task.date.loe(filterDto.getDateTo()));
+        if (CollectionUtils.isNotEmpty(filterDto.getCustomerProjectPartDtos())) {
+            BooleanBuilder projectPredicate = new BooleanBuilder();
+            for (CustomerProjectPartDto project : filterDto.getCustomerProjectPartDtos()) {
+                projectPredicate.or(ReportDataProvider.createPredicate(project));
+            }
+            predicates.add(projectPredicate);
+        }
+
+        BooleanBuilder bb = new BooleanBuilder();
+        Predicate combined = bb.orAllOf(predicates.toArray(new Predicate[0]));
+        query.where(combined);
+
+        return query.select(task).fetch();
+    }
+
+    private static <T> Predicate createListPredicate(List<T> list, EntityPathBase<T> base) {
+        if (list == null || list.isEmpty()) return null;
+        if (list.size() == 1) return base.eq(list.get(0));
+
+        BooleanExpression expr = base.eq(list.get(0));
+        for (int i = 1; i < list.size(); i++) {
+            expr = expr.or(base.eq(list.get(i)));
+        }
+        return expr;
+    }
+
+    private <T> void generateExcel(XSSFWorkbook workbook, String sheetName, List<T> tasks, ReportType reportType) {
+        List<WorkCellType> cells = WorkCellType.getCellsForReport(reportType);
+        List<CellDefinitionType> cellDefinitionTypes = new ArrayList<>();
+
+        int j = 0;
+        for (WorkCellType cell : cells) {
+            Class<?> fieldType = cell.getType();
+            CellStyle style = LocalDate.class.equals(fieldType)
+                    ? createDateStyle(workbook)
+                    : createDefaultCellStyle(workbook);
+
+            cellDefinitionTypes.add(new CellDefinitionType(
+                    cell.getDisplayName(),
+                    j,
+                    cell.getType(),
+                    style,
+                    cell.getGetMethod()
+            ));
+            j++;
+        }
+
+        int startRowNumber = 0;
+        XSSFSheet sheet = getSheet(workbook, sheetName);
+        if (sheet.getLastRowNum() != 0) {
+            startRowNumber = sheet.getLastRowNum() + 2;
+        }
+
+        XSSFRow header = sheet.createRow(startRowNumber);
+        CellStyle headerStyle = createHeaderDefaultStyle(workbook);
+        for (CellDefinitionType def : cellDefinitionTypes) {
+            XSSFCell headerCell = header.createCell(def.getPosition(), CellType.STRING);
+            headerCell.setCellValue(def.getDisplayName());
+            headerCell.setCellStyle(headerStyle);
+        }
+
+        for (int i = 0; i < tasks.size(); i++) {
+            T workTask = tasks.get(i);
+            XSSFRow row = sheet.createRow(startRowNumber + i + 1);
+            for (CellDefinitionType def : cellDefinitionTypes) {
+                XSSFCell cell = row.createCell(def.getPosition(), def.getCellType());
+                cell.setCellStyle(def.getStyle());
+                try {
+                    String[] methods = def.getGetMethod().split("\\.");
+                    Object value = workTask;
+                    for (String method : methods) {
+                        if (value == null) break;
+                        value = value.getClass().getMethod(method).invoke(value);
+                    }
+                    cell.setCellValue(value == null ? "" : value.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private CellStyle createHeaderDefaultStyle(XSSFWorkbook workbook) {
+        CellStyle style = workbook.createCellStyle();
         style.setBorderBottom(BorderStyle.MEDIUM);
         style.setBorderLeft(BorderStyle.MEDIUM);
         style.setBorderRight(BorderStyle.MEDIUM);
         style.setBorderTop(BorderStyle.MEDIUM);
-        Font font = wb.createFont(); font.setBold(true); style.setFont(font); return style;
+        style.setShrinkToFit(true);
+        Font font = workbook.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        return style;
     }
-    private CellStyle createDefaultCellStyle(XSSFWorkbook wb) {
-        CellStyle style = wb.createCellStyle();
+
+    private CellStyle createDefaultCellStyle(XSSFWorkbook workbook) {
+        CellStyle style = workbook.createCellStyle();
         style.setBorderBottom(BorderStyle.THIN);
         style.setBorderLeft(BorderStyle.THIN);
         style.setBorderRight(BorderStyle.THIN);
         style.setBorderTop(BorderStyle.THIN);
-        style.setWrapText(true); return style;
-    }
-    private CellStyle createDateStyle(XSSFWorkbook wb) {
-        CellStyle dateStyle = createDefaultCellStyle(wb);
-        CreationHelper ch = wb.getCreationHelper();
-        dateStyle.setDataFormat(ch.createDataFormat().getFormat("dd/mm/yyyy"));
-        return dateStyle;
-    }
-    private void createHeaderCell(XSSFRow row, int col, String text, CellStyle style) {
-        XSSFCell cell = row.createCell(col, CellType.STRING); cell.setCellValue(text); cell.setCellStyle(style);
-    }
-    private void createTextCell(XSSFRow row, int col, String text, CellStyle style) {
-        XSSFCell cell = row.createCell(col, CellType.STRING); cell.setCellValue(text != null ? text : ""); cell.setCellStyle(style);
+        style.setWrapText(true);
+        return style;
     }
 
+    private CellStyle createDateStyle(XSSFWorkbook workbook) {
+        CellStyle dateStyle = createDefaultCellStyle(workbook);
+        CreationHelper createHelper = workbook.getCreationHelper();
+        dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy"));
+        return dateStyle;
+    }
+
+    private XSSFSheet getSheet(XSSFWorkbook workbook, String sheetName) {
+        XSSFSheet sheet = workbook.getSheet(sheetName);
+        if (sheet == null) {
+            sheet = workbook.createSheet(sheetName);
+            sheet.setDefaultColumnWidth(20);
+            sheet.getPrintSetup().setLandscape(true);
+            sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A4_PAPERSIZE);
+        }
+        return sheet;
+    }
 }
+
