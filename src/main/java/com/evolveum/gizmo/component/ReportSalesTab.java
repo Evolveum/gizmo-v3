@@ -5,14 +5,12 @@ import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
-import com.evolveum.gizmo.component.modal.DownloadOverviewReportConfigPanel;
-import com.evolveum.gizmo.component.modal.DownloadReportConfigPanel;
-import com.evolveum.gizmo.component.modal.DownloadTimeoffReportConfigPanel;
+import com.evolveum.gizmo.component.modal.DownloadProjectReportConfigPanel;
+import com.evolveum.gizmo.component.modal.DownloadSalesReportConfigPanel;
 import com.evolveum.gizmo.component.modal.MainPopupDialog;
 import com.evolveum.gizmo.data.AbstractTask;
 import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.provider.ReportDataProvider;
-import com.evolveum.gizmo.data.provider.SummaryUserDataProvider;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
@@ -33,12 +31,13 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReportOverviewTab extends SimplePanel {
+public class ReportSalesTab extends SimplePanel{
     private static final String ID_FORM = "form";
     private static final String ID_FROM = "from";
     private static final String ID_TO = "to";
@@ -56,15 +55,13 @@ public class ReportOverviewTab extends SimplePanel {
 
     public static final String ID_CONFIRM_DOWNLOAD = "confirmDownload";
 
-    private final String panelId;
-
     private IModel<ReportFilterDto> model;
     private Form<?> form;
+    private SummaryPartsPanel summaryPanel;
 
-    public ReportOverviewTab(String id){
+    public ReportSalesTab(String id){
         super(id);
         setOutputMarkupId(true);
-        this.panelId = id;
 
         ReportFilterDto filter = GizmoAuthWebSession.getSession().getReportFilterDto();
         if (filter == null) {
@@ -80,6 +77,7 @@ public class ReportOverviewTab extends SimplePanel {
         }
         this.model = Model.of(filter);
     }
+
     @Override
     protected void onConfigure() {
         super.onConfigure();
@@ -98,10 +96,9 @@ public class ReportOverviewTab extends SimplePanel {
     }
 
     private void initPanelLayout() {
-
         form = new Form<>(ID_FORM, model);
         form.setOutputMarkupId(true);
-        add(form);
+        addOrReplace(form);
 
         Label month = new Label(ID_MONTH, new PropertyModel<>(model, ReportFilterDto.F_MONTH_YEAR));
         month.setOutputMarkupId(true);
@@ -125,7 +122,9 @@ public class ReportOverviewTab extends SimplePanel {
         next.setOutputMarkupId(true);
         form.add(next);
 
-        LocalDateTextField from = new LocalDateTextField(ID_FROM, new PropertyModel<>(getFilterModel(), ReportFilterDto.F_DATE_FROM), "dd/MM/yyyy");
+        LocalDateTextField from = new LocalDateTextField(ID_FROM,
+                new PropertyModel<>(getFilterModel(), ReportFilterDto.F_DATE_FROM),
+                "dd/MM/yyyy");
         from.setOutputMarkupId(true);
         from.add(new EmptyOnChangeAjaxBehavior());
         from.add(new DateRangePickerBehavior() {
@@ -136,43 +135,45 @@ public class ReportOverviewTab extends SimplePanel {
         });
         form.add(from);
 
-        LocalDateTextField to = new LocalDateTextField(ID_TO, new PropertyModel<>(getFilterModel(), ReportFilterDto.F_DATE_TO), "dd/MM/yyyy");
+        LocalDateTextField to = new LocalDateTextField(ID_TO,
+                new PropertyModel<>(getFilterModel(), ReportFilterDto.F_DATE_TO),
+                "dd/MM/yyyy");
         to.setOutputMarkupId(true);
         to.add(new DateRangePickerBehavior());
         form.add(to);
 
-        MultiselectDropDownInput<User> realizators = new
-                MultiselectDropDownInput<>(ID_REALIZATOR,
+        MultiselectDropDownInput<User> realizators = new MultiselectDropDownInput<>(ID_REALIZATOR,
                 new PropertyModel<>(model, ReportFilterDto.F_REALIZATORS),
                 GizmoUtils.createUsersModel(getPageTemplate()),
                 GizmoUtils.createUserChoiceRenderer());
         realizators.setOutputMarkupId(true);
         form.add(realizators);
 
-        CustomerProjectPartSearchPanel customerProjectSearchPanel = new CustomerProjectPartSearchPanel(ID_CUSTOMER, new PropertyModel<>(getFilterModel(), ReportFilterDto.F_PROJECT_SEARCH_SETTINGS));
+        CustomerProjectPartSearchPanel customerProjectSearchPanel = new CustomerProjectPartSearchPanel(
+                ID_CUSTOMER, new PropertyModel<>(getFilterModel(), ReportFilterDto.F_PROJECT_SEARCH_SETTINGS));
         customerProjectSearchPanel.setOutputMarkupId(true);
         form.add(customerProjectSearchPanel);
 
-        AjaxSubmitButton preview = new AjaxSubmitButton(ID_PREVIEW, createStringResource("PageReports.button.preview")) {
-
+        AjaxSubmitButton preview = new AjaxSubmitButton(ID_PREVIEW,
+                createStringResource("PageReports.button.preview")) {
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
-                refreshTable(target);
+                refreshSummary(target);
             }
 
             @Override
             protected void onError(AjaxRequestTarget target) {
-                target.add((getPageTemplate().getFeedbackPanel()));
+                target.add(getPageTemplate().getFeedbackPanel());
                 super.onError(target);
             }
         };
         form.add(preview);
 
+
         ReportDataProvider provider = new ReportDataProvider(getPageTemplate());
         provider.setFilter(model.getObject());
 
         List<IColumn<WorkDto, String>> columns = createColumns();
-
         TablePanel<WorkDto> table = new TablePanel<>(ID_TABLE, provider, columns, 50);
         table.setOutputMarkupId(true);
         add(table);
@@ -185,23 +186,19 @@ public class ReportOverviewTab extends SimplePanel {
 
         columns.add(new PropertyColumn<>(createStringResource("AbstractTask.date"), AbstractTask.F_DATE));
         columns.add(GizmoUtils.createWorkInvoiceColumn(getPageTemplate()));
-        columns.add(GizmoUtils.createWorkTimeRangeColumn(getPageTemplate()));
-        columns.add(GizmoUtils.createWorkInvoiceColumn(getPageTemplate()));
         columns.add(GizmoUtils.createAbstractTaskRealizatorColumn(getPageTemplate()));
         columns.add(GizmoUtils.createWorkProjectColumn(getPageTemplate()));
         columns.add(new PropertyColumn<>(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));
-        columns.add(new PropertyColumn<>(createStringResource("PageReports.trackId"), AbstractTask.F_TRACK_ID));
 
         return columns;
     }
-
 
     private void showDownloadModal(Form form) {
         MainPopupDialog confirmDownload = new MainPopupDialog(ID_CONFIRM_DOWNLOAD);
         confirmDownload.setOutputMarkupId(true);
         add(confirmDownload);
 
-        DownloadOverviewReportConfigPanel content = new DownloadOverviewReportConfigPanel(ModalDialog.CONTENT_ID, getFilterModel());
+        DownloadSalesReportConfigPanel content = new DownloadSalesReportConfigPanel(ModalDialog.CONTENT_ID, getFilterModel());
         content.add(AttributeModifier.append("class", "modal-content"));
         confirmDownload.setContent(content);
 
@@ -226,41 +223,37 @@ public class ReportOverviewTab extends SimplePanel {
 
     }
 
-    private void refreshTable(AjaxRequestTarget target) {
+    private void refreshSummary(AjaxRequestTarget target) {
         WebPage page = (WebPage) getPage();
         if (page instanceof PageAppTemplate template) {
             target.add(template.getFeedbackPanel());
         }
         ReportFilterDto reportFilter = model.getObject();
+        GizmoAuthWebSession.getSession().setReportFilterDto(reportFilter);
 
-        GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
-        session.setReportFilterDto(reportFilter);
-
+        target.add(form);
         target.add(get(ID_TABLE));
     }
 
     private void previousClicked(AjaxRequestTarget target) {
-        ReportFilterDto workFilter = model.getObject();
-        LocalDate defaultFrom = workFilter.getDateFrom();
-        workFilter.setDateFrom(defaultFrom.minusMonths(1));
-
-        workFilter.setDateTo(workFilter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
-        handleCalendarNavigation(target, workFilter);
+        ReportFilterDto filter = model.getObject();
+        LocalDate from = filter.getDateFrom();
+        filter.setDateFrom(from.minusMonths(1));
+        filter.setDateTo(filter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
+        handleCalendarNavigation(target, filter);
     }
 
     private void nextClicked(AjaxRequestTarget target) {
-        ReportFilterDto workFilter = model.getObject();
-        LocalDate defaultFrom = workFilter.getDateFrom();
-        workFilter.setDateFrom(defaultFrom.plusMonths(1));
-
-
-        workFilter.setDateTo(workFilter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
-        handleCalendarNavigation(target, workFilter);
+        ReportFilterDto filter = model.getObject();
+        LocalDate from = filter.getDateFrom();
+        filter.setDateFrom(from.plusMonths(1));
+        filter.setDateTo(filter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
+        handleCalendarNavigation(target, filter);
     }
 
-    private void handleCalendarNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
-        GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
-        session.setDashboardFilter(workFilter);
+    private void handleCalendarNavigation(AjaxRequestTarget target, ReportFilterDto filter) {
+        GizmoAuthWebSession.getSession().setDashboardFilter(filter);
         target.add(form);
+        target.add(get(ID_TABLE));
     }
 }

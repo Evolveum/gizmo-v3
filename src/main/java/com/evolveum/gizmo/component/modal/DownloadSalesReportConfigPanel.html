@@ -1,0 +1,13 @@
+<wicket:panel xmlns:wicket="http://wicket.apache.org">
+    <form wicket:id="form" class="download-config-form">
+        <div class="form-group">
+            <label wicket:for="reportName">File name</label>
+            <input wicket:id="reportName" type="text" class="form-control"/>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" wicket:id="perUser" class="form-check-input" id="perUserChk">
+            <label class="form-check-label" for="perUserChk">Per user</label>
+        </div>
+        <a wicket:id="export" class="btn btn-primary">Download</a>
+    </form>
+</wicket:panel>

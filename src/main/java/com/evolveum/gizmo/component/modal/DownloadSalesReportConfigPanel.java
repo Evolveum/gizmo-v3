@@ -40,15 +40,17 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterDto> {
+public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto> {
 
     private static final String ID_PER_USER = "perUser";
     private static final String ID_REPORT_NAME = "reportName";
     private TextField<String> reportNameField;
     private IModel<DownloadSettingsDto> downloadModel;
 
-    public DownloadOverviewReportConfigPanel(String id, IModel<ReportFilterDto> model) {
+    public DownloadSalesReportConfigPanel(String id, IModel<ReportFilterDto> model) {
         super(id, model);
     }
 
@@ -105,14 +107,6 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
         form.add(exportExcel);
     }
 
-    public void syncReportNameWithFilter(AjaxRequestTarget target) {
-        String fresh = defaultFileName(getModelObject());
-        downloadModel.getObject().setReportName(fresh);
-        if (reportNameField != null) {
-            target.add(reportNameField);
-        }
-    }
-
     private String defaultFileName(ReportFilterDto filter) {
         LocalDate from = filter.getDateFrom();
         LocalDate to = filter.getDateTo();
@@ -123,7 +117,7 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
             realizatorPart = "-" + slug(last);
         }
         String range = (from.toString() + "_" + (to.toString()));
-        return ("overview-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_");
+        return ("sales-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_");
     }
 
     private static String slug(String s) {
@@ -136,13 +130,21 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
         return cleaned.toLowerCase(java.util.Locale.ROOT);
     }
 
+    public void syncReportNameWithFilter(AjaxRequestTarget target) {
+        String fresh = defaultFileName(getModelObject());
+        downloadModel.getObject().setReportName(fresh);
+        if (reportNameField != null) {
+            target.add(reportNameField);
+        }
+    }
+
     private IModel<File> createDownloadReportModel() {
         return new IModel<>() {
             @Serial
             private static final long serialVersionUID = 1L;
             @Override
             public File getObject() {
-                File tempFile = new File("overview.xlsx");
+                File tempFile = new File("sales.xlsx");
                 generateExcelReport(tempFile, downloadModel.getObject());
                 return tempFile;
             }
@@ -156,7 +158,7 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
             if (downloadSettings.isPerUser()) {
                 generateReportPerUser(workbook, filterDto);
             } else {
-                generateUsersReport(workbook, "Overview report", filterDto, ReportType.GENERIC);
+                generateUsersReport(workbook, "Sales report", filterDto, ReportType.GENERIC);
             }
 
             try (FileOutputStream os = new FileOutputStream(tempFile)) {
@@ -206,6 +208,12 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
         generateExcel(workbook, sheetName, tasks, reportType);
     }
 
+    private static final Set<String> EXCLUDED_METHODS = Set.of(
+            "getFrom",
+            "getTo",
+            "getTrackId"
+    );
+
     private List<AbstractTask> listLoggedWork(ReportFilterDto filterDto) {
         QAbstractTask task = QAbstractTask.abstractTask;
         JPAQuery<Work> query = GizmoUtils.createWorkQuery(getPageTemplate().getEntityManager());
@@ -242,7 +250,10 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
     }
 
     private <T> void generateExcel(XSSFWorkbook workbook, String sheetName, List<T> tasks, ReportType reportType) {
-        List<WorkCellType> cells = WorkCellType.getCellsForReport(reportType);
+        List<WorkCellType> cells = WorkCellType.getCellsForReport(reportType)
+                .stream()
+                .filter(c -> !EXCLUDED_METHODS.contains(c.getGetMethod()))
+                .collect(Collectors.toList());
         List<CellDefinitionType> cellDefinitionTypes = new ArrayList<>();
 
         int j = 0;
