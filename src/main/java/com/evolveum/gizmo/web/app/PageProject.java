@@ -18,7 +18,6 @@
 package com.evolveum.gizmo.web.app;
 
 import com.evolveum.gizmo.component.*;
-import com.evolveum.gizmo.component.modal.DownloadReportConfigPanel;
 import com.evolveum.gizmo.component.modal.MainPopupDialog;
 import com.evolveum.gizmo.component.modal.ProjectPartPanel;
 import com.evolveum.gizmo.data.Customer;

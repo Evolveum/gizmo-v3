@@ -1,7 +1,6 @@
 package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.SimplePanel;
-import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.data.AbstractTask;
 import com.evolveum.gizmo.data.QAbstractTask;
 import com.evolveum.gizmo.data.User;
@@ -67,7 +66,6 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
             }
             @Override
             public void detach() {
-
             }
         };
 
@@ -97,10 +95,7 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
                 .setCacheDuration(Duration.ofMillis(0))
                 .setDeleteAfterDownload(true);
 
-        exportExcel.add(new AttributeAppender(
-                "onclick",
-                Model.of("$('.modal.show').modal('hide');"),
-                ";"
+        exportExcel.add(new AttributeAppender("onclick", Model.of("$('.modal.show').modal('hide');"), ";"
         ));
         form.add(exportExcel);
     }

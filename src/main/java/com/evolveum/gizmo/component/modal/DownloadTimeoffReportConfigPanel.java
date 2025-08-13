@@ -58,10 +58,7 @@ public class DownloadTimeoffReportConfigPanel extends SimplePanel<ReportFilterDt
                 })
                 .setCacheDuration(Duration.ofMillis(0))
                 .setDeleteAfterDownload(true);
-        exportExcel.add(new AttributeAppender(
-                "onclick",
-                Model.of("$('.modal.show').modal('hide');"),
-                ";"
+        exportExcel.add(new AttributeAppender("onclick", Model.of("$('.modal.show').modal('hide');"), ";"
         ));
         form.add(exportExcel);
     }
@@ -76,7 +73,7 @@ public class DownloadTimeoffReportConfigPanel extends SimplePanel<ReportFilterDt
             realizatorPart = "-" + slug(last);
         }
         String range = (from.toString() + "_" + (to.toString()));
-        return ("user-summary-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_");
+        return ("user-summary-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_").replaceAll("--", "-");
     }
 
     private static String slug(String s) {

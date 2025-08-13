@@ -1,13 +1,10 @@
 package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.SimplePanel;
-import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
-import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.PartSummary;
 import com.evolveum.gizmo.dto.ReportFilterDto;
-import com.evolveum.gizmo.util.LoadableModel;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -19,12 +16,10 @@ import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serial;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.Normalizer;
 import java.time.Duration;
@@ -67,10 +62,7 @@ public class DownloadProjectReportConfigPanel extends SimplePanel<ReportFilterDt
                 })
                 .setCacheDuration(Duration.ofMillis(0))
                 .setDeleteAfterDownload(true);
-        exportExcel.add(new AttributeAppender(
-                "onclick",
-                Model.of("$('.modal.show').modal('hide');"),
-                ";"
+        exportExcel.add(new AttributeAppender("onclick", Model.of("$('.modal.show').modal('hide');"), ";"
         ));
         form.add(exportExcel);
     }
@@ -96,7 +88,7 @@ public class DownloadProjectReportConfigPanel extends SimplePanel<ReportFilterDt
             projectPart = "-" + slug(project);
         }
         String range = (from.toString() + "_" + (to.toString()));
-        return ("part-summary-" + projectPart + "-" + range + ".xlsx").replaceAll("__", "_");
+        return ("part-summary-" + projectPart + "-" + range + ".xlsx").replaceAll("__", "_").replaceAll("--", "-");
     }
 
     private static String slug(String s) {

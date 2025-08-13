@@ -5,8 +5,6 @@ import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.component.modal.DownloadProjectReportConfigPanel;
-import com.evolveum.gizmo.component.modal.DownloadReportConfigPanel;
-import com.evolveum.gizmo.component.modal.DownloadTimeoffReportConfigPanel;
 import com.evolveum.gizmo.component.modal.MainPopupDialog;
 import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;

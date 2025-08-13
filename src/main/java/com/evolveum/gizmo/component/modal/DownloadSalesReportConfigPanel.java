@@ -1,7 +1,6 @@
 package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.SimplePanel;
-import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.data.AbstractTask;
 import com.evolveum.gizmo.data.QAbstractTask;
 import com.evolveum.gizmo.data.User;
@@ -68,9 +67,7 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
                 return cache;
             }
             @Override
-            public void detach() {
-
-            }
+            public void detach() {}
         };
 
         Form<DownloadSettingsDto> form = new Form<>("form");
@@ -99,10 +96,7 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
                 .setCacheDuration(Duration.ofMillis(0))
                 .setDeleteAfterDownload(true);
 
-        exportExcel.add(new AttributeAppender(
-                "onclick",
-                Model.of("$('.modal.show').modal('hide');"),
-                ";"
+        exportExcel.add(new AttributeAppender("onclick", Model.of("$('.modal.show').modal('hide');"), ";"
         ));
         form.add(exportExcel);
     }
@@ -117,7 +111,7 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
             realizatorPart = "-" + slug(last);
         }
         String range = (from.toString() + "_" + (to.toString()));
-        return ("sales-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_");
+        return ("sales-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_").replaceAll("--", "-");
     }
 
     private static String slug(String s) {
