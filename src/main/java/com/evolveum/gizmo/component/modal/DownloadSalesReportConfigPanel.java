@@ -6,7 +6,9 @@ import com.evolveum.gizmo.data.QAbstractTask;
 import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.Work;
 import com.evolveum.gizmo.data.provider.ReportDataProvider;
+import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
+import com.evolveum.gizmo.dto.PartSummary;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
@@ -31,6 +33,7 @@ import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -199,6 +202,59 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
     private void generateUsersReport(XSSFWorkbook workbook, String sheetName,
                                      ReportFilterDto filterDto, ReportType reportType) {
         List<AbstractTask> tasks = listLoggedWork(filterDto);
+
+        XSSFSheet sheet = getSheet(workbook, sheetName);
+        CellStyle header = createHeaderDefaultStyle(workbook);
+        CellStyle text = createDefaultCellStyle(workbook);
+
+        int rowIdx = 0;
+
+        XSSFRow head = sheet.createRow(rowIdx++);
+        XSSFCell h0 = head.createCell(0, CellType.STRING);
+        h0.setCellValue("User");
+        h0.setCellStyle(header);
+        XSSFCell h1 = head.createCell(1, CellType.STRING);
+        h1.setCellValue("Project");
+        h1.setCellStyle(header);
+        XSSFCell h2 = head.createCell(2, CellType.STRING);
+        h2.setCellValue("Time (h)");
+        h2.setCellStyle(header);
+
+        SummaryPartsDataProvider provider = new SummaryPartsDataProvider(getPageTemplate());
+        List<PartSummary> rows = provider.createSummary(filterDto);
+
+        double totalHours = 0d;
+        for (PartSummary s : rows) {
+            XSSFRow r = sheet.createRow(rowIdx++);
+
+            XSSFCell c0 = r.createCell(0, CellType.STRING);
+            c0.setCellValue(s.getFullName());       // User
+            c0.setCellStyle(text);
+
+            XSSFCell c1 = r.createCell(1, CellType.STRING);
+            c1.setCellValue(s.getName());           // Project (z PartSummary.name)
+            c1.setCellStyle(text);
+
+            XSSFCell c2 = r.createCell(2, CellType.NUMERIC);
+            c2.setCellValue(s.getLength());         // Time v hodinách (TaskLength.length)
+            c2.setCellStyle(text);
+
+            totalHours += s.getLength();
+        }
+
+        CellStyle sumStyle = createHeaderDefaultStyle(workbook);
+        XSSFRow sumRow = sheet.createRow(rowIdx++);
+        sheet.addMergedRegion(new CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
+        XSSFCell sumLabel = sumRow.createCell(0, CellType.STRING);
+        sumLabel.setCellValue("Summary");
+        sumLabel.setCellStyle(sumStyle);
+        XSSFCell totalCell = sumRow.createCell(2, CellType.NUMERIC);
+        totalCell.setCellValue(totalHours);
+        totalCell.setCellStyle(sumStyle);
+
+        for (int c = 0; c <= 2; c++) sheet.autoSizeColumn(c);
+        sheet.createRow(rowIdx++);
+
         generateExcel(workbook, sheetName, tasks, reportType);
     }
 
