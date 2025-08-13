@@ -26,19 +26,21 @@
             <!--            <label><wicket:message key="PageReports.searchBy" /></label>-->
             <!--        </div>-->
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" wicket:id="customerSearch"/>&nbsp;
-                <label class="form-check-label"><wicket:message key="CustomerProjectPartSearchPanel.customerSearch"/></label>
+                <input class="form-check-input" type="checkbox" wicket:id="customerSearch"/>
+                <label class="form-check-label"><wicket:message key="CustomerProjectPartSearchPanel.customerSearch"/>
+                </label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" wicket:id="projectSearch"/>&nbsp;
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" wicket:id="partSearch"/>
-                <label class="form-check-label"><wicket:message key="CustomerProjectPartSearchPanel.partSearch"/></label>
+                <input class="form-check-input" type="checkbox" wicket:id="projectSearch"/>
+                <label class="form-check-label">
+                    <wicket:message key="CustomerProjectPartSearchPanel.projectSearch"/>
+                </label>
             </div>
         </div>
-        <label wicket:id="label"><wicket:message key="CustomerProjectPartSearchPanel.customerProjectPart"/></label>
-        <select class="form-control" wicket:id="customer"/>
+        <label wicket:id="label">
+            <wicket:message key="CustomerProjectPartSearchPanel.customerProjectPart"/>
+        </label>
+        <select class="form-control" wicket:id="customer"></select>
     </div>
 </wicket:panel>
 </html>
