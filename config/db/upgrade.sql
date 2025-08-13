@@ -27,3 +27,5 @@ ADD COLUMN allocation FLOAT4 NOT NULL DEFAULT 1;
 ALTER TABLE g_abstract_task
     ADD COLUMN from_time TIME,
     ADD COLUMN to_time TIME;
+
+UPDATE g_project SET off = true WHERE id = 30203;
