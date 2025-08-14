@@ -1,6 +1,5 @@
 package com.evolveum.gizmo.component.modal;
 
-import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.data.AbstractTask;
 import com.evolveum.gizmo.data.QAbstractTask;
 import com.evolveum.gizmo.data.User;
@@ -11,159 +10,44 @@ import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.PartSummary;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.util.LoadableModel;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
-import org.apache.wicket.behavior.AttributeAppender;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.link.DownloadLink;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.poi.xssf.usermodel.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.Serial;
-import java.time.Duration;
+import org.apache.wicket.model.IModel;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto> {
+public class DownloadSalesReportConfigPanel extends AbstractExcelDownloadPanel {
 
-    private static final String ID_PER_USER = "perUser";
-    private static final String ID_REPORT_NAME = "reportName";
-    private TextField<String> reportNameField;
-    private IModel<DownloadSettingsDto> downloadModel;
+    private static final Set<String> EXCLUDED_METHODS = Set.of("getFrom","getTo","getTrackId");
 
     public DownloadSalesReportConfigPanel(String id, IModel<ReportFilterDto> model) {
         super(id, model);
     }
 
+    @Override protected String filePrefix() { return "sales"; }
+
+    @Override protected String contextSuffix(ReportFilterDto f) {
+        return f.getRealizators().size() == 1 ? slug(f.getRealizators().getFirst().getFamilyName()) : "";
+    }
+
+    @Override protected boolean supportsPerUser() { return true; }
+
     @Override
-    protected void initLayout() {
-        downloadModel = new LoadableModel<>(false) {
-            private DownloadSettingsDto cache;
-            @Override
-            protected DownloadSettingsDto load() {
-                if (cache == null) {
-                    cache = new DownloadSettingsDto();
-                    cache.setReportName(defaultFileName(getModelObject()));
-
-                }
-                return cache;
-            }
-            @Override
-            public void detach() {}
-        };
-
-        Form<DownloadSettingsDto> form = new Form<>("form");
-        add(form);
-
-        reportNameField = new TextField<>(ID_REPORT_NAME,
-                new PropertyModel<>(downloadModel, DownloadSettingsDto.F_REPORT_NAME));
-        reportNameField.setOutputMarkupId(true);
-        form.add(reportNameField);
-
-        AjaxCheckBox perUser = new AjaxCheckBox(ID_PER_USER,
-                new PropertyModel<>(downloadModel, DownloadSettingsDto.F_PER_USER)) {
-            @Override
-            protected void onUpdate(AjaxRequestTarget target) {
-                target.add(reportNameField);
-            }
-        };
-        form.add(perUser);
-
-        DownloadLink exportExcel = new DownloadLink("export",
-                createDownloadReportModel(),
-                () -> {
-                    DownloadSettingsDto s = downloadModel.getObject();
-                    return defaultFileName(getModelObject());
-                })
-                .setCacheDuration(Duration.ofMillis(0))
-                .setDeleteAfterDownload(true);
-
-        exportExcel.add(new AttributeAppender("onclick", Model.of("$('.modal.show').modal('hide');"), ";"
-        ));
-        form.add(exportExcel);
-    }
-
-    private String defaultFileName(ReportFilterDto filter) {
-        LocalDate from = filter.getDateFrom();
-        LocalDate to = filter.getDateTo();
-        String realizatorPart = "";
-        if (filter.getRealizators().size() == 1) {
-            User u = filter.getRealizators().getFirst();
-            String last = u.getFamilyName();
-            realizatorPart = "-" + slug(last);
-        }
-        String range = (from.toString() + "_" + (to.toString()));
-        return ("sales-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_").replaceAll("--", "-");
-    }
-
-    private static String slug(String s) {
-        if (s == null || s.isBlank()) return "";
-        String noDia = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD)
-                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-        String cleaned = noDia.replaceAll("[^A-Za-z0-9._-]+", "-")
-                .replaceAll("[-_]{2,}", "-")
-                .replaceAll("(^-|-$)", "");
-        return cleaned.toLowerCase(java.util.Locale.ROOT);
-    }
-
-    public void syncReportNameWithFilter(AjaxRequestTarget target) {
-        String fresh = defaultFileName(getModelObject());
-        downloadModel.getObject().setReportName(fresh);
-        if (reportNameField != null) {
-            target.add(reportNameField);
-        }
-    }
-
-    private IModel<File> createDownloadReportModel() {
-        return new IModel<>() {
-            @Serial
-            private static final long serialVersionUID = 1L;
-            @Override
-            public File getObject() {
-                File tempFile = new File("sales.xlsx");
-                generateExcelReport(tempFile, downloadModel.getObject());
-                return tempFile;
-            }
-        };
-    }
-
-    private void generateExcelReport(File tempFile, DownloadSettingsDto downloadSettings) {
-        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            ReportFilterDto filterDto = getModelObject();
-
-            if (downloadSettings.isPerUser()) {
-                generateReportPerUser(workbook, filterDto);
-            } else {
-                generateUsersReport(workbook, "Sales report", filterDto, ReportType.GENERIC);
-            }
-
-            try (FileOutputStream os = new FileOutputStream(tempFile)) {
-                workbook.write(os);
-            }
-        } catch (Exception e) {
-            handleGuiExceptionFromPanel("Message.couldntGenerateReport", e, null);
+    protected void generateWorkbook(XSSFWorkbook wb, ReportFilterDto f, boolean perUser) throws Exception {
+        if (perUser) {
+            generateReportPerUser(wb, f);
+        } else {
+            generateUsersReport(wb, "Sales report", f, ReportType.GENERIC);
         }
     }
 
@@ -183,12 +67,8 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
         JPAQuery<Work> query = GizmoUtils.createWorkQuery(getPageTemplate().getEntityManager());
         BooleanBuilder predicates = new BooleanBuilder(task.realizator.name.eq(realizator.getName()));
 
-        if (filterDto.getDateFrom() != null) {
-            predicates.and(task.date.goe(filterDto.getDateFrom()));
-        }
-        if (filterDto.getDateTo() != null) {
-            predicates.and(task.date.loe(filterDto.getDateTo()));
-        }
+        if (filterDto.getDateFrom() != null) predicates.and(task.date.goe(filterDto.getDateFrom()));
+        if (filterDto.getDateTo() != null) predicates.and(task.date.loe(filterDto.getDateTo()));
         if (CollectionUtils.isNotEmpty(filterDto.getCustomerProjectPartDtos())) {
             BooleanBuilder projectPredicate = new BooleanBuilder();
             for (CustomerProjectPartDto project : filterDto.getCustomerProjectPartDtos()) {
@@ -205,21 +85,18 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
         List<AbstractTask> tasks = listLoggedWork(filterDto);
 
         XSSFSheet sheet = getSheet(workbook, sheetName);
-        CellStyle header = createHeaderDefaultStyle(workbook);
-        CellStyle text = createDefaultCellStyle(workbook);
+        CellStyle header = headerStyle(workbook);
+        CellStyle text = textStyle(workbook);
 
         int rowIdx = 0;
 
         XSSFRow head = sheet.createRow(rowIdx++);
         XSSFCell h0 = head.createCell(0, CellType.STRING);
-        h0.setCellValue("User");
-        h0.setCellStyle(header);
+        h0.setCellValue("User"); h0.setCellStyle(header);
         XSSFCell h1 = head.createCell(1, CellType.STRING);
-        h1.setCellValue("Project");
-        h1.setCellStyle(header);
+        h1.setCellValue("Project"); h1.setCellStyle(header);
         XSSFCell h2 = head.createCell(2, CellType.STRING);
-        h2.setCellValue("Time (h)");
-        h2.setCellStyle(header);
+        h2.setCellValue("Time (h)"); h2.setCellStyle(header);
 
         SummaryPartsDataProvider provider = new SummaryPartsDataProvider(getPageTemplate());
         List<PartSummary> rows = provider.createSummary(filterDto);
@@ -227,43 +104,28 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
         double totalHours = 0d;
         for (PartSummary s : rows) {
             XSSFRow r = sheet.createRow(rowIdx++);
-
             XSSFCell c0 = r.createCell(0, CellType.STRING);
-            c0.setCellValue(s.getFullName());       // User
-            c0.setCellStyle(text);
-
+            c0.setCellValue(s.getFullName()); c0.setCellStyle(text);
             XSSFCell c1 = r.createCell(1, CellType.STRING);
-            c1.setCellValue(s.getName());           // Project (z PartSummary.name)
-            c1.setCellStyle(text);
-
+            c1.setCellValue(s.getName()); c1.setCellStyle(text);
             XSSFCell c2 = r.createCell(2, CellType.NUMERIC);
-            c2.setCellValue(s.getLength());         // Time v hodinách (TaskLength.length)
-            c2.setCellStyle(text);
-
+            c2.setCellValue(s.getLength()); c2.setCellStyle(text);
             totalHours += s.getLength();
         }
 
-        CellStyle sumStyle = createHeaderDefaultStyle(workbook);
+        CellStyle sumStyle = headerStyle(workbook);
         XSSFRow sumRow = sheet.createRow(rowIdx++);
         sheet.addMergedRegion(new CellRangeAddress(rowIdx - 1, rowIdx - 1, 0, 1));
         XSSFCell sumLabel = sumRow.createCell(0, CellType.STRING);
-        sumLabel.setCellValue("Summary");
-        sumLabel.setCellStyle(sumStyle);
+        sumLabel.setCellValue("Summary"); sumLabel.setCellStyle(sumStyle);
         XSSFCell totalCell = sumRow.createCell(2, CellType.NUMERIC);
-        totalCell.setCellValue(totalHours);
-        totalCell.setCellStyle(sumStyle);
+        totalCell.setCellValue(totalHours); totalCell.setCellStyle(sumStyle);
 
         for (int c = 0; c <= 2; c++) sheet.autoSizeColumn(c);
         sheet.createRow(rowIdx++);
 
         generateExcel(workbook, sheetName, tasks, reportType);
     }
-
-    private static final Set<String> EXCLUDED_METHODS = Set.of(
-            "getFrom",
-            "getTo",
-            "getTrackId"
-    );
 
     private List<AbstractTask> listLoggedWork(ReportFilterDto filterDto) {
         QAbstractTask task = QAbstractTask.abstractTask;
@@ -301,38 +163,29 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
     }
 
     private <T> void generateExcel(XSSFWorkbook workbook, String sheetName, List<T> tasks, ReportType reportType) {
-        List<WorkCellType> cells = WorkCellType.getCellsForReport(reportType)
-                .stream()
-                .filter(c -> !EXCLUDED_METHODS.contains(c.getGetMethod()))
+        var cells = WorkCellType.getCellsForReport(reportType)
+                .stream().filter(c -> !EXCLUDED_METHODS.contains(c.getGetMethod()))
                 .collect(Collectors.toList());
-        List<CellDefinitionType> cellDefinitionTypes = new ArrayList<>();
+        var defs = new ArrayList<CellDefinitionType>();
 
         int j = 0;
         for (WorkCellType cell : cells) {
             Class<?> fieldType = cell.getType();
             CellStyle style = LocalDate.class.equals(fieldType)
-                    ? createDateStyle(workbook)
-                    : createDefaultCellStyle(workbook);
+                    ? dateStyle(workbook)
+                    : textStyle(workbook);
 
-            cellDefinitionTypes.add(new CellDefinitionType(
-                    cell.getDisplayName(),
-                    j,
-                    cell.getType(),
-                    style,
-                    cell.getGetMethod()
-            ));
+            defs.add(new CellDefinitionType(cell.getDisplayName(), j, cell.getType(), style, cell.getGetMethod()));
             j++;
         }
 
         int startRowNumber = 0;
         XSSFSheet sheet = getSheet(workbook, sheetName);
-        if (sheet.getLastRowNum() != 0) {
-            startRowNumber = sheet.getLastRowNum() + 2;
-        }
+        if (sheet.getLastRowNum() != 0) startRowNumber = sheet.getLastRowNum() + 2;
 
         XSSFRow header = sheet.createRow(startRowNumber);
-        CellStyle headerStyle = createHeaderDefaultStyle(workbook);
-        for (CellDefinitionType def : cellDefinitionTypes) {
+        CellStyle headerStyle = headerStyle(workbook);
+        for (CellDefinitionType def : defs) {
             XSSFCell headerCell = header.createCell(def.getPosition(), CellType.STRING);
             headerCell.setCellValue(def.getDisplayName());
             headerCell.setCellStyle(headerStyle);
@@ -341,7 +194,7 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
         for (int i = 0; i < tasks.size(); i++) {
             T workTask = tasks.get(i);
             XSSFRow row = sheet.createRow(startRowNumber + i + 1);
-            for (CellDefinitionType def : cellDefinitionTypes) {
+            for (CellDefinitionType def : defs) {
                 XSSFCell cell = row.createCell(def.getPosition(), def.getCellType());
                 cell.setCellStyle(def.getStyle());
                 try {
@@ -358,46 +211,4 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
             }
         }
     }
-
-    private CellStyle createHeaderDefaultStyle(XSSFWorkbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        style.setBorderBottom(BorderStyle.MEDIUM);
-        style.setBorderLeft(BorderStyle.MEDIUM);
-        style.setBorderRight(BorderStyle.MEDIUM);
-        style.setBorderTop(BorderStyle.MEDIUM);
-        style.setShrinkToFit(true);
-        Font font = workbook.createFont();
-        font.setBold(true);
-        style.setFont(font);
-        return style;
-    }
-
-    private CellStyle createDefaultCellStyle(XSSFWorkbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setWrapText(true);
-        return style;
-    }
-
-    private CellStyle createDateStyle(XSSFWorkbook workbook) {
-        CellStyle dateStyle = createDefaultCellStyle(workbook);
-        CreationHelper createHelper = workbook.getCreationHelper();
-        dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy"));
-        return dateStyle;
-    }
-
-    private XSSFSheet getSheet(XSSFWorkbook workbook, String sheetName) {
-        XSSFSheet sheet = workbook.getSheet(sheetName);
-        if (sheet == null) {
-            sheet = workbook.createSheet(sheetName);
-            sheet.setDefaultColumnWidth(20);
-            sheet.getPrintSetup().setLandscape(true);
-            sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A4_PAPERSIZE);
-        }
-        return sheet;
-    }
 }
-

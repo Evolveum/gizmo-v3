@@ -1,6 +1,5 @@
 package com.evolveum.gizmo.component.modal;
 
-import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.data.AbstractTask;
 import com.evolveum.gizmo.data.QAbstractTask;
 import com.evolveum.gizmo.data.User;
@@ -9,163 +8,48 @@ import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.util.LoadableModel;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
-import org.apache.wicket.behavior.AttributeAppender;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.link.DownloadLink;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.poi.xssf.usermodel.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.Serial;
-import java.time.Duration;
+import org.apache.wicket.model.IModel;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterDto> {
-
-    private static final String ID_PER_USER = "perUser";
-    private static final String ID_REPORT_NAME = "reportName";
-    private TextField<String> reportNameField;
-    private IModel<DownloadSettingsDto> downloadModel;
+public class DownloadOverviewReportConfigPanel extends AbstractExcelDownloadPanel {
 
     public DownloadOverviewReportConfigPanel(String id, IModel<ReportFilterDto> model) {
         super(id, model);
     }
 
+    @Override protected String filePrefix() { return "overview"; }
+
+    @Override protected String contextSuffix(ReportFilterDto f) {
+        return f.getRealizators().size() == 1 ? slug(f.getRealizators().getFirst().getFamilyName()) : "";
+    }
+
+    @Override protected boolean supportsPerUser() { return true; }
+
     @Override
-    protected void initLayout() {
-        downloadModel = new LoadableModel<>(false) {
-            private DownloadSettingsDto cache;
-            @Override
-            protected DownloadSettingsDto load() {
-                if (cache == null) {
-                    cache = new DownloadSettingsDto();
-                    cache.setReportName(defaultFileName(getModelObject()));
-
-                }
-                return cache;
-            }
-            @Override
-            public void detach() {
-            }
-        };
-
-        Form<DownloadSettingsDto> form = new Form<>("form");
-        add(form);
-
-        reportNameField = new TextField<>(ID_REPORT_NAME,
-                new PropertyModel<>(downloadModel, DownloadSettingsDto.F_REPORT_NAME));
-        reportNameField.setOutputMarkupId(true);
-        form.add(reportNameField);
-
-        AjaxCheckBox perUser = new AjaxCheckBox(ID_PER_USER,
-                new PropertyModel<>(downloadModel, DownloadSettingsDto.F_PER_USER)) {
-            @Override
-            protected void onUpdate(AjaxRequestTarget target) {
-                target.add(reportNameField);
-            }
-        };
-        form.add(perUser);
-
-        DownloadLink exportExcel = new DownloadLink("export",
-                createDownloadReportModel(),
-                () -> {
-                    DownloadSettingsDto s = downloadModel.getObject();
-                    return defaultFileName(getModelObject());
-                })
-                .setCacheDuration(Duration.ofMillis(0))
-                .setDeleteAfterDownload(true);
-
-        exportExcel.add(new AttributeAppender("onclick", Model.of("$('.modal.show').modal('hide');"), ";"
-        ));
-        form.add(exportExcel);
-    }
-
-    public void syncReportNameWithFilter(AjaxRequestTarget target) {
-        String fresh = defaultFileName(getModelObject());
-        downloadModel.getObject().setReportName(fresh);
-        if (reportNameField != null) {
-            target.add(reportNameField);
-        }
-    }
-
-    private String defaultFileName(ReportFilterDto filter) {
-        LocalDate from = filter.getDateFrom();
-        LocalDate to = filter.getDateTo();
-        String realizatorPart = "";
-        if (filter.getRealizators().size() == 1) {
-            User u = filter.getRealizators().getFirst();
-            String last = u.getFamilyName();
-            realizatorPart = "-" + slug(last);
-        }
-        String range = (from.toString() + "_" + (to.toString()));
-        return ("overview-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_").replaceAll("--", "-");
-    }
-
-    private static String slug(String s) {
-        if (s == null || s.isBlank()) return "";
-        String noDia = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD)
-                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-        String cleaned = noDia.replaceAll("[^A-Za-z0-9._-]+", "-")
-                .replaceAll("[-_]{2,}", "-")
-                .replaceAll("(^-|-$)", "");
-        return cleaned.toLowerCase(java.util.Locale.ROOT);
-    }
-
-    private IModel<File> createDownloadReportModel() {
-        return new IModel<>() {
-            @Serial
-            private static final long serialVersionUID = 1L;
-            @Override
-            public File getObject() {
-                File tempFile = new File("overview.xlsx");
-                generateExcelReport(tempFile, downloadModel.getObject());
-                return tempFile;
-            }
-        };
-    }
-
-    private void generateExcelReport(File tempFile, DownloadSettingsDto downloadSettings) {
-        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            ReportFilterDto filterDto = getModelObject();
-
-            if (downloadSettings.isPerUser()) {
-                generateReportPerUser(workbook, filterDto);
-            } else {
-                generateUsersReport(workbook, "Overview report", filterDto, ReportType.GENERIC);
-            }
-
-            try (FileOutputStream os = new FileOutputStream(tempFile)) {
-                workbook.write(os);
-            }
-        } catch (Exception e) {
-            handleGuiExceptionFromPanel("Message.couldntGenerateReport", e, null);
+    protected void generateWorkbook(XSSFWorkbook wb, ReportFilterDto f, boolean perUser) throws Exception {
+        if (perUser) {
+            generateReportPerUser(wb, f);
+        } else {
+            generateUsersReport(wb, "Overview report", f);
         }
     }
 
     private void generateReportPerUser(XSSFWorkbook workbook, ReportFilterDto filterDto) {
         List<User> realizators = filterDto.getRealizators().isEmpty() ?
                 getPageTemplate().getUserRepository().findAllEnabledUsers() : filterDto.getRealizators();
+
         for (User realizator : realizators) {
             List<AbstractTask> tasks = loadWork(realizator, filterDto);
             if (tasks.isEmpty()) continue;
@@ -179,12 +63,8 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
         JPAQuery<Work> query = GizmoUtils.createWorkQuery(getPageTemplate().getEntityManager());
         BooleanBuilder predicates = new BooleanBuilder(task.realizator.name.eq(realizator.getName()));
 
-        if (filterDto.getDateFrom() != null) {
-            predicates.and(task.date.goe(filterDto.getDateFrom()));
-        }
-        if (filterDto.getDateTo() != null) {
-            predicates.and(task.date.loe(filterDto.getDateTo()));
-        }
+        if (filterDto.getDateFrom() != null) predicates.and(task.date.goe(filterDto.getDateFrom()));
+        if (filterDto.getDateTo() != null) predicates.and(task.date.loe(filterDto.getDateTo()));
         if (CollectionUtils.isNotEmpty(filterDto.getCustomerProjectPartDtos())) {
             BooleanBuilder projectPredicate = new BooleanBuilder();
             for (CustomerProjectPartDto project : filterDto.getCustomerProjectPartDtos()) {
@@ -196,10 +76,9 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
         return query.select(task).fetch();
     }
 
-    private void generateUsersReport(XSSFWorkbook workbook, String sheetName,
-                                     ReportFilterDto filterDto, ReportType reportType) {
+    private void generateUsersReport(XSSFWorkbook workbook, String sheetName, ReportFilterDto filterDto) {
         List<AbstractTask> tasks = listLoggedWork(filterDto);
-        generateExcel(workbook, sheetName, tasks, reportType);
+        generateExcel(workbook, sheetName, tasks, ReportType.GENERIC);
     }
 
     private List<AbstractTask> listLoggedWork(ReportFilterDto filterDto) {
@@ -245,15 +124,11 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
         for (WorkCellType cell : cells) {
             Class<?> fieldType = cell.getType();
             CellStyle style = LocalDate.class.equals(fieldType)
-                    ? createDateStyle(workbook)
-                    : createDefaultCellStyle(workbook);
+                    ? dateStyle(workbook)
+                    : textStyle(workbook);
 
             cellDefinitionTypes.add(new CellDefinitionType(
-                    cell.getDisplayName(),
-                    j,
-                    cell.getType(),
-                    style,
-                    cell.getGetMethod()
+                    cell.getDisplayName(), j, cell.getType(), style, cell.getGetMethod()
             ));
             j++;
         }
@@ -265,7 +140,7 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
         }
 
         XSSFRow header = sheet.createRow(startRowNumber);
-        CellStyle headerStyle = createHeaderDefaultStyle(workbook);
+        CellStyle headerStyle = headerStyle(workbook);
         for (CellDefinitionType def : cellDefinitionTypes) {
             XSSFCell headerCell = header.createCell(def.getPosition(), CellType.STRING);
             headerCell.setCellValue(def.getDisplayName());
@@ -292,46 +167,4 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
             }
         }
     }
-
-    private CellStyle createHeaderDefaultStyle(XSSFWorkbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        style.setBorderBottom(BorderStyle.MEDIUM);
-        style.setBorderLeft(BorderStyle.MEDIUM);
-        style.setBorderRight(BorderStyle.MEDIUM);
-        style.setBorderTop(BorderStyle.MEDIUM);
-        style.setShrinkToFit(true);
-        Font font = workbook.createFont();
-        font.setBold(true);
-        style.setFont(font);
-        return style;
-    }
-
-    private CellStyle createDefaultCellStyle(XSSFWorkbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setWrapText(true);
-        return style;
-    }
-
-    private CellStyle createDateStyle(XSSFWorkbook workbook) {
-        CellStyle dateStyle = createDefaultCellStyle(workbook);
-        CreationHelper createHelper = workbook.getCreationHelper();
-        dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy"));
-        return dateStyle;
-    }
-
-    private XSSFSheet getSheet(XSSFWorkbook workbook, String sheetName) {
-        XSSFSheet sheet = workbook.getSheet(sheetName);
-        if (sheet == null) {
-            sheet = workbook.createSheet(sheetName);
-            sheet.setDefaultColumnWidth(20);
-            sheet.getPrintSetup().setLandscape(true);
-            sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A4_PAPERSIZE);
-        }
-        return sheet;
-    }
 }
-

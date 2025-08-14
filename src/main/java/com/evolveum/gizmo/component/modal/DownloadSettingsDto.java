@@ -47,4 +47,8 @@ public class DownloadSettingsDto implements Serializable {
 
     public void setReportName(String reportName) { this.reportName = reportName; }
 
+    public String getReportName() { return reportName; }
+
+    public void setPerUser(boolean perUser) { this.perUser = perUser; }
+
 }
