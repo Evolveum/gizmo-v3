@@ -6,9 +6,12 @@ import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponentLabel;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.*;
@@ -81,13 +84,14 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
             reportNameField.setOutputMarkupId(true);
             form.add(reportNameField);
 
-            form.add(new org.apache.wicket.ajax.markup.html.form.AjaxCheckBox(
-                    ID_PER_USER, new PropertyModel<>(downloadModel, DownloadSettingsDto.F_PER_USER)) {
-                @Override
-                protected void onUpdate(AjaxRequestTarget target) {
-                    target.add(reportNameField);
-                }
-            });
+            AjaxCheckBox perUser = new AjaxCheckBox(ID_PER_USER,
+                    new PropertyModel<Boolean>(downloadModel, DownloadSettingsDto.F_PER_USER)) {
+                @Override protected void onUpdate(AjaxRequestTarget target) { target.add(reportNameField); }
+            };
+            perUser.setOutputMarkupId(true);
+            form.add(perUser);
+
+            form.add(new FormComponentLabel("perUserLabel", perUser));
         } else {
             IModel<String> nameModel = new LoadableDetachableModel<>() {
                 @Override protected String load() {
@@ -99,6 +103,7 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
             };
             reportNameField.setOutputMarkupId(true);
             form.add(reportNameField);
+
         }
     }
 

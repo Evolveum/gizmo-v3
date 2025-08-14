@@ -31,7 +31,7 @@ public class ProjectSearchSettings implements Serializable {
 
     private boolean customerSearch = true;
     private boolean projectSearch = true;
-    private boolean partSearch = true;
+    private boolean partSearch = false;
     private List<CustomerProjectPartDto> customerProjectPartDtoList = new ArrayList<>();
 
     public ProjectSearchSettings(boolean customerSearch, boolean projectSearch, boolean partSearch) {

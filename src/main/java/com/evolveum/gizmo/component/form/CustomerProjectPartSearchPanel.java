@@ -74,7 +74,7 @@ public class CustomerProjectPartSearchPanel extends SimplePanel<ProjectSearchSet
         projectSearch.setOutputMarkupId(true);
         add(projectSearch);
 
-        /*
+
         AjaxCheckBox partSearch = new AjaxCheckBox(ID_PART_SEARCH, new PropertyModel<>(getModel(), ProjectSearchSettings.F_PART_SEARCH)) {
             @Override
             protected void onUpdate(AjaxRequestTarget target) {
@@ -94,8 +94,7 @@ public class CustomerProjectPartSearchPanel extends SimplePanel<ProjectSearchSet
         });
         partSearch.setOutputMarkupId(true);
         add(partSearch);
-        */
-        
+
         MultiselectDropDownInput<CustomerProjectPartDto> customerCombo = new MultiselectDropDownInput<>(ID_CUSTOMER,
                 new PropertyModel<>(getModel(), ProjectSearchSettings.F_CUSTOMER),
                 availabelProjects,
