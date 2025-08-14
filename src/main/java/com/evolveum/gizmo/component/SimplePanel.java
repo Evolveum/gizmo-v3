@@ -18,11 +18,17 @@
 package com.evolveum.gizmo.component;
 
 import com.evolveum.gizmo.web.app.PageAppTemplate;
+import com.evolveum.gizmo.web.error.PageError;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.wicket.Page;
+import org.apache.wicket.RestartResponseException;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author lazyman
@@ -113,7 +119,18 @@ public class SimplePanel<T> extends Panel {
         return StringUtils.join(components, ":");
     }
 
-    protected void initLayout() {
+    protected void initLayout() {}
 
+    protected void handleGuiExceptionFromPanel(String message, Exception e, AjaxRequestTarget target) {
+        if (target == null) {
+            target = RequestCycle.get().find(AjaxRequestTarget.class).orElse(null);
+        }
+        Page page = getPage();
+        if (page instanceof PageAppTemplate tem) {
+            tem.handleGuiException(tem, message, e, target);
+        } else {
+            LoggerFactory.getLogger(getClass()).error("Error", e);
+        }
     }
+
 }

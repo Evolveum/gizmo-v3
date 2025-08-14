@@ -34,6 +34,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.wicket.request.cycle.RequestCycle;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -162,7 +163,7 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
                 workbook.write(os);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            handleGuiExceptionFromPanel("Message.couldntGenerateReport", e, null);
         }
     }
 
@@ -352,7 +353,7 @@ public class DownloadSalesReportConfigPanel extends SimplePanel<ReportFilterDto>
                     }
                     cell.setCellValue(value == null ? "" : value.toString());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    handleGuiExceptionFromPanel("Message.couldntGenerateReport", e, null);
                 }
             }
         }

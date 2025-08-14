@@ -7,6 +7,7 @@ import com.evolveum.gizmo.dto.UserSummary;
 import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
@@ -14,6 +15,7 @@ import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.cycle.RequestCycle;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -137,7 +139,7 @@ public class DownloadTimeoffReportConfigPanel extends SimplePanel<ReportFilterDt
                 workbook.write(os);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            handleGuiExceptionFromPanel("Message.couldntGenerateReport", e, null);
         }
     }
 

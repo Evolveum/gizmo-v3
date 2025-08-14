@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.cycle.RequestCycle;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -118,7 +119,7 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
             realizatorPart = "-" + slug(last);
         }
         String range = (from.toString() + "_" + (to.toString()));
-        return ("overview-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_");
+        return ("overview-" + realizatorPart + "-" + range + ".xlsx").replaceAll("__", "_").replaceAll("--", "-");
     }
 
     private static String slug(String s) {
@@ -158,7 +159,7 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
                 workbook.write(os);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            handleGuiExceptionFromPanel("Message.couldntGenerateReport", e, null);
         }
     }
 
@@ -286,7 +287,7 @@ public class DownloadOverviewReportConfigPanel extends SimplePanel<ReportFilterD
                     }
                     cell.setCellValue(value == null ? "" : value.toString());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    handleGuiExceptionFromPanel("Message.couldntGenerateReport", e, null);
                 }
             }
         }
