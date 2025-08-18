@@ -52,12 +52,20 @@ public class DownloadSalesReportConfigPanel extends AbstractExcelDownloadPanel {
     }
 
     private void generateReportPerUser(XSSFWorkbook workbook, ReportFilterDto filterDto) {
-        List<User> realizators = filterDto.getRealizators().isEmpty() ?
-                getPageTemplate().getUserRepository().findAllEnabledUsers() : filterDto.getRealizators();
+        List<User> realizators = filterDto.getRealizators().isEmpty()
+                ? getPageTemplate().getUserRepository().findAllEnabledUsers()
+                : filterDto.getRealizators();
+
         for (User realizator : realizators) {
             List<AbstractTask> tasks = loadWork(realizator, filterDto);
             if (tasks.isEmpty()) continue;
+
             String sheetName = realizator.getFullName() + "(" + realizator.getId() + ")";
+            XSSFSheet sheet = getSheet(workbook, sheetName);
+
+            ReportFilterDto perUserFilter = filterForSingleRealizator(filterDto, realizator);
+            writeSummaryTable(workbook, sheet, perUserFilter);
+
             generateExcel(workbook, sheetName, tasks, ReportType.GENERIC);
         }
     }
@@ -85,10 +93,17 @@ public class DownloadSalesReportConfigPanel extends AbstractExcelDownloadPanel {
         List<AbstractTask> tasks = listLoggedWork(filterDto);
 
         XSSFSheet sheet = getSheet(workbook, sheetName);
+
+        writeSummaryTable(workbook, sheet, filterDto);
+
+        generateExcel(workbook, sheetName, tasks, reportType);
+    }
+
+    private void writeSummaryTable(XSSFWorkbook workbook, XSSFSheet sheet, ReportFilterDto filterDto) {
         CellStyle header = headerStyle(workbook);
         CellStyle text = textStyle(workbook);
 
-        int rowIdx = 0;
+        int rowIdx = 1;
 
         XSSFRow head = sheet.createRow(rowIdx++);
         XSSFCell h0 = head.createCell(0, CellType.STRING);
@@ -122,9 +137,17 @@ public class DownloadSalesReportConfigPanel extends AbstractExcelDownloadPanel {
         totalCell.setCellValue(totalHours); totalCell.setCellStyle(sumStyle);
 
         for (int c = 0; c <= 2; c++) sheet.autoSizeColumn(c);
-        sheet.createRow(rowIdx++);
 
-        generateExcel(workbook, sheetName, tasks, reportType);
+        sheet.createRow(rowIdx++);
+    }
+
+    private ReportFilterDto filterForSingleRealizator(ReportFilterDto base, User realizator) {
+        ReportFilterDto f = new ReportFilterDto();
+        f.setDateFrom(base.getDateFrom());
+        f.setDateTo(base.getDateTo());
+        f.setCustomerProjectPartDtos(base.getCustomerProjectPartDtos());
+        f.setRealizators(List.of(realizator));
+        return f;
     }
 
     private List<AbstractTask> listLoggedWork(ReportFilterDto filterDto) {

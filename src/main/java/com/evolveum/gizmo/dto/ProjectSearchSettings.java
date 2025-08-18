@@ -63,4 +63,12 @@ public class ProjectSearchSettings implements Serializable {
     public void setPartSearch(boolean partSearch) {
         this.partSearch = partSearch;
     }
+
+    public void setCustomerProjectPartDtoList(List<CustomerProjectPartDto> customerProjectPartDtoList) {
+        if (customerProjectPartDtoList == null) {
+            this.customerProjectPartDtoList = new ArrayList<>();
+        } else {
+            this.customerProjectPartDtoList = new ArrayList<>(customerProjectPartDtoList);
+        }
+    }
 }
