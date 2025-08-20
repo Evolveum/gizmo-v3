@@ -5,12 +5,14 @@ import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.component.modal.MainPopupDialog;
+import com.evolveum.gizmo.data.LabelPart;
 import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
+import com.evolveum.gizmo.util.LabelService;
 import com.evolveum.gizmo.web.app.PageAppTemplate;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
@@ -22,10 +24,14 @@ import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -39,6 +45,7 @@ public abstract class AbstractReportTab extends SimplePanel {
     protected static final String ID_TO = "to";
     protected static final String ID_REALIZATOR = "realizator";
     protected static final String ID_CUSTOMER = "customer";
+    protected static final String ID_LABELS = "labels";
 
     protected static final String ID_BTN_PREVIOUS = "previous";
     protected static final String ID_BTN_NEXT = "next";
@@ -48,6 +55,10 @@ public abstract class AbstractReportTab extends SimplePanel {
     protected static final String ID_EXPORT = "export";
     protected static final String ID_CONFIRM_DOWNLOAD = "confirmDownload";
 
+
+    @SpringBean
+    private LabelService labelService;
+    private ListMultipleChoice<LabelPart> labelsField;
     private IModel<ReportFilterDto> model;
     protected Form<?> form;
 
@@ -118,6 +129,29 @@ public abstract class AbstractReportTab extends SimplePanel {
             customerProjectSearchPanel.setOutputMarkupId(true);
             form.add(customerProjectSearchPanel);
         }
+
+        IChoiceRenderer<LabelPart> labelRenderer = new IChoiceRenderer<>() {
+            @Override public Object getDisplayValue(LabelPart l) { return l.getCode() + " — " + l.getName(); }
+            @Override public String getIdValue(LabelPart l, int index) { return String.valueOf(l.getId()); }
+            @Override public LabelPart getObject(String id, IModel<? extends List<? extends LabelPart>> choices) {
+                Long lid = Long.valueOf(id);
+                for (LabelPart lp : choices.getObject()) if (lp != null && lid.equals(lp.getId())) return lp;
+                return null;
+            }
+        };
+
+        LoadableDetachableModel<List<LabelPart>> labelsChoices = new LoadableDetachableModel<>() {
+            @Override protected List<LabelPart> load() { return labelService.findAllOrdered(); }
+        };
+
+        labelsField = new MultiselectDropDownInput<>(
+                ID_LABELS,
+                new PropertyModel<>(model, ReportFilterDto.F_LABELS),
+                labelsChoices,
+                labelRenderer
+        );
+        labelsField.setOutputMarkupId(true);
+        form.add(labelsField);
 
         form.add(new AjaxSubmitButton(ID_PREVIEW, createStringResource("PageReports.button.preview")) {
             @Override protected void onSubmit(AjaxRequestTarget target) {

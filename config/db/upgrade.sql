@@ -29,3 +29,15 @@ ALTER TABLE g_abstract_task
     ADD COLUMN to_time TIME;
 
 UPDATE g_project SET off = true WHERE id = 30203;
+
+CREATE TABLE g_label (
+    id   BIGSERIAL PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE g_part_label (
+    part_id  BIGINT NOT NULL REFERENCES g_part(id)   ON DELETE CASCADE,
+    label_id BIGINT NOT NULL REFERENCES g_label(id)  ON DELETE CASCADE,
+    PRIMARY KEY (part_id, label_id)
+);
