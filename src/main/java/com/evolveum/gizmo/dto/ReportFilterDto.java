@@ -17,14 +17,13 @@
 
 package com.evolveum.gizmo.dto;
 
+import com.evolveum.gizmo.data.LabelPart;
 import com.evolveum.gizmo.data.User;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class ReportFilterDto implements Serializable {
 
@@ -34,6 +33,7 @@ public class ReportFilterDto implements Serializable {
     public static final String F_CUSTOMER = "customer";
     public static final String F_REALIZATORS = "realizators";
     public static final String F_MONTH_YEAR = "monthYear";
+    public static final String F_LABELS = "labels";
 
     private LocalDate dateFrom;
     private LocalDate dateTo;
@@ -41,6 +41,9 @@ public class ReportFilterDto implements Serializable {
     private ProjectSearchSettings projectSearchSettings = new ProjectSearchSettings();
     private List<User> realizators;
     private WorkType workType = WorkType.ALL;
+
+    private List<LabelPart> labels = new ArrayList<>();
+    private Set<Long> labelIds = new HashSet<>();
 
     public LocalDate getDateFrom() {
         return dateFrom;
@@ -92,4 +95,27 @@ public class ReportFilterDto implements Serializable {
     public String getMonthYear() {
         return dateFrom.getMonth().getDisplayName(TextStyle.FULL, Locale.US) + " " + dateFrom.getYear();
     }
+
+    public List<LabelPart> getLabels() {
+        if (labels == null) labels = new ArrayList<>();
+        return labels;
+    }
+    public void setLabels(List<LabelPart> labels) {
+        this.labels = (labels != null) ? labels : new ArrayList<>();
+    }
+
+    public Set<Long> getLabelIds() {
+        if (labels != null && !labels.isEmpty()) {
+            return labels.stream()
+                    .filter(Objects::nonNull)
+                    .map(LabelPart::getId)
+                    .filter(Objects::nonNull)
+                    .collect(java.util.stream.Collectors.toCollection(java.util.LinkedHashSet::new));
+        }
+        return (labelIds != null) ? labelIds : new LinkedHashSet<>();
+    }
+    public void setLabelIds(Set<Long> ids) {
+        this.labelIds = (ids != null) ? ids : new LinkedHashSet<>();
+    }
 }
+

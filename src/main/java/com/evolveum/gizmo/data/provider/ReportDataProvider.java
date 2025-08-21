@@ -24,9 +24,11 @@ import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.dto.WorkType;
 import com.evolveum.gizmo.web.PageTemplate;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
@@ -121,33 +123,44 @@ public class ReportDataProvider extends SortableDataProvider<WorkDto, String> {
             list.add(task.type.eq(filter.getWorkType().getType()));
         }
 
-        List<CustomerProjectPartDto> allFilter = filter.getCustomerProjectPartDtos();
-        p = createProjectListPredicate(allFilter);
+        p = createProjectListPredicate(filter.getCustomerProjectPartDtos(), task);
         if (p != null) {
             list.add(p);
         }
 
+
+        if (filter.getLabelIds() != null && !filter.getLabelIds().isEmpty()) {
+            list.add(task.type.eq(WorkType.WORK.getType()));
+            QWork w = QWork.work;
+            list.add(
+                    JPAExpressions.selectOne()
+                            .from(w)
+                            .where(
+                                    w.id.eq(task.id)
+                                            .and(w.part.isNotNull())
+                                            .and(w.part.labels.any().id.in(filter.getLabelIds()))
+                            )
+                            .exists()
+            );
+        }
+        BooleanBuilder date = new BooleanBuilder();
         if (filter.getDateFrom() != null) {
-            list.add(task.date.goe(filter.getDateFrom()));
+            date.and(task.date.goe(filter.getDateFrom()));
         }
-
-        if (filter.getDateTo() != null) {
-            list.add(task.date.loe(filter.getDateTo()));
+        if (filter.getDateTo()   != null) {
+            date.and(task.date.loe(filter.getDateTo()));
         }
-
-        BooleanBuilder allWork = new BooleanBuilder();
+        if (date.getValue() != null) {
+            list.add(date);
+        }
 
         if (list.isEmpty()) {
             return null;
         }
 
-
-//        if (!list.isEmpty()) {
-            allWork.orAllOf(list.toArray(new Predicate[0]));
-//        }
-
-        return allWork;
-
+        BooleanBuilder where = new BooleanBuilder();
+        for (Predicate pr : list) { where.and(pr); }
+        return where;
     }
 
     public static List<Predicate> createTimeOffPredicates(ReportFilterDto filter) {
@@ -172,39 +185,65 @@ public class ReportDataProvider extends SortableDataProvider<WorkDto, String> {
         return list;
     }
 
-    private static Predicate createProjectListPredicate(List<CustomerProjectPartDto> list) {
+    private static Predicate createProjectListPredicate(List<CustomerProjectPartDto> list, QAbstractTask task) {
         if (list == null || list.isEmpty()) {
             return null;
         }
+        QWork w = QWork.work;
 
-        if (list.size() == 1) {
-            return createPredicate(list.get(0));
-        }
+        BooleanBuilder anyOf = new BooleanBuilder();
 
-        BooleanBuilder bb = new BooleanBuilder();
         for (CustomerProjectPartDto dto : list) {
-            bb.or(createPredicate(dto));
-        }
+            BooleanBuilder one = new BooleanBuilder();
 
-        return bb;
+            if (dto.getPartId() != null) {
+                one.and(w.part.isNotNull())
+                        .and(w.part.id.eq(dto.getPartId()));
+            }
+            if (dto.getProjectId() != null) {
+                one.and(w.part.isNotNull())
+                        .and(w.part.project.id.eq(dto.getProjectId()));
+            }
+            if (dto.getCustomerId() != null) {
+                one.and(w.part.isNotNull())
+                        .and(w.part.project.isNotNull())
+                        .and(w.part.project.customer.id.eq(dto.getCustomerId()));
+            }
+
+            if (one.hasValue()) {
+                anyOf.or(one);
+            }
+        }
+        if (!anyOf.hasValue()) {
+            return null;
+        }
+        return ExpressionUtils.allOf(
+                task.type.eq(WorkType.WORK.getType()),
+                JPAExpressions.selectOne()
+                        .from(w)
+                        .where(
+                                w.id.eq(task.id)
+                                        .and(anyOf)
+                        )
+                        .exists()
+        );
     }
 
     public static Predicate createPredicate(CustomerProjectPartDto dto) {
         BooleanBuilder bb = new BooleanBuilder();
 
         QAbstractTask task = QAbstractTask.abstractTask;
-        QLog log = task.as(QLog.class);
-        bb.or(log.customer.id.eq(dto.getCustomerId()));
-
         QWork work = task.as(QWork.class);
+        QLog log = task.as(QLog.class);
+
         if (dto.getPartId() != null) {
             bb.or(work.part.id.eq(dto.getPartId()));
         } else if (dto.getProjectId() != null) {
             bb.or(work.part.project.id.eq(dto.getProjectId()));
-        } else if (dto.getCustomerId() != null) {
-            bb.or(work.part.project.customer.id.eq(dto.getCustomerId()));
         }
-
+        if (dto.getCustomerId() != null) {
+            bb.or(log.customer.id.eq(dto.getCustomerId()));
+        }
         return bb;
     }
 

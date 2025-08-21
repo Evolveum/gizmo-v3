@@ -21,6 +21,8 @@ import com.evolveum.gizmo.util.GizmoUtils;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author lazyman
@@ -39,6 +41,7 @@ public class Part implements Serializable {
     private String description;
     private Project project;
     private String color;
+    private Set<LabelPart> labels = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "part_id")
@@ -114,4 +117,20 @@ public class Part implements Serializable {
         sb.append('}');
         return sb.toString();
     }
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "part_label",
+            joinColumns = @JoinColumn(name = "part_id",
+                    foreignKey = @ForeignKey(name = "fk_part_label_part")),
+            inverseJoinColumns = @JoinColumn(name = "label_id",
+                    foreignKey = @ForeignKey(name = "fk_part_label_label"))
+    )
+    public Set<LabelPart> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Set<LabelPart> labels) { this.labels = labels; }
+    public void addLabel(LabelPart l) { this.labels.add(l); }
+    public void removeLabel(LabelPart l) { this.labels.remove(l); }
 }
