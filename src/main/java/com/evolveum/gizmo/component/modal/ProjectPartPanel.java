@@ -18,11 +18,8 @@
 package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.SimplePanel;
-import com.evolveum.gizmo.component.form.AreaFormGroup;
-import com.evolveum.gizmo.component.form.FormGroup;
 import com.evolveum.gizmo.component.form.IconButton;
 import com.evolveum.gizmo.data.Part;
-import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.util.ColorUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
@@ -35,22 +32,13 @@ import org.apache.wicket.model.PropertyModel;
  * @author lazyman
  */
 public class ProjectPartPanel extends SimplePanel<Part> {
-//        extends ModalDialog {
-//
-    private static final String ID_LABEL = "label";
+
     private static final String ID_NAME = "name";
     private static final String ID_DESCRIPTION = "description";
     private static final String ID_COLOR = "color";
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
-    private static final String ID_PROJECT = "project";
     private static final String ID_FORM = "form";
-
-//    private IModel<Part> partModel;
-
-//    public ProjectPartPanel(String id, ) {
-//        this(id, new Model<>(new Part()));
-//    }
 
     public ProjectPartPanel(String id, IModel<Part> partModel) {
         super(id, partModel);
@@ -58,10 +46,6 @@ public class ProjectPartPanel extends SimplePanel<Part> {
         if (part.getColor() == null || part.getColor().isBlank()) {
             part.setColor(ColorUtils.getRandomFromPalette());
         }
-//        this.partModel = partModel;
-
-//        header(createTitle());
-
     }
 
 
@@ -120,42 +104,10 @@ public class ProjectPartPanel extends SimplePanel<Part> {
         };
 
         form.add(save);
-
-//        AjaxSubmitButton save = new AjaxSubmitButton(ID_SA,
-//                createStringResource("GizmoApplication.button.save"), Buttons.Type.Primary) {
-//
-//            @Override
-//            protected void onSubmit(AjaxRequestTarget target) {
-//                savePerformed(target, partModel);
-//            }
-//
-//            @Override
-//            protected void onError(AjaxRequestTarget target) {
-//                target.add(name, description);
-//            }
-//        };
-//        addButton(save);
     }
-
-//    public Part getPart() {
-//        return partModel.getObject();
-//    }
-
-//    public IModel<Part> getPartModel() {
-//        return partModel;
-//    }
-//
-//    public void setPart(Part part) {
-//        this.partModel.setObject(part);
-//    }
-
-//    private IModel<String> createStringResource(String key) {
-//        return new StringResourceModel(key, this, null);
-//    }
 
     protected void cancelPerformed(AjaxRequestTarget target) {
-//        close(target);
-    }
+   }
 
     protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {
 //        close(target);

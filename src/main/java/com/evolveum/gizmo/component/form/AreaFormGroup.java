@@ -17,8 +17,6 @@
 
 package com.evolveum.gizmo.component.form;
 
-import org.apache.wicket.behavior.AttributeAppender;
-import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
 
 import java.io.Serializable;
@@ -33,11 +31,8 @@ public class AreaFormGroup<T extends Serializable> extends FormGroup<TextAreaInp
     }
 
     @Override
-    protected FormInput createInput(String componentId, IModel<T> model, IModel<String> placeholder) {
+    protected FormInput createInput(String componentId, IModel<T> model) {
         TextAreaInput textInput = new TextAreaInput(componentId, model);
-        FormComponent input = textInput.getFormComponent();
-        input.add(AttributeAppender.replace("placeholder", placeholder));
-
         return textInput;
     }
 

@@ -16,6 +16,7 @@
  */
 package com.evolveum.gizmo;
 
+import com.evolveum.gizmo.security.GizmoAuthProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -25,13 +26,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import com.evolveum.gizmo.security.GizmoAuthProvider;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig { //} extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
 
     @Bean

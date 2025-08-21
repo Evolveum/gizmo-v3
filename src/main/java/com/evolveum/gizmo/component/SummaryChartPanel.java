@@ -20,11 +20,10 @@ package com.evolveum.gizmo.component;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
 import com.evolveum.gizmo.dto.PartSummary;
 import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.util.LoadableModel;
 import com.evolveum.wicket.chartjs.*;
 import org.apache.wicket.model.IModel;
-import com.evolveum.gizmo.util.LoadableModel;
 
-import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -42,9 +41,7 @@ public class SummaryChartPanel extends SimplePanel<ReportFilterDto> {
     }
 
     @Override
-    protected void onInitialize() {
-        super.onInitialize();
-
+    protected void initLayout() {
         IModel<DoughnutChartConfiguration> chartModel = () -> {
             DoughnutChartConfiguration config = new DoughnutChartConfiguration();
 

@@ -55,8 +55,11 @@ public class DataPrintPanel extends SimplePanel<ReportFilterDto> {
     public DataPrintPanel(String id, IModel<ReportFilterDto> filter, IModel<List<AbstractTask>> dataModel) {
         super(id, filter);
         setRenderBodyOnly(true);
-
         this.dataModel = dataModel;
+    }
+
+    @Override
+    protected void initLayout() {
         initPanelLayout();
     }
 

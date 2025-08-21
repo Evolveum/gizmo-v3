@@ -57,12 +57,6 @@ public abstract class AbstractReportTab extends SimplePanel {
         this.model = Model.of(loadOrCreateFilter());
     }
 
-    @Override
-    protected void onConfigure() {
-        super.onConfigure();
-        initPanelLayout();
-    }
-
     protected void initPanelLayout() {
         form = new Form<>(ID_FORM, model);
         form.setOutputMarkupId(true);
@@ -132,6 +126,11 @@ public abstract class AbstractReportTab extends SimplePanel {
         buildResultsUI();
 
         showDownloadModal();
+    }
+
+    @Override
+    protected void initLayout() {
+        initPanelLayout();
     }
 
     protected boolean includeCustomerSearch() {

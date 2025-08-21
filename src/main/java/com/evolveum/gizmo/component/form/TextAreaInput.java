@@ -29,8 +29,11 @@ public class TextAreaInput<T> extends FormInput<T> {
 
     public TextAreaInput(String id, IModel<T> model) {
         super(id, model);
+    }
 
-        TextArea<T> text = new TextArea<T>(ID_INPUT, model);
+    @Override
+    protected void initLayout() {
+        TextArea<T> text = new TextArea<T>(ID_INPUT, getModel());
         text.add(AttributeAppender.replace("rows", new IModel<String>() {
 
             @Override

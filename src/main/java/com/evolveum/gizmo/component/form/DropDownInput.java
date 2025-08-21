@@ -37,14 +37,18 @@ public class DropDownInput<T> extends FormInput<T> {
     public DropDownInput(String id, IModel<T> model) {
         super(id, model);
 
-        DropDownChoice input = new DropDownChoice(ID_INPUT, new Model<>(new ArrayList<T>())) {
+    }
+
+    @Override
+    protected void initLayout() {
+        DropDownChoice<T> input = new DropDownChoice<>(ID_INPUT, new Model<>(new ArrayList<T>())) {
 
             @Override
             protected CharSequence getDefaultChoice(String selectedValue) {
                 return getString(defaultChoice);
             }
         };
-        input.setModel(model);
+        input.setModel(getModel());
         add(input);
     }
 

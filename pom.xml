@@ -38,7 +38,6 @@
         <apt-maven-plugin.version>1.1.3</apt-maven-plugin.version>
         <testng.version>6.8.8</testng.version>
         <wicket.version>10.0.0-M2</wicket.version>
-<!--        <wicket.bootstrap.version>2.0.13</wicket.bootstrap.version>-->
         <apache.poi.version>5.2.2</apache.poi.version>
         <spring-boot.version>3.1.5</spring-boot.version>
         <wicket.chartjs.version>0.6-SNAPSHOT</wicket.chartjs.version>
@@ -81,12 +80,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-
-        <!-- QUERY DSL -->
-<!--        <dependency>-->
-<!--            <groupId>com.querydsl</groupId>-->
-<!--            <artifactId>querydsl-core</artifactId>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -187,28 +180,6 @@
             <artifactId>wicket-chartjs-core</artifactId>
             <version>${wicket.chartjs.version}</version>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>de.agilecoders.wicket</groupId>-->
-<!--            <artifactId>wicket-bootstrap-core</artifactId>-->
-<!--            <version>${wicket.bootstrap.version}</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>javassist</groupId>-->
-<!--                    <artifactId>javassist</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>de.agilecoders.wicket</groupId>-->
-<!--            <artifactId>wicket-bootstrap-extensions</artifactId>-->
-<!--            <version>${wicket.bootstrap.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>de.agilecoders.wicket</groupId>-->
-<!--            <artifactId>wicket-bootstrap-less</artifactId>-->
-<!--            <version>${wicket.bootstrap.version}</version>-->
-<!--        </dependency>-->
 
         <!-- HIBERNATE -->
         <dependency>
