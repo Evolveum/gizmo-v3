@@ -35,11 +35,11 @@ public abstract class SimplePanel<T> extends Panel {
 
     private IModel<T> model;
 
-    public SimplePanel(String id) {
+    protected SimplePanel(String id) {
         this(id, null);
     }
 
-    public SimplePanel(String id, IModel<T> model) {
+    protected SimplePanel(String id, IModel<T> model) {
         super(id);
         this.model = model == null ? createModel() : model;
     }

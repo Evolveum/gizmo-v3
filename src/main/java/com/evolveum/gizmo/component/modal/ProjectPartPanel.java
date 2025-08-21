@@ -107,6 +107,7 @@ public class ProjectPartPanel extends SimplePanel<Part> {
     }
 
     protected void cancelPerformed(AjaxRequestTarget target) {
+        //nothing by default, close modal where implemented.
    }
 
     protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {

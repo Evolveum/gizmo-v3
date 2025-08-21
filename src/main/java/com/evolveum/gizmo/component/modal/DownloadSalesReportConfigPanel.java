@@ -43,7 +43,7 @@ public class DownloadSalesReportConfigPanel extends AbstractExcelDownloadPanel {
     @Override protected boolean supportsPerUser() { return true; }
 
     @Override
-    protected void generateWorkbook(XSSFWorkbook wb, ReportFilterDto f, boolean perUser) throws Exception {
+    protected void generateWorkbook(XSSFWorkbook wb, ReportFilterDto f, boolean perUser) {
         if (perUser) {
             generateReportPerUser(wb, f);
         } else {

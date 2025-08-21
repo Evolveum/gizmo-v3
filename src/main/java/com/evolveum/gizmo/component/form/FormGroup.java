@@ -20,7 +20,6 @@ package com.evolveum.gizmo.component.form;
 import com.evolveum.gizmo.component.SimplePanel;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.feedback.ComponentFeedbackMessageFilter;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -64,7 +63,7 @@ public class FormGroup<F extends FormInput, T extends Serializable> extends Simp
         add(inputWrapper);
 
         FormComponent input = inputWrapper.getFormComponent();
-        input.add(AttributeAppender.replace("placeholder", labelModel));
+        input.add(AttributeModifier.replace("placeholder", labelModel));
         input.setRequired(required);
         input.setLabel(labelModel);
 
@@ -84,8 +83,7 @@ public class FormGroup<F extends FormInput, T extends Serializable> extends Simp
     }
 
     protected FormInput createInput(String componentId, IModel<T> model) {
-        TextInput textInput = new TextInput(componentId, model);
-        return textInput;
+        return new TextInput(componentId, model);
     }
 
     public F getFormInput() {

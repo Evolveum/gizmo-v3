@@ -2,11 +2,12 @@ package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.dto.ReportFilterDto;
-import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.behavior.AttributeAppender;
@@ -14,14 +15,17 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponentLabel;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
-import org.apache.wicket.model.*;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.Normalizer;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.text.Normalizer;
 import java.util.Locale;
 
 public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilterDto> {
@@ -63,7 +67,7 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
 
     protected boolean supportsPerUser() { return false; }
 
-    protected abstract void generateWorkbook(XSSFWorkbook wb, ReportFilterDto filter, boolean perUser) throws Exception;
+    protected abstract void generateWorkbook(XSSFWorkbook wb, ReportFilterDto filter, boolean perUser);
 
 
     protected void buildFields() {
@@ -85,7 +89,7 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
             form.add(reportNameField);
 
             AjaxCheckBox perUser = new AjaxCheckBox(ID_PER_USER,
-                    new PropertyModel<Boolean>(downloadModel, DownloadSettingsDto.F_PER_USER)) {
+                    new PropertyModel<>(downloadModel, DownloadSettingsDto.F_PER_USER)) {
                 @Override protected void onUpdate(AjaxRequestTarget target) { target.add(reportNameField); }
             };
             perUser.setOutputMarkupId(true);
@@ -160,7 +164,7 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
             sheet = wb.createSheet(name);
             sheet.setDefaultColumnWidth(20);
             sheet.getPrintSetup().setLandscape(true);
-            sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A4_PAPERSIZE);
+            sheet.getPrintSetup().setPaperSize(PrintSetup.A4_PAPERSIZE);
         }
         return sheet;
     }

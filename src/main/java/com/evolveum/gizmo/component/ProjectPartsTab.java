@@ -50,8 +50,6 @@ public class ProjectPartsTab extends SimplePanel {
     private static final String ID_TABLE = "table";
     private static final String ID_NEW_PART = "newPart";
 
-    private boolean initialized;
-
     public ProjectPartsTab(String id) {
         super(id);
         setOutputMarkupId(true);
@@ -61,16 +59,6 @@ public class ProjectPartsTab extends SimplePanel {
     protected void initLayout() {
         initPanelLayout();
     }
-
-//    @Override
-//    protected void onConfigure() {
-//        super.onConfigure();
-//
-////        if (!initialized) {
-////            initPanelLayout();
-////            initialized = true;
-////        }
-//    }
 
     private void initPanelLayout() {
         AjaxButton newPart = new AjaxButton(ID_NEW_PART, createStringResource("ProjectPartsTab.newPart")) {
@@ -132,10 +120,10 @@ public class ProjectPartsTab extends SimplePanel {
     }
 
     protected void newPartPerformed(AjaxRequestTarget target) {
-
+        throw new UnsupportedOperationException("New part action is not implemented.");
     }
 
     protected void editPartPerformed(AjaxRequestTarget target, Part part) {
-
+        throw new UnsupportedOperationException("Edit part action is not implemented.");
     }
 }

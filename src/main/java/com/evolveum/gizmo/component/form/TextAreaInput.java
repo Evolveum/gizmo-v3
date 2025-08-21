@@ -33,14 +33,8 @@ public class TextAreaInput<T> extends FormInput<T> {
 
     @Override
     protected void initLayout() {
-        TextArea<T> text = new TextArea<T>(ID_INPUT, getModel());
-        text.add(AttributeAppender.replace("rows", new IModel<String>() {
-
-            @Override
-            public String getObject() {
-                return Integer.toString(rows);
-            }
-        }));
+        TextArea<T> text = new TextArea<>(ID_INPUT, getModel());
+        text.add(AttributeAppender.replace("rows", (IModel<String>) () -> Integer.toString(rows)));
         add(text);
     }
 
@@ -49,7 +43,8 @@ public class TextAreaInput<T> extends FormInput<T> {
     }
 
     @Override
-    public FormComponent getFormComponent() {
-        return (FormComponent) get(ID_INPUT);
+    public FormComponent<T> getFormComponent() {
+        //noinspection unchecked
+        return (FormComponent<T>) get(ID_INPUT);
     }
 }

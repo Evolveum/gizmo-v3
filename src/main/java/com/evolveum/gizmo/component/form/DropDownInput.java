@@ -41,7 +41,7 @@ public class DropDownInput<T> extends FormInput<T> {
 
     @Override
     protected void initLayout() {
-        DropDownChoice<T> input = new DropDownChoice<>(ID_INPUT, new Model<>(new ArrayList<T>())) {
+        DropDownChoice<T> input = new DropDownChoice<>(ID_INPUT, new Model<>(new ArrayList<>())) {
 
             @Override
             protected CharSequence getDefaultChoice(String selectedValue) {

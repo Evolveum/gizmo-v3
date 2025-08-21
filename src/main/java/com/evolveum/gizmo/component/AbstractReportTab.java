@@ -242,6 +242,7 @@ public abstract class AbstractReportTab extends SimplePanel {
         }
     }
 
+    @Override
     protected void handleGuiExceptionFromPanel(String message, Exception e, AjaxRequestTarget target) {
         if (target == null) {
             target = RequestCycle.get().find(AjaxRequestTarget.class).orElse(null);

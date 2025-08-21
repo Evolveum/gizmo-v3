@@ -32,8 +32,7 @@ public class AreaFormGroup<T extends Serializable> extends FormGroup<TextAreaInp
 
     @Override
     protected FormInput createInput(String componentId, IModel<T> model) {
-        TextAreaInput textInput = new TextAreaInput(componentId, model);
-        return textInput;
+        return new TextAreaInput(componentId, model);
     }
 
     public void setRows(int rows) {
