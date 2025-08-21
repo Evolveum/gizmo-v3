@@ -58,14 +58,19 @@ public class ProjectPartsTab extends SimplePanel {
     }
 
     @Override
-    protected void onConfigure() {
-        super.onConfigure();
-
-        if (!initialized) {
-            initPanelLayout();
-            initialized = true;
-        }
+    protected void initLayout() {
+        initPanelLayout();
     }
+
+//    @Override
+//    protected void onConfigure() {
+//        super.onConfigure();
+//
+////        if (!initialized) {
+////            initPanelLayout();
+////            initialized = true;
+////        }
+//    }
 
     private void initPanelLayout() {
         AjaxButton newPart = new AjaxButton(ID_NEW_PART, createStringResource("ProjectPartsTab.newPart")) {

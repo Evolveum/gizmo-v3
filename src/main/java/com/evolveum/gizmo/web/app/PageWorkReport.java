@@ -18,48 +18,35 @@
 package com.evolveum.gizmo.web.app;
 
 
-import com.evolveum.gizmo.component.SummaryChartPanel;
-import com.evolveum.gizmo.component.calendar.CalendarPanel;
-import com.evolveum.gizmo.component.calendar.Event;
-import com.evolveum.gizmo.component.calendar.HeaderToolbar;
-import com.evolveum.gizmo.component.calendar.Plugins;
 import com.evolveum.gizmo.component.data.*;
 import com.evolveum.gizmo.data.AbstractTask;
-import com.evolveum.gizmo.data.Log;
-import com.evolveum.gizmo.data.Work;
 import com.evolveum.gizmo.data.provider.ReportDataProvider;
-import com.evolveum.gizmo.data.provider.SummaryDataProvider;
-import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryUserDataProvider;
-import com.evolveum.gizmo.dto.*;
+import com.evolveum.gizmo.dto.ProgressDto;
+import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.dto.UserSummary;
+import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.repository.AbstractTaskRepository;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author lazyman
@@ -147,15 +134,6 @@ public class PageWorkReport extends PageAppTemplate {
         table.setOutputMarkupId(true);
         add(table);
 
-//        SummaryPartsDataProvider partsProvider = new SummaryPartsDataProvider(this);
-//        SummaryChartPanel chart = new SummaryChartPanel(ID_SUMMARY_PARTS, partsProvider, getFilterModel());
-//        chart.setOutputMarkupId(true);
-//        add(chart);
-//
-//
-//        CalendarPanel calendarPanel = new CalendarPanel(ID_CALENDAR, createCalendarModel());
-//        add(calendarPanel);
-
     }
 
     @Override
@@ -220,49 +198,6 @@ public class PageWorkReport extends PageAppTemplate {
     }
 
 
-
-//    private IModel<com.evolveum.gizmo.component.calendar.FullCalendar> createCalendarModel() {
-//        return () -> {
-//
-//            List<Plugins> calendarPlugins = List.of(Plugins.DAY_GRID);
-//            HeaderToolbar headerToolbar = new HeaderToolbar();
-//
-//            com.evolveum.gizmo.component.calendar.FullCalendar configNew =
-//                    new com.evolveum.gizmo.component.calendar.FullCalendar(
-//                            calendarPlugins,
-//                            headerToolbar,
-//                            Date.from(filter.getObject().getDateFrom().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
-//                            createEvents()
-//                    );
-//
-//            return configNew;
-//        };
-//    }
-
-//    private List<Event> createEvents() {
-//        IModel<SummaryPanelDto> summaryModel = createSummaryModel();
-//        SummaryPanelDto summary = summaryModel.getObject();
-//        Map<LocalDate, TaskLength> workSummaryPerDeay = summary.getDates();
-//
-//        List<Event> events = new ArrayList<>();
-//        int i = 0;
-//        for (Map.Entry<LocalDate, TaskLength> entry : workSummaryPerDeay.entrySet()) {
-//            i++;
-//
-//            TaskLength length = entry.getValue();
-//            String lenghtAsString = StringUtils.join(new Object[]{length.getLength(), length.getInvoice()}, '/');
-//            LocalDate startDay = entry.getKey();
-//            Date day = Date.from(startDay.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-//            boolean isFullDay = length.getLength() >= (8 * getFilterModel().getObject().getRealizators().get(0).getAllocation());
-//            Event event = new Event(Integer.toString(i), lenghtAsString, day, isFullDay ? "green" : "red");
-//            events.add(event);
-//        }
-//
-//
-//
-//        return events;
-//    }
-
     private void newWorkPerformed() {
         setResponsePage(PageWork.class);
     }
@@ -270,17 +205,6 @@ public class PageWorkReport extends PageAppTemplate {
     private void newBulkPerformed() {
         setResponsePage(PageBulk.class);
     }
-
-//    private IModel<SummaryPanelDto> createSummaryModel() {
-//        return new LoadableModel<>(false) {
-//
-//            @Override
-//            protected SummaryPanelDto load() {
-//                SummaryDataProvider provider = new SummaryDataProvider(PageWorkReport.this);
-//                return provider.createSummary(getFilterModel().getObject());
-//            }
-//        };
-//    }
 
     private void previousClicked(AjaxRequestTarget target) {
         ReportFilterDto workFilter = filter.getObject();
@@ -312,31 +236,6 @@ public class PageWorkReport extends PageAppTemplate {
     //date, length (0.0), realizator, customer, description, attachments(icon) (LOG)
     private List<IColumn<WorkDto, String>> createColumns() {
         List<IColumn<WorkDto, String>> columns = new ArrayList<>();
-
-//        columns.add(new LinkColumn<>(createStringResource("AbstractTask.date"), AbstractTask.F_DATE) {
-//
-//            @Override
-//            protected IModel<String> createLinkModel(final IModel<WorkDto> rowModel) {
-//                return () -> {
-//                    PropertyModel<LocalDate> propertyModel = new PropertyModel<>(rowModel, getPropertyExpression());
-//                    LocalDate date = propertyModel.getObject();
-//                    return date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-//                };
-//            }
-//
-//            @Override
-//            public void onClick(AjaxRequestTarget target, IModel<WorkDto> rowModel) {
-////                WorkDto task = rowModel.getObject();
-////                switch (task.getType()) {
-////                    case LOG:
-////                        logDetailsPerformed((Log) task);
-////                        break;
-////                    case WORK:
-//                        workDetailsPerformed(rowModel.getObject());
-////                        break;
-////                }
-//            }
-//        });
 
         columns.add(new EditablePropertyColumn<>(createStringResource("AbstractTask.date"), AbstractTask.F_DATE));
         columns.add(GizmoUtils.createWorkInvoiceColumn(this));
@@ -388,13 +287,6 @@ public class PageWorkReport extends PageAppTemplate {
         work.setEditable(true);
         work.setDescription("added description");
         target.add(link.findParent(MyRowItem.class));
-    }
-
-    private void logDetailsPerformed(Log log) {
-        PageParameters params = new PageParameters();
-        params.add(PageLog.LOG_ID, log.getId());
-
-        setResponsePage(PageLog.class, params);
     }
 
     private void deletePerformed(AjaxRequestTarget target, WorkDto task) {

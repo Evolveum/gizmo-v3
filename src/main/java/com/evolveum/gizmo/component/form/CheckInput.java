@@ -17,8 +17,8 @@
 
 package com.evolveum.gizmo.component.form;
 
-import org.apache.wicket.model.IModel;
 import com.evolveum.gizmo.component.CheckBox;
+import org.apache.wicket.model.IModel;
 
 /**
  * @author lazyman
@@ -27,7 +27,11 @@ public class CheckInput extends FormInput<Boolean> {
 
     public CheckInput(String id, IModel<Boolean> model) {
         super(id, model);
-
-        add(new CheckBox(ID_INPUT, model));
     }
+
+    @Override
+    protected void initLayout() {
+        add(new CheckBox(ID_INPUT, getModel()));
+    }
+
 }

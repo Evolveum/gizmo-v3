@@ -17,13 +17,13 @@
 
 package com.evolveum.gizmo.component.form;
 
+import com.evolveum.gizmo.component.SimplePanel;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
-import com.evolveum.gizmo.component.SimplePanel;
 
 public class IconButton extends SimplePanel<String> {
 
@@ -45,8 +45,7 @@ public class IconButton extends SimplePanel<String> {
     }
 
     @Override
-    protected void onInitialize() {
-        super.onInitialize();
+    protected void initLayout() {
         AjaxSubmitLink button = new AjaxSubmitLink(ID_BUTTON) {
 
             @Override
@@ -68,7 +67,6 @@ public class IconButton extends SimplePanel<String> {
         label.setRenderBodyOnly(true);
         button.add(label);
         button.add(icon);
-
     }
 
     protected void submitPerformed(AjaxRequestTarget target) {

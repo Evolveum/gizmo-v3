@@ -26,10 +26,16 @@ public class TextInput<T> extends FormInput {
         this(id, model, String.class);
     }
 
+    private Class<?> clazz;
+
     public TextInput(String id, IModel<T> model, Class clazz) {
         super(id, model);
+        this.clazz = clazz;
+    }
 
-        final TextField<T> text = new TextField<>(ID_INPUT, model);
+    @Override
+    protected void initLayout() {
+        final TextField<T> text = new TextField<>(ID_INPUT, getModel());
         text.setType(clazz);
         add(text);
     }

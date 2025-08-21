@@ -17,9 +17,9 @@
 
 package com.evolveum.gizmo.component.form;
 
+import com.evolveum.gizmo.util.GizmoUtils;
 import org.apache.wicket.extensions.markup.html.form.DateTextField;
 import org.apache.wicket.model.IModel;
-import com.evolveum.gizmo.util.GizmoUtils;
 
 /**
  * @author lazyman
@@ -28,8 +28,11 @@ public class DateInput extends FormInput {
 
     public DateInput(String id, IModel model) {
         super(id, model);
+    }
 
-        DateTextField input = new DateTextField(ID_INPUT, model, GizmoUtils.DATE_FIELD_FORMAT);
+    @Override
+    protected void initLayout() {
+        DateTextField input = new DateTextField(ID_INPUT, getModel(), GizmoUtils.DATE_FIELD_FORMAT);
         add(input);
     }
 }

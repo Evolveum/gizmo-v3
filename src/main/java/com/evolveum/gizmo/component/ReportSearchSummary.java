@@ -54,23 +54,20 @@ public class ReportSearchSummary extends SimplePanel<ReportSearchSummaryDto> {
     public ReportSearchSummary(String id, IModel<ReportSearchSummaryDto> model) {
         super(id, model);
         setRenderBodyOnly(true);
+    }
 
+    @Override
+    protected void initLayout() {
         initPanelLayout();
     }
 
     public ReportSearchSummary(String id, final IModel<ReportFilterDto> filterModel,
                                final IModel<List<AbstractTask>> dataModel) {
-        this(id, new LoadableModel<ReportSearchSummaryDto>(false) {
+        this(id, new LoadableModel<>(false) {
 
             @Override
             protected ReportSearchSummaryDto load() {
                 ReportSearchSummaryDto dto = new ReportSearchSummaryDto();
-
-                ReportFilterDto filter = filterModel.getObject();
-//                dto.setRealizators(filter.getRealizators());
-//                dto.setProjects(filter.getProjects());
-//                dto.setFrom(filter.getFrom());
-//                dto.setTo(filter.getTo());
 
                 dto.setInvoice(GizmoUtils.sumInvoiceLength(dataModel));
                 dto.setWork(GizmoUtils.sumWorkLength(dataModel));

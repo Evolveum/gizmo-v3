@@ -22,15 +22,10 @@ import com.evolveum.gizmo.component.form.CheckFormGroup;
 import com.evolveum.gizmo.component.form.DropDownFormGroup;
 import com.evolveum.gizmo.component.form.FormGroup;
 import com.evolveum.gizmo.data.Customer;
-import com.evolveum.gizmo.data.CustomerType;
 import com.evolveum.gizmo.data.Project;
 import com.evolveum.gizmo.repository.CustomerRepository;
 import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.EnumChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 
@@ -61,6 +56,8 @@ public class ProjectBasicsPanel extends SimplePanel<Project> {
         DropDownFormGroup customer = new DropDownFormGroup(ID_CUSTOMER,
                 new PropertyModel<Customer>(getModel(), Project.F_CUSTOMER),
                 createStringResource("Project.customer"), true);
+        add(customer);
+
         customer.setNullValid(false);
         customer.setChoices(new LoadableModel<List<Customer>>(false) {
 
@@ -75,7 +72,6 @@ public class ProjectBasicsPanel extends SimplePanel<Project> {
             }
         });
         customer.setRenderer(GizmoUtils.createCustomerChoiceRenderer());
-        add(customer);
 
         FormGroup closed = new CheckFormGroup(ID_CLOSED, new PropertyModel<Boolean>(getModel(), Project.F_CLOSED),
                 createStringResource("Project.closed"), true);

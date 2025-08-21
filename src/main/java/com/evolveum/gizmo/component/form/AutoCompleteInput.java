@@ -17,9 +17,9 @@
 
 package com.evolveum.gizmo.component.form;
 
-import org.apache.wicket.model.IModel;
 import com.evolveum.gizmo.component.PartAutoCompleteText;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
+import org.apache.wicket.model.IModel;
 
 import java.util.List;
 
@@ -28,9 +28,15 @@ import java.util.List;
  */
 public class AutoCompleteInput extends FormInput<CustomerProjectPartDto> {
 
+    private final IModel<List<CustomerProjectPartDto>> choices;
+
     public AutoCompleteInput(String id, IModel<CustomerProjectPartDto> model, IModel<List<CustomerProjectPartDto>> choices) {
         super(id, model);
+        this.choices = choices;
+    }
 
-        add(new PartAutoCompleteText(ID_INPUT, model, choices));
+    @Override
+    protected void initLayout() {
+        add(new PartAutoCompleteText(ID_INPUT, getModel(), choices));
     }
 }

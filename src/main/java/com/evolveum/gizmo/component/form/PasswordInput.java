@@ -34,19 +34,22 @@ public class PasswordInput extends FormInput<String> {
 
     public PasswordInput(String id, IModel<String> model) {
         super(id, model);
+    }
 
-        PasswordTextField text = new PasswordTextField(ID_INPUT, createCustomInputModel(model));
+    @Override
+    protected void initLayout() {
+        PasswordTextField text = new PasswordTextField(ID_INPUT, createCustomInputModel(getModel()));
         text.setRequired(false);
         add(text);
 
-        PasswordTextField text2 = new PasswordTextField(ID_INPUT_2, new Model<String>());
+        PasswordTextField text2 = new PasswordTextField(ID_INPUT_2, new Model<>());
         text2.setRequired(false);
         text2.setLabel(createStringResource("PasswordInput.confirmPassword"));
         add(text2);
     }
 
     private IModel<String> createCustomInputModel(final IModel<String> model) {
-        return new IModel<String>() {
+        return new IModel<>() {
 
             @Override
             public String getObject() {

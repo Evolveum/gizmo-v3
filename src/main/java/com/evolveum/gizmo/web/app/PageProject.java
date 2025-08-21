@@ -231,7 +231,12 @@ public class PageProject extends PageAppProjects {
                 protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {
                     savePartPerformed(target, model);
                 }
-            };
+
+            @Override
+            protected void cancelPerformed(AjaxRequestTarget target) {
+                closeModal(target);
+            }
+        };
 
         content.add(AttributeModifier.append("class", "modal-content"));
         MainPopupDialog partModal = (MainPopupDialog) get(ID_PART_MODAL);
@@ -240,9 +245,13 @@ public class PageProject extends PageAppProjects {
 
     }
 
-    private void savePartPerformed(AjaxRequestTarget target, IModel<Part> model) {
+    private void closeModal(AjaxRequestTarget target) {
         MainPopupDialog partModal = (MainPopupDialog) get(ID_PART_MODAL);
         partModal.close(target);
+    }
+
+    private void savePartPerformed(AjaxRequestTarget target, IModel<Part> model) {
+        closeModal(target);
         try {
             PartRepository repository = getProjectPartRepository();
             Part part = model.getObject();

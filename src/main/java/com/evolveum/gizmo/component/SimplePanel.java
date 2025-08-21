@@ -18,10 +18,8 @@
 package com.evolveum.gizmo.component;
 
 import com.evolveum.gizmo.web.app.PageAppTemplate;
-import com.evolveum.gizmo.web.error.PageError;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.Page;
-import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -33,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author lazyman
  */
-public class SimplePanel<T> extends Panel {
+public abstract class SimplePanel<T> extends Panel {
 
     private IModel<T> model;
 
@@ -119,7 +117,7 @@ public class SimplePanel<T> extends Panel {
         return StringUtils.join(components, ":");
     }
 
-    protected void initLayout() {}
+    protected abstract void initLayout();
 
     protected void handleGuiExceptionFromPanel(String message, Exception e, AjaxRequestTarget target) {
         if (target == null) {

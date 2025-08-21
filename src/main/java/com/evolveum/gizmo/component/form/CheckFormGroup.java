@@ -36,7 +36,7 @@ public class CheckFormGroup extends FormGroup<CheckInput, Boolean> {
     }
 
     @Override
-    protected FormInput createInput(String componentId, IModel<Boolean> model, IModel<String> placeholder) {
+    protected FormInput createInput(String componentId, IModel<Boolean> model) {
         CheckInput formInput = new CheckInput(componentId, model) {
 
             @Override
@@ -44,7 +44,6 @@ public class CheckFormGroup extends FormGroup<CheckInput, Boolean> {
                 return null;
             }
         };
-//        formInput.getFormComponent().add(new CssClassNameRemover("form-group", "input-sm"));
         formInput.setRenderBodyOnly(true);
 
         return formInput;

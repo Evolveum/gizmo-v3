@@ -32,7 +32,7 @@ public class DropDownFormGroup<T extends Serializable> extends FormGroup<DropDow
         super(id, value, label, required);
     }
 
-    protected FormInput createInput(String componentId, IModel<T> model, IModel<String> placeholder) {
+    protected FormInput createInput(String componentId, IModel<T> model) {
         return new DropDownInput<>(componentId, model);
     }
 

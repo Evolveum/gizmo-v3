@@ -23,44 +23,28 @@ import com.evolveum.gizmo.component.calendar.CalendarPanel;
 import com.evolveum.gizmo.component.calendar.Event;
 import com.evolveum.gizmo.component.calendar.HeaderToolbar;
 import com.evolveum.gizmo.component.calendar.Plugins;
-import com.evolveum.gizmo.component.data.LinkColumn;
-import com.evolveum.gizmo.component.data.LinkIconColumn;
 import com.evolveum.gizmo.component.data.ProgressPanel;
-import com.evolveum.gizmo.component.data.TablePanel;
-import com.evolveum.gizmo.data.AbstractTask;
-import com.evolveum.gizmo.data.Log;
-import com.evolveum.gizmo.data.Work;
-import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
 import com.evolveum.gizmo.data.provider.SummaryUserDataProvider;
 import com.evolveum.gizmo.dto.*;
-import com.evolveum.gizmo.repository.AbstractTaskRepository;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.util.HolidayDay;
 import com.evolveum.gizmo.util.LoadableModel;
-import com.evolveum.gizmo.util.WorkingDaysProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Date;
@@ -368,19 +352,6 @@ public class PageDashboard extends PageAppTemplate {
 //        return columns;
 //    }
 
-//    private void workDetailsPerformed(Work work) {
-//        PageParameters params = new PageParameters();
-//        params.add(PageWork.WORK_ID, work.getId());
-//
-//        setResponsePage(PageWork.class, params);
-//    }
-//
-//    private void logDetailsPerformed(Log log) {
-//        PageParameters params = new PageParameters();
-//        params.add(PageLog.LOG_ID, log.getId());
-//
-//        setResponsePage(PageLog.class, params);
-//    }
 
 //    private void deletePerformed(AjaxRequestTarget target, AbstractTask task) {
 //        //todo add confirmation

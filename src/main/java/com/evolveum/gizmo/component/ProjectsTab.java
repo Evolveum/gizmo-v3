@@ -17,29 +17,26 @@
 
 package com.evolveum.gizmo.component;
 
+import com.evolveum.gizmo.component.data.LinkColumn;
+import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.data.Customer;
 import com.evolveum.gizmo.data.Project;
+import com.evolveum.gizmo.data.QProject;
 import com.evolveum.gizmo.data.provider.BasicDataProvider;
 import com.evolveum.gizmo.data.provider.CustomTabDataProvider;
-import com.evolveum.gizmo.repository.CustomerRepository;
 import com.evolveum.gizmo.web.app.PageAppTemplate;
 import com.evolveum.gizmo.web.app.PageCustomer;
+import com.evolveum.gizmo.web.app.PageProject;
 import com.querydsl.core.types.Predicate;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.springframework.data.domain.Sort;
-import com.evolveum.gizmo.component.data.LinkColumn;
-import com.evolveum.gizmo.component.data.TablePanel;
-import com.evolveum.gizmo.data.QProject;
-import com.evolveum.gizmo.web.app.PageProject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author lazyman
@@ -54,9 +51,7 @@ public class ProjectsTab extends SimplePanel {
     }
 
     @Override
-    protected void onConfigure() {
-        super.onConfigure();
-
+    protected void initLayout() {
         initPanelLayout();
     }
 

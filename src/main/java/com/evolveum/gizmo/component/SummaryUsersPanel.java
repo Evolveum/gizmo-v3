@@ -57,6 +57,11 @@ public class SummaryUsersPanel extends SimplePanel<List<UserSummary>> {
         });
 
         setOutputMarkupId(true);
+
+    }
+
+    @Override
+    protected void initLayout() {
         initPanelLayout();
     }
 

@@ -54,20 +54,21 @@ public class CustomerBasicsPanel extends SimplePanel<Customer> {
         AreaFormGroup description = new AreaFormGroup(ID_DESCRIPTION,
                 new PropertyModel<String>(getModel(), Customer.F_DESCRIPTION),
                 createStringResource("Customer.description"), false);
-        description.setRows(3);
         add(description);
+        description.setRows(3);
 
         DropDownFormGroup type = new DropDownFormGroup(ID_TYPE,
                 new PropertyModel<CustomerType>(getModel(), Customer.F_TYPE),
                 createStringResource("Customer.type"), true);
+        add(type);
         type.setChoices(GizmoUtils.createReadonlyModelFromEnum(CustomerType.class));
         type.setRenderer(new EnumChoiceRenderer(this));
         DropDownChoice choice = (DropDownChoice) type.getFormComponent();
-        add(type);
 
         final DropDownFormGroup partner = new DropDownFormGroup(ID_PARTNER,
                 new PropertyModel<Customer>(getModel(), Customer.F_PARTNER),
                 createStringResource("Customer.partner"), false);
+        add(partner);
         partner.setOutputMarkupId(true);
         partner.setChoices(new LoadableModel<List<Customer>>(false) {
 
@@ -92,7 +93,6 @@ public class CustomerBasicsPanel extends SimplePanel<Customer> {
                 return !CustomerType.PARTNER.equals(customer.getType());
             }
         });
-        add(partner);
 
         choice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
 

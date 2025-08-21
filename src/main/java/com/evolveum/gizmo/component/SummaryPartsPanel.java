@@ -55,6 +55,10 @@ public class SummaryPartsPanel extends SimplePanel<List<PartSummary>> {
         });
 
         setOutputMarkupId(true);
+    }
+
+    @Override
+    protected void initLayout() {
         initPanelLayout();
     }
 
