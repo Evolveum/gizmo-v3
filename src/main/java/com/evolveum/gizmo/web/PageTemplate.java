@@ -60,6 +60,8 @@ public class PageTemplate extends WebPage {
     private AbstractTaskRepository abstractTaskRepository;
     @SpringBean
     private Environment environment;
+    @SpringBean
+    private LabelRepository labelRepository;
 
     public PageTemplate() {
         this(null);
@@ -146,6 +148,10 @@ public class PageTemplate extends WebPage {
 
     public AbstractTaskRepository getAbstractTaskRepository() {
         return abstractTaskRepository;
+    }
+
+    public LabelRepository getLabelPartRepository() {
+        return labelRepository;
     }
 
     public String getPropertyValue(String name) {

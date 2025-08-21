@@ -11,6 +11,10 @@ import java.util.Objects;
         uniqueConstraints = @UniqueConstraint(name = "uq_g_label_code", columnNames = "code"))
 public class LabelPart implements Serializable {
     private static final long serialVersionUID = 1L;
+    public static final String F_NAME = "name";
+    public static final String F_CODE = "code";
+    public static final String F_ID = "id";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,5 +42,13 @@ public class LabelPart implements Serializable {
     }
     @Override public int hashCode() { return Objects.hashCode(id); }
 
-    @Override public String toString() { return code + " — " + name; }
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Label{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", code='").append(code);
+        sb.append('}');
+        return sb.toString();
+    }
 }

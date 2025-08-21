@@ -77,6 +77,7 @@ public class PageAppTemplate extends PageTemplate {
 //                menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.emails"), PageEmails.class));
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.reports"), PageReports.class));
                 menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.calendar"), PageCalendar.class));
+                menuItems.add(new NavigationMenuItem(createStringResource("PageAppTemplate.menu.labels"), PageLabels.class));
                 return menuItems;
             }
         };
