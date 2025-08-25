@@ -22,82 +22,51 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> {
-
-            web.ignoring().requestMatchers(new AntPathRequestMatcher("/js/**"));
-            web.ignoring().requestMatchers(new AntPathRequestMatcher("/css/**"));
-            web.ignoring().requestMatchers(new AntPathRequestMatcher("/img/**"));
-            web.ignoring().requestMatchers(new AntPathRequestMatcher("/fonts/**"));
-
-            web.ignoring().requestMatchers(new AntPathRequestMatcher("/static/**"));
-
-            web.ignoring().requestMatchers(new AntPathRequestMatcher("/wicket/resource/**"));
-
-            web.ignoring().requestMatchers(new AntPathRequestMatcher("/favicon.ico"));
-        };
-    }
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers(
-                                antMatcher("/j_spring_security_check"),
-                                antMatcher("/spring_security_login"),
-                                antMatcher("/login"),
-                                antMatcher("/error"),
-                                antMatcher("/error/*"),
-                                antMatcher("/bootstrap"),
-                                antMatcher("/wicket/resource/**"))
+                        .requestMatchers("/j_spring_security_check",
+                                "/login",
+                                "/error",
+                                "/error/*",
+                                "/bootstrap",
+                                "/wicket/resource/**",
+                                "/css/**",
+                                "/js/**",
+                                "/img/**",
+                                "/fonts/**",
+                                "/static/**",
+                                "/favicon.ico")
                             .permitAll()
                         .anyRequest()
                             .authenticated());
 
         http.formLogin((formLogin) -> formLogin
                 .loginPage("/login")
-                .loginProcessingUrl("/spring_security_login"));
-
+                .loginProcessingUrl("/login")       // URL form posts to
+                .defaultSuccessUrl("/dashboard")         // where to go on success
+                .failureUrl("/login?error"));
 
         http.logout((logout) -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
                 .clearAuthentication(true)
-                .logoutUrl("/j_spring_security_logout")
-                .logoutSuccessUrl("/app/dashboard")
+                .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true));
 
         http.sessionManagement((sessionManagement) -> sessionManagement
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .maximumSessions(1));
-
-        http.csrf().disable();
-
-        http.headers().disable();
-//        http.headers(headers -> headers
-//                        .disable()
-//                        .defaultsDisabled()
-//                        .xssProtection(HeadersConfigurer.XXssConfig::disable).defaultsDisabled()
-//                .contentSecurityPolicy(contentSecurityPolicy -> contentSecurityPolicy
-//                        .
-//                        .policyDirectives(
-//                                "default-src 'unsafe-inline'; " +
-//                                "script-src 'strict-dynamic'; " +
-//                                "style-src 'strict-dynamic';"))
-//                        .policyDirectives("script-src 'self'; style-src 'self'; style-src-attr 'self'; script-src-elem 'self'; style-src-elem 'self';"))
-//        );
-
+        //csrf and csp policies are set in GizmoApplication
         return http.build();
     }
 

@@ -17,26 +17,29 @@
 
 package com.evolveum.gizmo.web.app;
 
+import com.evolveum.gizmo.component.AjaxButton;
+import com.evolveum.gizmo.component.AjaxSubmitButton;
 import com.evolveum.gizmo.component.VisibleEnableBehaviour;
+import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
-import com.evolveum.gizmo.component.form.IconButton;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
+import com.evolveum.gizmo.data.Work;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
-import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.dto.ProjectSearchSettings;
 import com.evolveum.gizmo.dto.WorkDto;
 import com.evolveum.gizmo.repository.PartRepository;
+import com.evolveum.gizmo.repository.WorkRepository;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
+import com.evolveum.gizmo.util.GizmoUtils;
+import com.evolveum.gizmo.util.LoadableModel;
 import com.evolveum.gizmo.web.component.TimeField;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Fragment;
@@ -45,27 +48,11 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.wicketstuff.annotation.mount.MountPath;
-import com.evolveum.gizmo.component.AjaxButton;
-import com.evolveum.gizmo.component.AjaxSubmitButton;
-import com.evolveum.gizmo.component.PartAutoCompleteText;
-import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
-import com.evolveum.gizmo.data.Part;
-import com.evolveum.gizmo.data.Project;
-import com.evolveum.gizmo.data.User;
-import com.evolveum.gizmo.data.Work;
-import com.evolveum.gizmo.repository.WorkRepository;
-import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.util.LoadableModel;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * @author lazyman
@@ -89,7 +76,7 @@ public class PageWork extends PageAppTemplate {
     private static final String ID_CUSTOMER_PROJECT_PART = "customerProjectPart";
     private static final String ID_REMOVE_WORK = "removeWork";
 
-    private IModel<List<WorkDto>> model;
+    private final IModel<List<WorkDto>> model;
 
     public PageWork() {
         this(null);
@@ -195,7 +182,7 @@ public class PageWork extends PageAppTemplate {
         MultiselectDropDownInput<CustomerProjectPartDto> partCombo = new MultiselectDropDownInput<>(ID_CUSTOMER_PROJECT_PART,
                 new PropertyModel<>(workModel, WorkDto.F_CUSTOMER_PROJECT_PART),
                 isMultiProjectEnabled(),
-                GizmoUtils.createCustomerProjectPartList(this, true, true, true),
+                GizmoUtils.createCustomerProjectPartList(this, () -> new ProjectSearchSettings(true, true, true)),
                 GizmoUtils.createCustomerProjectPartRenderer());
         partCombo.add(new EmptyOnChangeAjaxBehavior());
         item.add(partCombo);

@@ -18,11 +18,11 @@
 package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.SimplePanel;
+import com.evolveum.gizmo.component.form.GizmoForm;
 import com.evolveum.gizmo.component.form.IconButton;
 import com.evolveum.gizmo.data.Part;
 import com.evolveum.gizmo.util.ColorUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
@@ -49,18 +49,9 @@ public class ProjectPartPanel extends SimplePanel<Part> {
     }
 
 
-    private IModel<String> createTitle() {
-        return () -> {
-                Part part = getModelObject();
-
-                String key = part.getId() != null ? "ProjectPartModal.edit" : "ProjectPartModal.new";
-                return createStringResource(key).getObject();
-        };
-    }
-
     protected void initLayout() {
 
-        Form<Part> form = new Form<>(ID_FORM);
+        GizmoForm<Part> form = new GizmoForm<>(ID_FORM);
         add(form);
 
         TextField<String> name = new TextField<>(ID_NAME, new PropertyModel<>(getModel(), Part.F_NAME));

@@ -27,15 +27,13 @@ import com.evolveum.gizmo.repository.CustomerRepository;
 import com.evolveum.gizmo.repository.UserRepository;
 import com.evolveum.gizmo.web.PageTemplate;
 import com.evolveum.gizmo.web.error.PageError;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -47,11 +45,12 @@ import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.codec.Hex;
+import org.springframework.security.web.csrf.CsrfToken;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -75,49 +74,6 @@ public class GizmoUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(GizmoUtils.class);
 
-    public static Date addOneDay(Date date) {
-        if (date == null) {
-            return null;
-        }
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        cal.add(Calendar.DAY_OF_YEAR, 1);
-
-        return cal.getTime();
-    }
-
-    public static Date removeOneMilis(Date date) {
-        if (date == null) {
-            return null;
-        }
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        cal.add(Calendar.MILLISECOND, -1);
-
-        return cal.getTime();
-    }
-
-    public static Date clearTime(Date date) {
-        if (date == null) {
-            return null;
-        }
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-
-        return cal.getTime();
-
-    }
-
     public static String describeProject(Project project) {
         if (project == null) {
             return null;
@@ -137,7 +93,7 @@ public class GizmoUtils {
             sb.append(c.getName());
         }
 
-        if (sb.length() != 0) {
+        if (!sb.isEmpty()) {
             sb.append(delimiter);
         }
 
@@ -146,7 +102,7 @@ public class GizmoUtils {
             sb.append(p.getName());
         }
 
-        if (sb.length() != 0) {
+        if (!sb.isEmpty()) {
             sb.append(delimiter);
         }
 
@@ -169,54 +125,12 @@ public class GizmoUtils {
         return LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
     }
 
-//    public static LocalDate createWorkDefaultFrom() {
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(GizmoUtils.clearTime(new Date()));
-//        cal.set(Calendar.DAY_OF_MONTH, 1);
-//
-//        return cal.getTime();
-//    }
-//
-//    public static Date createWorkDefaultTo() {
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(createWorkDefaultFrom());
-//
-//        cal.add(Calendar.MONTH, 1);
-//        cal.add(Calendar.MILLISECOND, -1);
-//
-//        return cal.getTime();
-//    }
+    public static <T extends Enum<?>> IModel<List<T>> createReadonlyModelFromEnum(final Class<T> type) {
+        return () -> {
+            List<T> list = new ArrayList<>();
+            Collections.addAll(list, type.getEnumConstants());
 
-    public static <T extends Enum> IChoiceRenderer<T> createEnumRenderer(final Component component) {
-        return new ChoiceRenderer<>() {
-
-            @Override
-            public Object getDisplayValue(T object) {
-                return createLocalizedModelForEnum(object, component).getObject();
-            }
-
-            @Override
-            public String getIdValue(T object, int index) {
-                return Integer.toString(index);
-            }
-        };
-    }
-
-    public static <T extends Enum> IModel<String> createLocalizedModelForEnum(T value, Component comp) {
-        String key = value != null ? value.getClass().getSimpleName() + "." + value.name() : "";
-        return new StringResourceModel(key, comp, null);
-    }
-
-    public static <T extends Enum> IModel<List<T>> createReadonlyModelFromEnum(final Class<T> type) {
-        return new IModel<List<T>>() {
-
-            @Override
-            public List<T> getObject() {
-                List<T> list = new ArrayList<T>();
-                Collections.addAll(list, type.getEnumConstants());
-
-                return list;
-            }
+            return list;
         };
     }
 
@@ -292,41 +206,6 @@ public class GizmoUtils {
         };
     }
 
-    public static IModel<List<CustomerProjectPartDto>> createCustomerProjectPartList(final PageTemplate page,
-                                                                                     final boolean showCustomers,
-                                                                                     final boolean showProjects,
-                                                                                     final boolean showParts) {
-        return new LoadableModel<>(false) {
-
-            @Override
-            protected List<CustomerProjectPartDto> load() {
-                List<CustomerProjectPartDto> list = null;
-                try {
-                    if (showCustomers && showProjects && !showParts) {
-                        List<CustomerProjectPartDto> dbList = listProjectsFromDb(page.getEntityManager());
-                        list = listCustomersProjects(dbList);
-                    } else if (showCustomers && showProjects && showParts) {
-                        list = listProjectsFromDb(page.getEntityManager());
-                    } else if (showCustomers && !showProjects && !showParts) {
-                        list = listCustomers(page);
-                    }
-                } catch (Exception ex) {
-                    handleModelException(page, "Message.couldntLoadProjectData", ex);
-                }
-
-                if (list == null) {
-                    list = new ArrayList<>();
-                }
-
-                LOG.debug("Found {} items.", list.size());
-
-                Collections.sort(list);
-
-                return list;
-            }
-        };
-    }
-
     public static LoadableModel<List<CustomerProjectPartDto>> createCustomerProjectPartList(final PageTemplate page,
                                                                                      IModel<ProjectSearchSettings> settings) {
         return new LoadableModel<>(false) {
@@ -366,7 +245,7 @@ public class GizmoUtils {
         QProject project = QProject.project;
         QPart part = QPart.part;
 
-        JPAQuery query = new JPAQuery(entityManager);
+        JPAQuery<?> query = new JPAQuery<>(entityManager);
         query.from(customer).leftJoin(customer.projects, project).leftJoin(QProject.project.parts, part);
         query.where(QProject.project.closed.eq(false).and(part.id.isNotNull()));
         query.orderBy(customer.name.asc(), project.name.asc(), part.name.asc());
@@ -378,7 +257,7 @@ public class GizmoUtils {
         bindings.put(CustomerProjectPartDto.F_PROJECT_NAME, project.name);
         bindings.put(CustomerProjectPartDto.F_PART_ID, part.id);
         bindings.put(CustomerProjectPartDto.F_PART_NAME, part.name);
-        QBean projection = Projections.bean(CustomerProjectPartDto.class, bindings);
+        QBean<CustomerProjectPartDto> projection = Projections.bean(CustomerProjectPartDto.class, bindings);
 
         return query.select(projection).fetch();
 
@@ -388,7 +267,7 @@ public class GizmoUtils {
         Logger LOG = LoggerFactory.getLogger(page.getClass());
         LOG.error("Exception occurred, {}, reason: {}", message, ex.getMessage());
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Exception occurred, {}", ex);
+            LOG.debug("Exception occurred, {}", ex.getMessage(), ex);
         }
 
         PageError errorPage = new PageError();
@@ -411,23 +290,13 @@ public class GizmoUtils {
     private static List<CustomerProjectPartDto> listCustomersProjects(List<CustomerProjectPartDto> dbList) {
         List<CustomerProjectPartDto> list = new ArrayList<>();
 
-        Set<Integer> addedCustomers = new HashSet<>();
         Set<Integer> addedProjects = new HashSet<>();
         for (CustomerProjectPartDto dto : dbList) {
-//            if (!addedCustomers.contains(dto.getCustomerId())) {
-//                list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getCustomerId()));
-//                addedCustomers.add(dto.getCustomerId());
-//            }
             if (!addedProjects.contains(dto.getProjectId())) {
                 list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getProjectName(),
                         dto.getCustomerId(), dto.getProjectId()));
                 addedProjects.add(dto.getProjectId());
             }
-//            if (!addedProjects.contains(dto.getPartId())) {
-//                list.add(new CustomerProjectPartDto(dto.getCustomerName(), dto.getProjectName(), dto.getPartName(),
-//                        dto.getCustomerId(), dto.getProjectId(), dto.getPartId()));
-//                addedProjects.add(dto.getPartId());
-//            }
         }
 
         return list;
@@ -477,7 +346,7 @@ public class GizmoUtils {
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);
 
-        JPAQuery query = new JPAQuery(entityManager);
+        JPAQuery<AbstractTask> query = new JPAQuery<>(entityManager);
         query.from(task).leftJoin(work.part.project);
 
         query.where(ReportDataProvider.createPredicates(filter));
@@ -485,7 +354,6 @@ public class GizmoUtils {
         query.orderBy(task.date.asc());
 
         return query.fetch();
-//        return query.list(task);
     }
 
     public static IColumn<WorkDto, String> createAbstractTaskRealizatorColumn(PageTemplate page) {
@@ -510,11 +378,6 @@ public class GizmoUtils {
             double length = task.getWorkLength();
             double invoice = task.getInvoiceLength();
 
-//            if (task instanceof Work) {
-//                Work work = (Work) task;
-//                invoice = work.getInvoiceLength();
-//            }
-
             String roundedLength = String.format("%.2g%n", length);
             String roundedInvoice = String.format("%.2g%n", invoice);
 
@@ -534,16 +397,9 @@ public class GizmoUtils {
     }
 
     private static IModel<String> createProjectModel(final IModel<WorkDto> rowModel) {
-        return (IModel<String>) () -> {
+        return () -> {
             WorkDto task = rowModel.getObject();
-            CustomerProjectPartDto customerProjectPartDto = task.getCustomerProjectPart().iterator().next();
-//            if (!(task instanceof Work)) {
-//                return null;
-//            }
-//
-//            Work work = (Work) task;
-//            return GizmoUtils.describeProjectPart(task.getPart(), " - ");
-//            return "N/A";
+            CustomerProjectPartDto customerProjectPartDto = task.getCustomerProjectPart().getFirst();
             return StringUtils.join(new Object[]{
                     customerProjectPartDto.getCustomerName(),
                     customerProjectPartDto.getProjectName(),
@@ -562,18 +418,13 @@ public class GizmoUtils {
     }
 
     private static IModel<String> createCustomerModel(final IModel<AbstractTask> rowModel) {
-        return new IModel<String>() {
-
-            @Override
-            public String getObject() {
-                AbstractTask task = rowModel.getObject();
-                if (!(task instanceof Log)) {
-                    return null;
-                }
-
-                Log log = (Log) task;
-                return log.getCustomer().getName();
+        return () -> {
+            AbstractTask task = rowModel.getObject();
+            if (!(task instanceof Log log)) {
+                return null;
             }
+
+            return log.getCustomer().getName();
         };
     }
 
@@ -595,7 +446,7 @@ public class GizmoUtils {
     }
 
     public static JPAQuery<Work> createWorkQuery(EntityManager entityManager) {
-        JPAQuery<Work> query = new JPAQuery(entityManager);
+        JPAQuery<Work> query = new JPAQuery<>(entityManager);
         QAbstractTask task = QAbstractTask.abstractTask;
         QWork work = task.as(QWork.class);
         query.from(QAbstractTask.abstractTask).leftJoin(work.part.project);
@@ -630,5 +481,12 @@ public class GizmoUtils {
         };
     }
 
+
+    public static CsrfToken getCsrfToken() {
+        Request req = RequestCycle.get().getRequest();
+        HttpServletRequest httpReq = (HttpServletRequest) req.getContainerRequest();
+
+        return (CsrfToken) httpReq.getAttribute("_csrf");
+    }
 
 }

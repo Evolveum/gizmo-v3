@@ -20,28 +20,22 @@ package com.evolveum.gizmo.web.app;
 import com.evolveum.gizmo.component.AjaxButton;
 import com.evolveum.gizmo.component.AjaxSubmitButton;
 import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
-import com.evolveum.gizmo.component.form.*;
+import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.data.Part;
 import com.evolveum.gizmo.data.TaskType;
-import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.data.Work;
 import com.evolveum.gizmo.dto.BulkDto;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
-import com.evolveum.gizmo.dto.WorkDto;
+import com.evolveum.gizmo.dto.ProjectSearchSettings;
 import com.evolveum.gizmo.repository.PartRepository;
 import com.evolveum.gizmo.repository.WorkRepository;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.util.HolidayDay;
 import com.evolveum.gizmo.util.LoadableModel;
-import com.evolveum.gizmo.util.WorkingDaysProvider;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
@@ -52,7 +46,6 @@ import org.wicketstuff.annotation.mount.MountPath;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,7 +66,7 @@ public class PageBulk extends PageAppTemplate {
 
     private static final int MAX_BULK_CREATE = 20;
 
-    private IModel<BulkDto> model;
+    private final IModel<BulkDto> model;
 
     public PageBulk() {
         model = new LoadableModel<>(false) {
@@ -102,13 +95,13 @@ public class PageBulk extends PageAppTemplate {
     }
 
     private void initLayout() {
-        Form form = new Form(ID_FORM);
+        Form<?> form = new Form<>(ID_FORM);
         add(form);
 
         MultiselectDropDownInput<CustomerProjectPartDto> partCombo = new MultiselectDropDownInput<>(ID_PART,
                 new PropertyModel<>(model, BulkDto.F_PART),
                 false,
-                GizmoUtils.createCustomerProjectPartList(this, true, true, true),
+                GizmoUtils.createCustomerProjectPartList(this, () -> new ProjectSearchSettings(true, true, true)),
                 GizmoUtils.createCustomerProjectPartRenderer());
         form.add(partCombo);
 
@@ -135,7 +128,7 @@ public class PageBulk extends PageAppTemplate {
     }
 
 
-    private void initButtons(Form form) {
+    private void initButtons(Form<?> form) {
         AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override
@@ -154,13 +147,13 @@ public class PageBulk extends PageAppTemplate {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                cancelPerformed(target);
+                cancelPerformed();
             }
         };
         form.add(cancel);
     }
 
-    private void cancelPerformed(AjaxRequestTarget target) {
+    private void cancelPerformed() {
         setResponsePage(PageDashboard.class);
     }
 
@@ -176,7 +169,7 @@ public class PageBulk extends PageAppTemplate {
                 target.add(getFeedbackPanel());
                 return;
             }
-            CustomerProjectPartDto partDto = parts.get(0);
+            CustomerProjectPartDto partDto = parts.getFirst();
             Optional<Part> optionalPart = partsRepository.findById(partDto.getPartId());
             Part part = null;
             if (optionalPart.isPresent()) {

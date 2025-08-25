@@ -17,6 +17,7 @@
 
 package com.evolveum.gizmo.security;
 
+import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.web.PageLogin;
 import com.evolveum.gizmo.web.PageTemplate;
 import com.evolveum.gizmo.web.app.PageDashboard;
@@ -25,18 +26,23 @@ import com.evolveum.gizmo.web.error.PageError401;
 import com.evolveum.gizmo.web.error.PageError403;
 import com.evolveum.gizmo.web.error.PageError404;
 import org.apache.wicket.RuntimeConfigurationType;
+import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.authroles.authentication.AbstractAuthenticatedWebSession;
 import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication;
 import org.apache.wicket.core.request.mapper.MountedMapper;
 import org.apache.wicket.csp.CSPDirective;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.request.mapper.parameter.UrlPathPageParametersEncoder;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.settings.ApplicationSettings;
 import org.apache.wicket.settings.ResourceSettings;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Component;
 import org.wicketstuff.annotation.scan.AnnotatedMountScanner;
 
@@ -45,8 +51,6 @@ import org.wicketstuff.annotation.scan.AnnotatedMountScanner;
  */
 @Component("gizmoApplication")
 public class GizmoApplication extends AuthenticatedWebApplication {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GizmoApplication.class);
 
     @Override
     public Class<PageDashboard> getHomePage() {
@@ -57,19 +61,6 @@ public class GizmoApplication extends AuthenticatedWebApplication {
     public void init() {
         super.init();
 
-//        Map<String, GizmoApplicationConfiguration> map =
-//                applicationContext.getBeansOfType(GizmoApplicationConfiguration.class);
-//        if (map != null) {
-//            map.forEach((key, value) -> value.init(this));
-//        }
-
-//        IBootstrapSettings settings = new BootstrapSettings();
-//        settings.setAutoAppendResources(false);
-//        settings.useCdnResources(false);
-//        settings.setThemeProvider(new GizmoThemeProvider());
-//        Bootstrap.install(this, settings);
-//        BootstrapLess.install(this);
-
         getCspSettings().blocking().clear()
                 .unsafeInline()
                 .add(CSPDirective.IMG_SRC, "data:")
@@ -78,16 +69,12 @@ public class GizmoApplication extends AuthenticatedWebApplication {
         getJavaScriptLibrarySettings().setJQueryReference(
                 new PackageResourceReference(GizmoApplication.class, "../../../../META-INF/resources/webjars/jquery/3.6.0/jquery.min.js"));
 
-
-
         getComponentInstantiationListeners().add(new SpringComponentInjector(this));
 
         ResourceSettings resourceSettings = getResourceSettings();
 
         resourceSettings.setThrowExceptionOnMissingResource(false);
         getMarkupSettings().setStripWicketTags(true);
-//        getMarkupSettings().setDefaultBeforeDisabledLink("");
-//        getMarkupSettings().setDefaultAfterDisabledLink("");
 
         if (RuntimeConfigurationType.DEVELOPMENT.equals(getConfigurationType())) {
             getDebugSettings().setAjaxDebugModeEnabled(true);
@@ -101,24 +88,52 @@ public class GizmoApplication extends AuthenticatedWebApplication {
         appSettings.setPageExpiredErrorPage(PageError.class);
 
         new AnnotatedMountScanner().scanPackage(PageTemplate.class.getPackage().getName()).mount(this);
-//        mountResource("css/font-awesome.css", FontAwesomeCssReference.instance());
 
         mount(new MountedMapper("/error", PageError.class, new UrlPathPageParametersEncoder()));
         mount(new MountedMapper("/error/401", PageError401.class, new UrlPathPageParametersEncoder()));
         mount(new MountedMapper("/error/403", PageError403.class, new UrlPathPageParametersEncoder()));
         mount(new MountedMapper("/error/404", PageError404.class, new UrlPathPageParametersEncoder()));
 
-//        getRequestCycleListeners().add(new CsrfPreventionRequestCycleListener());
-//        getRequestCycleListeners().add(new AbstractRequestCycleListener() {
-//
-//            @Override
-//            public IRequestHandler onException(RequestCycle cycle, Exception ex) {
-//                LOGGER.error("Error occurred during page rendering, reason: {} (more on DEBUG level)", ex.getMessage());
-//                LOGGER.debug("Error occurred during page rendering", ex);
-//
-//                return new RenderPageRequestHandler(new PageProvider(new PageError(ex)));
-//            }
-//        });
+        getAjaxRequestTargetListeners().add(new AjaxRequestTarget.IListener() {
+
+            @Override
+            public void updateAjaxAttributes(AbstractDefaultAjaxBehavior behavior, AjaxRequestAttributes attributes) {
+                // check whether behavior will use POST method, if not then don't put CSRF token there
+                if (!isPostMethodTypeBehavior(behavior, attributes)) {
+                    return;
+                }
+
+                CsrfToken csrfToken = GizmoUtils.getCsrfToken();
+                if (csrfToken == null) {
+                    return;
+                }
+
+                String parameterName = csrfToken.getParameterName();
+                String value = csrfToken.getToken();
+
+                attributes.getExtraParameters().put(parameterName, value);
+
+            }
+
+        });
+    }
+
+    private boolean isPostMethodTypeBehavior(AbstractDefaultAjaxBehavior behavior, AjaxRequestAttributes attributes) {
+        if (behavior instanceof AjaxFormComponentUpdatingBehavior) {
+            // it also uses POST, but they set it after this method is called
+            return true;
+        }
+
+        if (behavior instanceof AjaxFormSubmitBehavior fb) {
+            Form<?> form = fb.getForm();
+            String formMethod = form.getMarkupAttributes().getString("method");
+            if (formMethod == null || "POST".equalsIgnoreCase(formMethod) || form.getRootForm().isMultiPart()) {
+                // this will also use POST
+                return true;
+            }
+        }
+
+        return AjaxRequestAttributes.Method.POST.equals(attributes.getMethod());
     }
 
     @Override

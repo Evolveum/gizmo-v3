@@ -18,17 +18,23 @@
 package com.evolveum.gizmo.component.navigation;
 
 import com.evolveum.gizmo.component.LabeledLink;
+import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.security.SecurityUtils;
+import com.evolveum.gizmo.web.app.PageDashboard;
 import com.evolveum.gizmo.web.app.PageUser;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
-import com.evolveum.gizmo.component.SimplePanel;
-import com.evolveum.gizmo.web.app.PageDashboard;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.springframework.security.web.csrf.CsrfToken;
 
 import java.util.List;
 
@@ -46,6 +52,19 @@ public class NavigationPanel extends SimplePanel<List<NavigationMenuItem>> {
     @Override
     public void initLayout() {
 
+        WebMarkupContainer logoutForm = new WebMarkupContainer("logoutForm");
+        logoutForm.setOutputMarkupId(true);
+        add(logoutForm);
+
+        HttpServletRequest request = ((ServletWebRequest) getRequest()).getContainerRequest();
+        CsrfToken token = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+
+        if (token != null) {
+            HiddenField<String> csrfField = new HiddenField<>(token.getParameterName(), Model.of(token.getToken()));
+            csrfField.add(new AttributeModifier("name", token.getParameterName()));
+            logoutForm.add(csrfField);
+        }
+
         AjaxLink<Void> home = new AjaxLink<>(ID_HOME) {
 
             @Override
@@ -55,7 +74,7 @@ public class NavigationPanel extends SimplePanel<List<NavigationMenuItem>> {
         };
         add(home);
 
-        ListView<NavigationMenuItem> listView = new ListView<NavigationMenuItem>(ID_MENU_ITEMS, getModel()) {
+        ListView<NavigationMenuItem> listView = new ListView<>(ID_MENU_ITEMS, getModel()) {
 
             @Override
             protected void populateItem(ListItem<NavigationMenuItem> item) {
