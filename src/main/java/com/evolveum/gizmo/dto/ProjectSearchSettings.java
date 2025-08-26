@@ -71,4 +71,9 @@ public class ProjectSearchSettings implements Serializable {
             this.customerProjectPartDtoList = new ArrayList<>(customerProjectPartDtoList);
         }
     }
+
+
+    public List<CustomerProjectPartDto> getCustomer() {
+        return this.customerProjectPartDtoList;
+    }
 }

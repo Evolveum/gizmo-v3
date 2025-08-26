@@ -285,4 +285,16 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
 
         return partName.compareTo(o.partName);
     }
+
+    public String getCustomer() {
+        return customerName;
+    }
+
+    public String getProject() {
+        return projectName;
+    }
+
+    public String getPart() {
+        return partName;
+    }
 }

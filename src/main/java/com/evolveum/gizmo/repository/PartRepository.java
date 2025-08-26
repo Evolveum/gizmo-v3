@@ -41,4 +41,60 @@ public interface PartRepository extends JpaRepository<Part, Integer>, QuerydslPr
     //@Query("SELECT p FROM Part p WHERE p.color IS NULL OR p.color = ''")
     //List<Part> findAllWithoutColor();
 
+    @Query("""
+      select distinct p
+      from Part p
+      left join fetch p.labels
+      where p.id in :ids
+    """)
+    List<Part> findAllWithLabelsByIdIn(java.util.Collection<Integer> ids);
+
+    @Query("""
+      select distinct p
+      from Part p
+      left join fetch p.labels
+      join p.project pr
+      where pr.id in :projectIds
+    """)
+    List<Part> findAllWithLabelsByProjectIdIn(java.util.Collection<Integer> projectIds);
+
+    @Query("""
+          select distinct p
+          from Part p
+          left join fetch p.labels
+          join p.project pr
+          join pr.customer c
+          where c.id in :customerIds
+        """)
+    List<Part> findAllWithLabelsByCustomerIdIn(java.util.Collection<Integer> customerIds);
+
+    @Query("""
+        select distinct concat(c.name, ' - ', pr.name, ' - ', p.name)
+        from Part p
+          join p.project pr
+          join pr.customer c
+          join p.labels l
+        where l.id = :labelId
+        order by concat(c.name, ' - ', pr.name, ' - ', p.name)
+    """)
+    List<String> findCustomerProjectPartStringsByLabelId(@Param("labelId") Long labelId);
+
+    @Query("""
+        select distinct p
+        from Part p
+        left join fetch p.labels
+        where p.id in (
+            select p2.id
+            from Part p2
+            join p2.labels l2
+            where l2.id = :labelId
+        )
+    """)
+    List<Part> findAllWithLabelsByLabelId(@Param("labelId") Long labelId);
+
+
 }
+
+
+
+
