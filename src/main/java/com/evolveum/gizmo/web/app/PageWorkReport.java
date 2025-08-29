@@ -40,6 +40,7 @@ import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wicketstuff.annotation.mount.MountPath;
 
 import java.time.DayOfWeek;
@@ -284,9 +285,12 @@ public class PageWorkReport extends PageAppTemplate {
     }
 
     private void editWorkReportPerformed(AjaxRequestTarget target, WorkDto work, AjaxLink link) {
-        work.setEditable(true);
-        work.setDescription("added description");
-        target.add(link.findParent(MyRowItem.class));
+//        work.setEditable(true);
+//        work.setDescription("added description");
+//        target.add(link.findParent(MyRowItem.class));
+        PageParameters params = new PageParameters();
+        params.add("workId", work.getId());
+        setResponsePage(PageWork.class, params);
     }
 
     private void deletePerformed(AjaxRequestTarget target, WorkDto task) {

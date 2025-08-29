@@ -133,11 +133,11 @@ public class PageWork extends PageAppTemplate {
 
     private void removeWork(WorkDto workToRemove, AjaxRequestTarget target) {
         model.getObject().remove(workToRemove);
-        target.add(PageWork.this);
+        target.add(get(ID_FORM));
     }
     private void addNewWork(AjaxRequestTarget target) {
         model.getObject().add(new WorkDto());
-        target.add(PageWork.this);
+        target.add(get(ID_FORM));
     }
 
     private List<WorkDto> loadWorks() {
@@ -204,10 +204,14 @@ public class PageWork extends PageAppTemplate {
         length.add(new EmptyOnChangeAjaxBehavior());
         item.add(length);
 
-        item.add(new TimeField(ID_FROM, new PropertyModel<>(workModel, WorkDto.F_FROM)));
-        item.add(new TimeField(ID_TO, new PropertyModel<>(workModel, WorkDto.F_TO)));
-
-
+        TimeField timeFrom = new TimeField(ID_FROM, new PropertyModel<>(workModel, WorkDto.F_FROM));
+        timeFrom.setOutputMarkupId(true);
+        timeFrom.add(new EmptyOnChangeAjaxBehavior());
+        item.add(timeFrom);
+        TimeField timeTo = new TimeField(ID_TO, new PropertyModel<>(workModel, WorkDto.F_TO));
+        timeTo.setOutputMarkupId(true);
+        timeTo.add(new EmptyOnChangeAjaxBehavior());
+        item.add(timeTo);
 
         TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(workModel, WorkDto.F_DESCRIPTION));
         description.add(new EmptyOnChangeAjaxBehavior());
@@ -263,7 +267,7 @@ public class PageWork extends PageAppTemplate {
     }
 
     private void cancelPerformed() {
-        setResponsePage(PageDashboard.class);
+        setResponsePage(PageWorkReport.class);
     }
 
     private void saveWorkPerformed(AjaxRequestTarget target) {
@@ -278,7 +282,7 @@ public class PageWork extends PageAppTemplate {
 
             getWorkRepository().saveAll(works);
 
-            PageDashboard response = new PageDashboard();
+            PageWorkReport response = new PageWorkReport();
             response.success(createStringResource("Message.workSavedSuccessfully").getString());
             setResponsePage(response);
         } catch (Exception ex) {
