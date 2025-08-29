@@ -3,32 +3,33 @@ package com.evolveum.gizmo.web.app;
 import com.evolveum.gizmo.component.data.LinkIconColumn;
 import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.component.form.IconButton;
+import com.evolveum.gizmo.data.LabelPart;
 import com.evolveum.gizmo.data.Part;
 import com.evolveum.gizmo.data.QLabelPart;
 import com.evolveum.gizmo.data.provider.BasicDataProvider;
 import com.evolveum.gizmo.repository.PartRepository;
+import com.querydsl.core.types.Predicate;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
-import com.evolveum.gizmo.data.LabelPart;
-import com.querydsl.core.types.Predicate;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.springframework.data.domain.Sort;
-import org.apache.wicket.markup.html.basic.Label;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
-import org.apache.wicket.markup.repeater.Item;
 
-public class PageLabels extends PageAppTemplate{
+public class PageLabels extends PageAppTemplate {
 
     private static final String ID_TABLE = "table";
     private static final String ID_FORM = "form";
@@ -103,7 +104,7 @@ public class PageLabels extends PageAppTemplate{
             @Override
             protected void onClickPerformed(AjaxRequestTarget target,
                                             IModel<LabelPart> rowModel,
-                                            AjaxLink link) {
+                                            AjaxLink<?> link) {
                 removeLabelPerformed(target, rowModel.getObject());
             }
         });
