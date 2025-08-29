@@ -17,6 +17,7 @@
 
 package com.evolveum.gizmo.dto;
 
+import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.util.GizmoUtils;
 
 import java.io.Serializable;
@@ -31,37 +32,78 @@ import java.util.stream.Collectors;
  */
 public class SummaryPanelDto implements Serializable {
 
+    private User user;
+    private LocalDate initialDate;
+
+    private LocalDate date;
+    private TaskLength length;
+
+//    public static class UserDateTaskLength {
+//
+//
+//
+//        public UserDateTaskLength(User user, LocalDate date, TaskLength length) {
+//            this.user = user;
+//            this.date = date;
+//            this.length = length;
+//        }
+
+        public LocalDate getDate() {
+            return date;
+        }
+
+        public TaskLength getLength() {
+            return length;
+        }
+
+        public User getUser() {
+            return user;
+        }
+
+    public LocalDate getInitialDate() {
+        return initialDate;
+    }
+
+    //    }
+
     public static final String F_MONTH_COUNT = "monthCount";
 
-    private ReportFilterDto filter;
-    private Map<LocalDate, TaskLength> dates = new HashMap<>();
+//    private ReportFilterDto filter;
+//    private List<UserDateTaskLength> userDateTaskLengths = new ArrayList<>();
+//    private Map<LocalDate, TaskLength> dates = new HashMap<>();
 
-    public SummaryPanelDto(ReportFilterDto filter) {
-        this.filter = filter;
+    public SummaryPanelDto(User user, LocalDate date, TaskLength length) {
+        this.user = user;
+        this.date = date;
+        this.length = length;
     }
 
-    private LocalDate getEffectiveStart() {
-        LocalDate monthStart;
-        if (filter.getDateFrom() == null) {
-            monthStart = GizmoUtils.createWorkDefaultFrom();
-        } else {
-            monthStart = filter.getDateFrom().with(TemporalAdjusters.firstDayOfMonth());
-        }
-        DayOfWeek dayOfWeek = monthStart.getDayOfWeek();
-        int daysToSubstract = dayOfWeek.getValue() - DayOfWeek.MONDAY.getValue();
-        return monthStart.minusDays(daysToSubstract);
-    }
+//    public List<UserDateTaskLength> getUserDateTaskLengths() {
+//        return userDateTaskLengths;
+//    }
 
-    private LocalDate getEffectiveEnd() {
-        LocalDate monthEnd;
-        if (filter.getDateTo() == null) {
-            monthEnd = GizmoUtils.createWorkDefaultTo();
-        } else {
-            monthEnd = filter.getDateTo().with(TemporalAdjusters.lastDayOfMonth());
-        }
-        int daysToAdd = DayOfWeek.SUNDAY.getValue() - monthEnd.getDayOfWeek().getValue();
-        return monthEnd.plusDays(daysToAdd + 1);
-    }
+//    private LocalDate getEffectiveStart() {
+//        LocalDate monthStart;
+//        if (filter.getDateFrom() == null) {
+//            monthStart = GizmoUtils.createWorkDefaultFrom();
+//        } else {
+//            monthStart = filter.getDateFrom().with(TemporalAdjusters.firstDayOfMonth());
+//        }
+//        DayOfWeek dayOfWeek = monthStart.getDayOfWeek();
+//        int daysToSubstract = dayOfWeek.getValue() - DayOfWeek.MONDAY.getValue();
+//        return monthStart.minusDays(daysToSubstract);
+//    }
+
+//    private LocalDate getEffectiveEnd() {
+//        LocalDate monthEnd;
+//        if (filter.getDateTo() == null) {
+//            monthEnd = GizmoUtils.createWorkDefaultTo();
+//        } else {
+//            monthEnd = filter.getDateTo().with(TemporalAdjusters.lastDayOfMonth());
+//        }
+//        int daysToAdd = DayOfWeek.SUNDAY.getValue() - monthEnd.getDayOfWeek().getValue();
+//        return monthEnd.plusDays(daysToAdd + 1);
+//    }
 
 
     /**
@@ -69,20 +111,20 @@ public class SummaryPanelDto implements Serializable {
      * @param week starts with 0
      * @param day starts with 0
      */
-    public LocalDate getDayModel(int week, int day) {
-        List<LocalDate> datesStream = getEffectiveDates();
-        List<LocalDate> subList = datesStream.subList(week * 7, week * 7 + 7);
-        return subList.get(day);
-    }
+//    public LocalDate getDayModel(int week, int day) {
+//        List<LocalDate> datesStream = getEffectiveDates();
+//        List<LocalDate> subList = datesStream.subList(week * 7, week * 7 + 7);
+//        return subList.get(day);
+//    }
 
-    public int getNumberOfWeeks() {
-        List<LocalDate> datesStream = getEffectiveDates();
-        return datesStream.size() / 7;
-    }
+//    public int getNumberOfWeeks() {
+//        List<LocalDate> datesStream = getEffectiveDates();
+//        return datesStream.size() / 7;
+//    }
 
-    private List<LocalDate> getEffectiveDates() {
-        return getEffectiveStart().datesUntil(getEffectiveEnd()).collect(Collectors.toList());
-    }
+//    private List<LocalDate> getEffectiveDates() {
+//        return getEffectiveStart().datesUntil(getEffectiveEnd()).collect(Collectors.toList());
+//    }
 
 //    private void aaa() {
 ////        LocalDate monthStart  = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
@@ -116,10 +158,6 @@ public class SummaryPanelDto implements Serializable {
 //    public WorkFilterDto getFilter() {
 //        return filter;
 //    }
-
-    public Map<LocalDate, TaskLength> getDates() {
-        return dates;
-    }
 
 //    public int getMonthCount() {
 //        Calendar fromCal = getFromRoundedToFirstMonthDay();
@@ -167,64 +205,64 @@ public class SummaryPanelDto implements Serializable {
 //        return cal.getTime();
 //    }
 
-    public boolean isWithinFilter(int monthIndex, int dayIndex) {
-        LocalDate date = getDayModel(monthIndex, dayIndex);
-        if (date == null) {
-            return false;
-        }
-        return date.getMonth() == filter.getDateFrom().getMonth();
-    }
+//    public boolean isWithinFilter(int monthIndex, int dayIndex) {
+//        LocalDate date = getDayModel(monthIndex, dayIndex);
+//        if (date == null) {
+//            return false;
+//        }
+//        return date.getMonth() == filter.getDateFrom().getMonth();
+//    }
+//
+//    public boolean isWeekend(int monthIndex, int dayIndex) {
+//        LocalDate date = getDayModel(monthIndex, dayIndex);
+//        if (date == null) {
+//            return false;
+//        }
+//
+//       return DayOfWeek.SATURDAY == date.getDayOfWeek() || DayOfWeek.SUNDAY == date.getDayOfWeek();
+//    }
+//
+//    public TaskLength getTaskLength(int week, int dayIndex) {
+//        LocalDate date = getDayModel(week, dayIndex);
+//        if (date == null) {
+//            return null;
+//        }
+//
+//        return dates.get(date);
+//    }
 
-    public boolean isWeekend(int monthIndex, int dayIndex) {
-        LocalDate date = getDayModel(monthIndex, dayIndex);
-        if (date == null) {
-            return false;
-        }
+//    public boolean isFuture(int monthIndex, int dayIndex) {
+//        LocalDate date = getDayModel(monthIndex, dayIndex);
+//        if (date == null) {
+//            return false;
+//        }
+//
+//        LocalDate now = LocalDate.now();
+//
+//        return date.isAfter(now);
+//    }
 
-       return DayOfWeek.SATURDAY == date.getDayOfWeek() || DayOfWeek.SUNDAY == date.getDayOfWeek();
-    }
+//    public boolean isFullDayDone(int week, int dayIndex) {
+//        if (isWeekend(week, dayIndex) || isFuture(week, dayIndex)) {
+//            return true;
+//        }
+//
+//        TaskLength task = getTaskLength(week, dayIndex);
+//        if (task == null) {
+//            return false;
+//        }
+//
+//        return task.getLength() >= 8.0;
+//    }
 
-    public TaskLength getTaskLength(int week, int dayIndex) {
-        LocalDate date = getDayModel(week, dayIndex);
-        if (date == null) {
-            return null;
-        }
-
-        return dates.get(date);
-    }
-
-    public boolean isFuture(int monthIndex, int dayIndex) {
-        LocalDate date = getDayModel(monthIndex, dayIndex);
-        if (date == null) {
-            return false;
-        }
-
-        LocalDate now = LocalDate.now();
-
-        return date.isAfter(now);
-    }
-
-    public boolean isFullDayDone(int week, int dayIndex) {
-        if (isWeekend(week, dayIndex) || isFuture(week, dayIndex)) {
-            return true;
-        }
-
-        TaskLength task = getTaskLength(week, dayIndex);
-        if (task == null) {
-            return false;
-        }
-
-        return task.getLength() >= 8.0;
-    }
-
-    public boolean isToday(int week, int dayIndex) {
-        LocalDate date = getDayModel(week, dayIndex);
-        if (date == null) {
-            return false;
-        }
-
-        return date.isEqual(LocalDate.now());
-    }
+//    public boolean isToday(int week, int dayIndex) {
+//        LocalDate date = getDayModel(week, dayIndex);
+//        if (date == null) {
+//            return false;
+//        }
+//
+//        return date.isEqual(LocalDate.now());
+//    }
 
 //    public String getMonthYear(int monthIndex) {
 //        DateFormat df = new SimpleDateFormat("MMMM yyyy");

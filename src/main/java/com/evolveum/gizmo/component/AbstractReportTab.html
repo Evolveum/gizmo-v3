@@ -4,19 +4,7 @@
 
     <form wicket:id="form" class="bg-white p-4 rounded shadow-sm">
         <div class="col-12">
-            <div class="card-body">
-                <div class="d-flex justify-content-center">
-                    <div class="d-flex">
-                        <div class="align-self-center mr-3">
-                            <button class="btn btn-xs btn-default" wicket:id="previous"><i class="fa fa-chevron-left"/></button>
-                        </div>
-                        <h2 class="align-self-center mr-3" wicket:id="month"></h2>
-                        <div class="align-self-center">
-                            <button class="btn btn-xs btn-default" wicket:id="next"><i class="fa fa-chevron-right"/></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <div wicket:id="monthNavigation"/>
         </div>
 
 
@@ -47,6 +35,13 @@
                 <div class="mb-3">
                     <select wicket:id="realizator" multiple class="form-control"></select>
                 </div>
+                <div>
+                    <div wicket:id="customer"></div>
+                </div>
+                <div class="form-group">
+                    <label>Labels</label>
+                    <select wicket:id="labels" class="form-select" style="width: 600px;"></select>
+                </div>
             </div>
         </div>
 
@@ -59,7 +54,7 @@
     </form>
 
     <div wicket:id="confirmDownload"></div>
-    <div wicket:id="summary" class="summary-users"></div>
+    <wicket:child/>
 </wicket:panel>
 </body>
 </html>

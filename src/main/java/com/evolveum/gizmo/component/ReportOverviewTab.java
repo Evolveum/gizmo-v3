@@ -1,63 +1,83 @@
 package com.evolveum.gizmo.component;
 
-import com.evolveum.gizmo.component.data.TablePanel;
+import com.evolveum.gizmo.component.calendar.CalendarEventsProvider;
+import com.evolveum.gizmo.component.calendar.CalendarPanel;
+import com.evolveum.gizmo.component.data.WorkDataTable;
 import com.evolveum.gizmo.component.modal.DownloadOverviewReportConfigPanel;
-import com.evolveum.gizmo.data.AbstractTask;
-import com.evolveum.gizmo.data.provider.ReportDataProvider;
-import com.evolveum.gizmo.dto.WorkDto;
+import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
-import com.evolveum.gizmo.util.GizmoUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
+import org.apache.wicket.extensions.markup.html.tabs.AbstractTab;
+import org.apache.wicket.extensions.markup.html.tabs.ITab;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReportOverviewTab extends AbstractReportTab {
 
-    private static final String ID_TABLE = "table";
+    private static final String ID_OVERVIEW_TABS = "overviewTabs";
 
     public ReportOverviewTab(String id) { super(id); }
 
-    @Override protected boolean includeCustomerSearch() { return true; }
-
     @Override protected void buildResultsUI() {
-        ReportDataProvider provider = new ReportDataProvider(getPageTemplate());
-        provider.setFilter(getFilterModel().getObject());
 
-        List<IColumn<WorkDto, String>> columns = new ArrayList<>();
-        columns.add(new PropertyColumn<>(createStringResource("AbstractTask.date"), AbstractTask.F_DATE));
-        columns.add(GizmoUtils.createWorkInvoiceColumn(getPageTemplate()));
-        columns.add(GizmoUtils.createWorkTimeRangeColumn(getPageTemplate()));
-        columns.add(GizmoUtils.createAbstractTaskRealizatorColumn(getPageTemplate()));
-        columns.add(GizmoUtils.createWorkProjectColumn(getPageTemplate()));
-        columns.add(new PropertyColumn<>(createStringResource("AbstractTask.description"), AbstractTask.F_DESCRIPTION));
-        columns.add(new PropertyColumn<>(createStringResource("PageReports.trackId"), AbstractTask.F_TRACK_ID));
+        GizmoTabbedPanel<ITab> tabbedPanel = new GizmoTabbedPanel<>(ID_OVERVIEW_TABS, createTabs());
+        add(tabbedPanel);
 
-        TablePanel<WorkDto> table = new TablePanel<>(ID_TABLE, provider, columns, 50);
-        table.setOutputMarkupId(true);
-        addOrReplace(table);
+    }
+
+    private List<ITab> createTabs() {
+        List<ITab> tabList = new ArrayList<>();
+
+        tabList.add(new AbstractTab(createStringResource("ReportOverviewTab.tab.summary")) {
+
+            @Override
+            public WebMarkupContainer getPanel(String panelId) {
+                CalendarEventsProvider eventsProvider = new CalendarEventsProvider(getPageTemplate(), getFilterModel());
+                CalendarPanel calendarPanel = new CalendarPanel(panelId, eventsProvider);
+                calendarPanel.setOutputMarkupId(true);
+                return calendarPanel;
+            }
+        });
+
+        tabList.add(new AbstractTab(createStringResource("ReportOverviewTab.tab.details")) {
+
+            @Override
+            public WebMarkupContainer getPanel(String panelId) {
+
+                WorkDataTable table = new WorkDataTable(panelId, getFilterModel(), false);
+                table.setOutputMarkupId(true);
+                return table;
+            }
+        });
+
+        return tabList;
     }
 
     @Override protected void onPreview(AjaxRequestTarget target) {
         GizmoAuthWebSession.getSession().setReportFilterDto(getFilterModel().getObject());
         targetAddFeedback(target);
-        target.add(get(ID_TABLE));
+        target.add(get(ID_OVERVIEW_TABS));
     }
 
     @Override protected void afterCalendarNavigation(AjaxRequestTarget target) {
-        target.add(get(ID_TABLE));
+        target.add(get(ID_OVERVIEW_TABS));
+    }
+
+    @Override
+    protected ReportFilterDto getFilterFromSession() {
+        return GizmoAuthWebSession.getSession().getOverviewReportFilterDto();
+    }
+
+    @Override
+    protected void setFilterToSession(ReportFilterDto filter) {
+        GizmoAuthWebSession.getSession().setOverviewReportFilterDto(filter);
     }
 
     @Override protected Component createDownloadContent(String contentId) {
         return new DownloadOverviewReportConfigPanel(contentId, getFilterModel());
     }
 
-    @Override protected void beforeOpenDownload(AjaxRequestTarget target, Component content) {
-        if (content instanceof DownloadOverviewReportConfigPanel c) {
-            c.syncReportNameWithFilter(target);
-        }
-    }
 }

@@ -50,6 +50,12 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
     private ReportFilterDto dashboardFilter;
     private ReportFilterDto reportFilterDto;
 
+    private ReportFilterDto overviewReportFilterDto;
+    private ReportFilterDto employeeReportFilterDto;
+    private ReportFilterDto projectReportFilterDto;
+    private ReportFilterDto customerReportFilterDto;
+    private ReportFilterDto vacationReportFilterDto;
+
     public GizmoAuthWebSession(Request request) {
         super(request);
         Injector.get().inject(this);
@@ -106,5 +112,45 @@ public class GizmoAuthWebSession extends AuthenticatedWebSession {
 
     public void setReportFilterDto(ReportFilterDto reportFilterDto) {
         this.reportFilterDto = reportFilterDto;
+    }
+
+    public ReportFilterDto getOverviewReportFilterDto() {
+        return overviewReportFilterDto;
+    }
+
+    public void setOverviewReportFilterDto(ReportFilterDto overviewReportFilterDto) {
+        this.overviewReportFilterDto = overviewReportFilterDto;
+    }
+
+    public ReportFilterDto getCustomerReportFilterDto() {
+        return customerReportFilterDto;
+    }
+
+    public void setCustomerReportFilterDto(ReportFilterDto customerReportFilterDto) {
+        this.customerReportFilterDto = customerReportFilterDto;
+    }
+
+    public ReportFilterDto getEmployeeReportFilterDto() {
+        return employeeReportFilterDto;
+    }
+
+    public void setEmployeeReportFilterDto(ReportFilterDto employeeReportFilterDto) {
+        this.employeeReportFilterDto = employeeReportFilterDto;
+    }
+
+    public ReportFilterDto getVacationReportFilterDto() {
+        return vacationReportFilterDto;
+    }
+
+    public void setVacationReportFilterDto(ReportFilterDto vacationReportFilterDto) {
+        this.vacationReportFilterDto = vacationReportFilterDto;
+    }
+
+    public ReportFilterDto getProjectReportFilterDto() {
+        return projectReportFilterDto;
+    }
+
+    public void setProjectReportFilterDto(ReportFilterDto projectReportFilterDto) {
+        this.projectReportFilterDto = projectReportFilterDto;
     }
 }

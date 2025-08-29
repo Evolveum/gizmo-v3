@@ -18,6 +18,7 @@
 package com.evolveum.gizmo.data.provider;
 
 import com.evolveum.gizmo.data.AbstractTask;
+import com.evolveum.gizmo.data.User;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
@@ -33,6 +34,7 @@ import com.evolveum.gizmo.web.PageTemplate;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,46 +56,31 @@ public class SummaryDataProvider implements Serializable {
      * @param filter
      * @return
      */
-    public SummaryPanelDto createSummary(ReportFilterDto filter) {
-        SummaryPanelDto dto = new SummaryPanelDto(filter);
-
+    public List<SummaryPanelDto> createSummary(ReportFilterDto filter) {
         QAbstractTask task = QAbstractTask.abstractTask;
 
 
         JPAQuery<?> query = ReportDataProvider.query(task, page.getEntityManager(), filter);
 
-//        JPAQuery query = new JPAQuery(page.getEntityManager());
-//        QWork work = task.as(QWork.class);
-//        query.from(task).leftJoin(work.part.project);
-//
-//        BooleanBuilder predicates = ReportDataProvider.createPredicates(filter);
-//
-//        if (predicates != null) {
-//            query.where(predicates);
-//        }
-//        if (!list.isEmpty()) {
-//            BooleanBuilder bb = new BooleanBuilder();
-//            bb.orAllOf(list.toArray(new Predicate[list.size()]));
-//            query.where(bb);
-//        }
+        List<SummaryPanelDto> dtos = new ArrayList<>();
 
         QWork work = task.as(QWork.class);
-        query.groupBy(createDateTruncExpression(work));
-        query.select(createDateTruncExpression(work), task.workLength.sum(), work.invoiceLength.sum());
+        query.groupBy(createDateTruncExpression(work), task.realizator);
+        query.select(task.realizator, createDateTruncExpression(work), task.workLength.sum(), work.invoiceLength.sum());
 
         List<Tuple> tuples = (List<Tuple>) query.fetch();
-//        List<Tuple> tuples = query.list(createDateTruncExpression(work),
-//                task.workLength.sum(), work.invoiceLength.sum());
         if (tuples != null) {
             for (Tuple tuple : tuples) {
-                TaskLength taskLength = new TaskLength(tuple.get(1, Double.class), tuple.get(2, Double.class));
-                LocalDate date = tuple.get(0, LocalDate.class);
-//                LocalDate date = day.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                dto.getDates().put(date, taskLength);
+                TaskLength taskLength = new TaskLength(tuple.get(2, Double.class), tuple.get(3, Double.class));
+                LocalDate date = tuple.get(1, LocalDate.class);
+                User realizator = tuple.get(0, User.class);
+                SummaryPanelDto dto = new SummaryPanelDto(realizator, date, taskLength);
+                dtos.add(dto);
+
             }
         }
 
-        return dto;
+        return dtos;
     }
 
     private DateTimeExpression createDateTruncExpression(QWork work) {

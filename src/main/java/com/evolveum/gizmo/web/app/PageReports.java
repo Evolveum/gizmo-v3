@@ -51,10 +51,10 @@ public class PageReports extends PageAppTemplate {
             }
         });
 
-        tabs.add(new AbstractTab(createStringResource("PageReports.tab.usersummary")) {
+        tabs.add(new AbstractTab(createStringResource("PageReports.tab.employeeReport")) {
             @Override
             public WebMarkupContainer getPanel(String panelId) {
-                return new ReportTimeoffTab(panelId);
+                return new ReportEmployeeLogTab(panelId);
             }
         });
 

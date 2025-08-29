@@ -1,5 +1,6 @@
 package com.evolveum.gizmo.component.modal;
 
+import com.evolveum.gizmo.component.AjaxSubmitButton;
 import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -8,6 +9,7 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.behavior.AttributeAppender;
@@ -34,7 +36,10 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
     protected static final String ID_REPORT_NAME = "reportName";
     protected static final String ID_PER_USER = "perUser";
 
-    protected Form<?> form;
+    protected static final String ID_EXPORT = "export";
+    protected static final String ID_CONFIRM_DOWNLOAD = "confirmDownload";
+
+
     protected TextField<String> reportNameField;
     protected IModel<DownloadSettingsDto> downloadModel;
 
@@ -44,10 +49,10 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
 
     @Override
     protected void initLayout() {
-        form = new Form<>(ID_FORM);
+        Form<?> form = new Form<>(ID_FORM);
         add(form);
 
-        buildFields();
+        buildFields(form);
 
         DownloadLink export = new DownloadLink("export",
                 createDownloadModel(),
@@ -70,7 +75,7 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
     protected abstract void generateWorkbook(XSSFWorkbook wb, ReportFilterDto filter, boolean perUser);
 
 
-    protected void buildFields() {
+    protected void buildFields(Form<?> form) {
         if (supportsPerUser()) {
             downloadModel = new LoadableDetachableModel<>() {
                 private DownloadSettingsDto cache;

@@ -22,14 +22,38 @@ import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
 
+import java.util.List;
+
 public class CalendarPanel extends WebMarkupContainer {
 
-    public CalendarPanel(String id, IModel<FullCalendar> model) {
-        super(id, model);
+    private IModel<FullCalendar> model;
+
+    public CalendarPanel(String id, CalendarEventsProvider provider) {
+        super(id);
+        this.model = createCalendarModel(provider);
+    }
+
+    private IModel<FullCalendar> createCalendarModel(CalendarEventsProvider provider) {
+        return () -> {
+
+            List<Plugins> calendarPlugins = List.of(Plugins.DAY_GRID);
+            HeaderToolbar headerToolbar = new HeaderToolbar();
+
+
+            FullCalendar configNew =
+                    new FullCalendar(
+                            calendarPlugins,
+                            headerToolbar,
+                            provider.getStartDateForEvents(),
+                            provider.createEvents()
+                    );
+
+            return configNew;
+        };
     }
 
     private IModel<FullCalendar> getModel() {
-        return (IModel<FullCalendar>) getDefaultModel();
+        return model;
     }
 
     private FullCalendar getModelObject() {
@@ -44,16 +68,6 @@ public class CalendarPanel extends WebMarkupContainer {
         if (config == null) {
             return;
         }
-
-//        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ChartJsPanel.class,
-//                "../../../../webjars/chartjs/4.1.2/dist/chart.umd.js")));
-////        response.render(CssReferenceHeaderItem.forReference(new PackageResourceReference(ChartJsPanel.class,
-////                "../../../../webjars/chartjs/4.1.2/Chart.min.css")));
-
-
-//        String script = "var ctx = document.getElementById('" + getMarkupId() + "');"
-//                +       "var calendar = new Calendar(ctx, " + FullCalendarMapper.toJson(config) + ");"
-//                + "calendar.render();";
         response.render(OnDomReadyHeaderItem.forScript(
                 "window.MidPointFullCalendar.initCalendar('" + getMarkupId() + "', " + FullCalendarMapper.toJson(config) + ");"));
     }

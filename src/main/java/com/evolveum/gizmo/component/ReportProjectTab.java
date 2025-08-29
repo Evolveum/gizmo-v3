@@ -14,8 +14,6 @@ public class ReportProjectTab extends AbstractReportTab {
 
     public ReportProjectTab(String id) { super(id); }
 
-    @Override protected boolean includeCustomerSearch() { return true; }
-
     @Override protected void buildResultsUI() {
         SummaryPartsDataProvider provider = new SummaryPartsDataProvider(getPageTemplate());
         summaryPanel = new SummaryPartsPanel(ID_SUMMARY, provider, getFilterModel());
@@ -31,8 +29,18 @@ public class ReportProjectTab extends AbstractReportTab {
     }
 
     @Override protected void afterCalendarNavigation(AjaxRequestTarget target) {
-        target.add(form);
+        target.add(get(ID_FORM));
         target.add(summaryPanel);
+    }
+
+    @Override
+    protected ReportFilterDto getFilterFromSession() {
+        return GizmoAuthWebSession.getSession().getProjectReportFilterDto();
+    }
+
+    @Override
+    protected void setFilterToSession(ReportFilterDto filter) {
+        GizmoAuthWebSession.getSession().setProjectReportFilterDto(filter);
     }
 
     @Override protected Component createDownloadContent(String contentId) {

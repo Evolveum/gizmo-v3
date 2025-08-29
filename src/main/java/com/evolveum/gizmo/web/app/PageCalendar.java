@@ -18,53 +18,34 @@
 package com.evolveum.gizmo.web.app;
 
 import com.evolveum.gizmo.component.AjaxSubmitButton;
-import com.evolveum.gizmo.component.calendar.*;
+import com.evolveum.gizmo.component.calendar.CalendarEventsProvider;
+import com.evolveum.gizmo.component.calendar.CalendarPanel;
+import com.evolveum.gizmo.component.data.MonthNavigationPanel;
 import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
-import com.evolveum.gizmo.data.Part;
-import com.evolveum.gizmo.data.QAbstractTask;
-import com.evolveum.gizmo.data.QWork;
 import com.evolveum.gizmo.data.User;
-import com.evolveum.gizmo.data.provider.ReportDataProvider;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.wicketstuff.annotation.mount.MountPath;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @MountPath("/app/calendar")
 public class PageCalendar extends PageAppTemplate {
 
     private static final String ID_CALENDAR = "calendar";
     private static final String ID_FORM = "form";
-    private static final String ID_FROM = "from";
-    private static final String ID_TO = "to";
     private static final String ID_REALIZATOR = "realizator";
     private static final String ID_PROJECT = "project";
     private static final String ID_SHOW = "show";
 
-    private static final String ID_BTN_PREVIOUS = "previous";
-    private static final String ID_BTN_NEXT = "next";
-    private static final String ID_MONTH = "month";
+    private static final String ID_MONTH_NAVIGATION = "monthNavigation";
 
-    private IModel<ReportFilterDto> model;
+    private final IModel<ReportFilterDto> model;
 
     public PageCalendar() {
 
@@ -92,30 +73,16 @@ public class PageCalendar extends PageAppTemplate {
         form.setOutputMarkupId(true);
         add(form);
 
-
-        Label month = new Label(ID_MONTH, new PropertyModel<>(model, ReportFilterDto.F_MONTH_YEAR));
-        month.setOutputMarkupId(true);
-        form.add(month);
-
-        AjaxLink<String> prev = new AjaxLink<>(ID_BTN_PREVIOUS, createStringResource("fa-chevron")) {
+        MonthNavigationPanel monthNavigation = new MonthNavigationPanel(ID_MONTH_NAVIGATION, model) {
 
             @Override
-            public void onClick(AjaxRequestTarget target) {
-                previousClicked(target);
+            protected void handleCalendarNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
+                PageCalendar.this.handleCalendarNavigation(target, workFilter);
             }
-        };
-        prev.setOutputMarkupId(true);
-        form.add(prev);
 
-        AjaxLink<String> next = new AjaxLink<>(ID_BTN_NEXT, createStringResource("fa-chevron")) {
-
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                nextClicked(target);
-            }
         };
-        next.setOutputMarkupId(true);
-        form.add(next);
+        monthNavigation.setOutputMarkupId(true);
+        form.add(monthNavigation);
 
         MultiselectDropDownInput<User> realizators = new
                 MultiselectDropDownInput<>(ID_REALIZATOR,
@@ -144,7 +111,8 @@ public class PageCalendar extends PageAppTemplate {
         };
         form.add(preview);
 
-        CalendarPanel calendarPanel = new CalendarPanel(ID_CALENDAR, createCalendarModel());
+        CalendarEventsProvider eventsProvider = new CalendarEventsProvider(PageCalendar.this, model, false);
+        CalendarPanel calendarPanel = new CalendarPanel(ID_CALENDAR, eventsProvider);
         add(calendarPanel);
 
     }
@@ -160,79 +128,7 @@ public class PageCalendar extends PageAppTemplate {
         target.add(get(ID_CALENDAR));
     }
 
-    private IModel<FullCalendar> createCalendarModel() {
-        return () -> {
-
-            List<Plugins> calendarPlugins = List.of(Plugins.DAY_GRID);
-            HeaderToolbar headerToolbar = new HeaderToolbar();
-
-            FullCalendar configNew =
-                    new FullCalendar(
-                            calendarPlugins,
-                            headerToolbar,
-                            Date.from(model.getObject().getDateFrom().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
-                            createEvents()
-                    );
-
-            return configNew;
-        };
-    }
-
-    private List<Event> createEvents() {
-
-
-        QAbstractTask task = QAbstractTask.abstractTask;
-        QWork work = task.as(QWork.class);
-
-        JPAQuery<Event> query = new JPAQuery<>(getEntityManager());
-        query.from(QAbstractTask.abstractTask)
-                .leftJoin(work.part.project);
-        query.where(createPredicate());
-        query.orderBy(work.date.asc());
-
-        List<Tuple> vacations = query.select(work.workLength, work.realizator, work.date, work.part)
-                .fetch();
-
-        List<Event> events = new ArrayList<>();
-        for (Tuple tuple : vacations) {
-            User user = tuple.get(work.realizator);
-            double workLength = tuple.get(work.workLength);
-            double length = workLength / 8 * user.getAllocation();
-            LocalDate date = tuple.get(work.date);
-            Part part = tuple.get(work.part);
-            String color = part.getColor() == null ? null : part.getColor();
-            Date vacationDate = Date.from(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-            Event event = new Event(user.getName(), user.getFullName() + " (" + length + "MD)", vacationDate, color).display("block");
-            events.add(event);
-        }
-
-        return events;
-    }
-
-    private Predicate createPredicate() {
-        ReportFilterDto filter = model.getObject();
-        return ReportDataProvider.createPredicates(filter);
-    }
-
-    private void previousClicked(AjaxRequestTarget target) {
-        ReportFilterDto workFilter = model.getObject();
-        LocalDate defaultFrom = workFilter.getDateFrom();
-        workFilter.setDateFrom(defaultFrom.minusMonths(1));
-
-        workFilter.setDateTo(workFilter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
-        handleCalendatNavigation(target, workFilter);
-    }
-
-    private void nextClicked(AjaxRequestTarget target) {
-        ReportFilterDto workFilter = model.getObject();
-        LocalDate defaultFrom = workFilter.getDateFrom();
-        workFilter.setDateFrom(defaultFrom.plusMonths(1));
-
-        workFilter.setDateTo(workFilter.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
-        handleCalendatNavigation(target, workFilter);
-    }
-
-    private void handleCalendatNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
+    private void handleCalendarNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
         GizmoAuthWebSession session = GizmoAuthWebSession.getSession();
         session.setReportFilterDto(workFilter);
 

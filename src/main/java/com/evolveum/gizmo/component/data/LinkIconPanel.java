@@ -43,7 +43,7 @@ public class LinkIconPanel extends Panel {
     }
 
     private void initLayout(IModel<String> model, IModel<String> titleModel) {
-        AjaxLink link = new AjaxLink(ID_LINK) {
+        AjaxLink<?> link = new AjaxLink<>(ID_LINK) {
 
             @Override
             public void onClick(AjaxRequestTarget target) {
@@ -61,8 +61,8 @@ public class LinkIconPanel extends Panel {
         add(link);
     }
 
-    protected AjaxLink getLink() {
-        return (AjaxLink) get(ID_LINK);
+    protected AjaxLink<?> getLink() {
+        return (AjaxLink<?>) get(ID_LINK);
     }
 
     protected void onClickPerformed(AjaxRequestTarget target) {

@@ -30,9 +30,6 @@ import org.apache.wicket.model.PropertyModel;
 import java.text.DecimalFormat;
 import java.util.List;
 
-/**
- * @author lazyman
- */
 public class SummaryUsersPanel extends SimplePanel<List<UserSummary>> {
 
     private static final String ID_PART_REPEATER = "partRepeater";
@@ -44,7 +41,8 @@ public class SummaryUsersPanel extends SimplePanel<List<UserSummary>> {
     public SummaryUsersPanel(String id, final SummaryUserDataProvider provider, final IModel<ReportFilterDto> model) {
         super(id);
 
-        setModel(new LoadableDetachableModel<List<UserSummary>>() {
+
+        setModel(new LoadableDetachableModel<>() {
             @Override
             protected List<UserSummary> load() {
                 try {

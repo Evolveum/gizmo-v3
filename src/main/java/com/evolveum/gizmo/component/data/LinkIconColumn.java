@@ -54,7 +54,7 @@ public class LinkIconColumn<T extends Serializable> extends AbstractColumn<T, St
         throw new UnsupportedOperationException("Not implemented, please implement in your column.");
     }
 
-    protected void onClickPerformed(AjaxRequestTarget target, IModel<T> rowModel, AjaxLink link) {
+    protected void onClickPerformed(AjaxRequestTarget target, IModel<T> rowModel, AjaxLink<?> link) {
 
     }
 }
