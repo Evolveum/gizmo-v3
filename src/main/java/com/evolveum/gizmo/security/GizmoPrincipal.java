@@ -17,22 +17,45 @@
 
 package com.evolveum.gizmo.security;
 
+import com.evolveum.gizmo.data.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.evolveum.gizmo.data.User;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author lazyman
  */
-public class GizmoPrincipal implements UserDetails {
+public class GizmoPrincipal implements UserDetails, OidcUser {
 
-    private User user;
+    private final User user;
+
+    private Map<String, Object> attributes;
+    private OidcIdToken idToken;
+    private OidcUserInfo userInfo;
+    private Map<String, Object> claims;
 
     public GizmoPrincipal(User user) {
         this.user = user;
+    }
+
+    public GizmoPrincipal(User user, Map<String, Object> attributes, OidcIdToken idToken,
+                         OidcUserInfo userInfo, Map<String, Object> claims) {
+        this.user = user;
+        this.attributes = attributes;
+        this.idToken = idToken;
+        this.userInfo = userInfo;
+        this.claims = claims;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 
     @Override
@@ -80,5 +103,25 @@ public class GizmoPrincipal implements UserDetails {
 
     public User getUser() {
         return user;
+    }
+
+    @Override
+    public Map<String, Object> getClaims() {
+        return claims;
+    }
+
+    @Override
+    public OidcUserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    @Override
+    public OidcIdToken getIdToken() {
+        return idToken;
+    }
+
+    @Override
+    public String getName() {
+        return getUsername();
     }
 }

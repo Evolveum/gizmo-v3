@@ -17,18 +17,36 @@
 package com.evolveum.gizmo;
 
 import com.evolveum.gizmo.security.GizmoAuthProvider;
+import com.evolveum.gizmo.security.GizmoOidcUserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Value("${spring.security.post-logout-redirect-uri}")
+    private String postLogoutRedirectUri;
+
+    private final GizmoOidcUserService gizmoOidcUserService;
+    private final ClientRegistrationRepository clientRegistrationRepository;
+
+    public SecurityConfig(GizmoOidcUserService gizmoOidcUserService,
+                          ClientRegistrationRepository clientRegistrationRepository) {
+        this.gizmoOidcUserService = gizmoOidcUserService;
+        this.clientRegistrationRepository = clientRegistrationRepository;
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -56,18 +74,41 @@ public class SecurityConfig {
                 .defaultSuccessUrl("/dashboard")         // where to go on success
                 .failureUrl("/login?error"));
 
-        http.logout((logout) -> logout
+        http.logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
+                .logoutSuccessHandler(oidcLogoutSuccessHandler())
+                .invalidateHttpSession(true)
                 .clearAuthentication(true)
                 .deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true));
+        );
+
+        http.oauth2Login(oauth2 -> oauth2
+                .userInfoEndpoint(userInfo -> userInfo
+                                .oidcUserService(gizmoOidcUserService))
+                .defaultSuccessUrl("/dashboard", true)
+
+        );
+
+        // TODO valid if we always want redirection to Keycloak
+//        http.exceptionHandling(ex -> ex
+//                .authenticationEntryPoint(
+//                        new LoginUrlAuthenticationEntryPoint("/oauth2/authorization/keycloak")
+//                )
+//        );
 
         http.sessionManagement((sessionManagement) -> sessionManagement
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .maximumSessions(1));
         //csrf and csp policies are set in GizmoApplication
         return http.build();
+    }
+
+    @Bean
+    public LogoutSuccessHandler oidcLogoutSuccessHandler() {
+        OidcClientInitiatedLogoutSuccessHandler handler =
+                new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
+        handler.setPostLogoutRedirectUri(postLogoutRedirectUri);
+        return handler;
     }
 
     @Bean

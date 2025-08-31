@@ -16,6 +16,20 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: password
+  security:
+    post-logout-redirect-uri: http://localhost:8080/gizmo/
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: client_id
+            client-secret: client_secret
+            scope: openid, profile, email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          keycloak:
+            issuer-uri: issuer_uri
 
   jpa:
     database-platform: com.evolveum.gizmo.util.GizmoPostgreSQLDialect
@@ -38,5 +52,4 @@ server:
     session:
       timeout: 30m  # in minutes. By default spring uses seconds, but tomcat/container (not embedded) uses this value
       # as minutes - so we end up with never expiring session.
-
 
