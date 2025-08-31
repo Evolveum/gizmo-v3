@@ -70,6 +70,7 @@ public class SecurityConfig {
 
         http.formLogin((formLogin) -> formLogin
                 .loginPage("/login")
+                .permitAll()
                 .loginProcessingUrl("/login")       // URL form posts to
                 .defaultSuccessUrl("/dashboard")         // where to go on success
                 .failureUrl("/login?error"));
@@ -83,6 +84,7 @@ public class SecurityConfig {
         );
 
         http.oauth2Login(oauth2 -> oauth2
+                .loginPage("/login")
                 .userInfoEndpoint(userInfo -> userInfo
                                 .oidcUserService(gizmoOidcUserService))
                 .defaultSuccessUrl("/dashboard", true)
