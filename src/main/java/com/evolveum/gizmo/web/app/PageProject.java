@@ -225,12 +225,21 @@ public class PageProject extends PageAppProjects {
 
     private void editPartPerformed(AjaxRequestTarget target, Part part) {
 
-        ProjectPartPanel content = new ProjectPartPanel(ModalDialog.CONTENT_ID, () -> part) {
+        if (part.getId() != null) {
+            PartRepository pr = getProjectPartRepository();
+            part = pr.findAllWithLabelsByIdIn(java.util.List.of(part.getId()))
+                    .stream().findFirst()
+                    .orElse(part);
+        }
 
-                @Override
-                protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {
-                    savePartPerformed(target, model);
-                }
+        final Part loadedPart = part;
+
+        ProjectPartPanel content = new ProjectPartPanel(ModalDialog.CONTENT_ID, () -> loadedPart) {
+
+            @Override
+            protected void savePerformed(AjaxRequestTarget target, IModel<Part> model) {
+                savePartPerformed(target, model);
+            }
 
             @Override
             protected void cancelPerformed(AjaxRequestTarget target) {
@@ -242,7 +251,6 @@ public class PageProject extends PageAppProjects {
         MainPopupDialog partModal = (MainPopupDialog) get(ID_PART_MODAL);
         partModal.setContent(content);
         partModal.open(target);
-
     }
 
     private void closeModal(AjaxRequestTarget target) {

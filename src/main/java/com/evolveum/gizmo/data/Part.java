@@ -35,6 +35,7 @@ public class Part implements Serializable {
     public static final String F_NAME = "name";
     public static final String F_DESCRIPTION = "description";
     public static final String F_COLOR = "color";
+    public static final String F_LABELS = "labels";
 
     private Integer id;
     private String name;

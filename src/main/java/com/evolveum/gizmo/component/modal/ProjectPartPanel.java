@@ -17,16 +17,31 @@
 
 package com.evolveum.gizmo.component.modal;
 
+import com.evolveum.gizmo.component.AjaxButton;
+import com.evolveum.gizmo.component.AjaxSubmitButton;
 import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.component.form.GizmoForm;
 import com.evolveum.gizmo.component.form.IconButton;
+import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.data.Part;
 import com.evolveum.gizmo.util.ColorUtils;
+import com.evolveum.gizmo.util.LabelService;
+import com.evolveum.gizmo.data.LabelPart;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author lazyman
@@ -36,9 +51,13 @@ public class ProjectPartPanel extends SimplePanel<Part> {
     private static final String ID_NAME = "name";
     private static final String ID_DESCRIPTION = "description";
     private static final String ID_COLOR = "color";
+    private static final String ID_LABELS = "labels";
     private static final String ID_CANCEL = "cancel";
     private static final String ID_SAVE = "save";
     private static final String ID_FORM = "form";
+
+    @SpringBean
+    private LabelService labelService;
 
     public ProjectPartPanel(String id, IModel<Part> partModel) {
         super(id, partModel);
@@ -70,31 +89,68 @@ public class ProjectPartPanel extends SimplePanel<Part> {
         form.add(color);
 
 
-        IconButton cancel = new IconButton(ID_CANCEL,
-                createStringResource("GizmoApplication.button.cancel"),
-                createStringResource("fa fa-times"),
-                createStringResource("btn-default")) {
+        IChoiceRenderer<LabelPart> labelRenderer = new IChoiceRenderer<>() {
+            @Override public Object getDisplayValue(LabelPart l) { return l.getCode() + " — " + l.getName(); }
+            @Override public String getIdValue(LabelPart l, int index) { return String.valueOf(l.getId()); }
+            @Override public LabelPart getObject(String id, IModel<? extends List<? extends LabelPart>> choices) {
+                Long lid = Long.valueOf(id);
+                for (LabelPart lp : choices.getObject()) if (lp != null && lid.equals(lp.getId())) return lp;
+                return null;
+            }
+        };
+
+        LoadableDetachableModel<List<LabelPart>> labelsChoices = new LoadableDetachableModel<>() {
+            @Override protected List<LabelPart> load() {
+                return labelService != null ? labelService.findAllOrdered() : java.util.Collections.emptyList();
+            }
+        };
+
+        IModel<List<LabelPart>> labelsSelectionModel = new IModel<>() {
+            @Override public List<LabelPart> getObject() {
+                Part p = ProjectPartPanel.this.getModelObject();
+                if (p == null) return java.util.Collections.emptyList();
+                return new ArrayList<>(p.getLabels());
+            }
+            @Override public void setObject(List<LabelPart> value) {
+                Part p = ProjectPartPanel.this.getModelObject();
+                if (p == null) return;
+                p.getLabels().clear();
+                if (value != null) p.getLabels().addAll(value);
+            }
+            @Override public void detach() {}
+        };
+
+        MultiselectDropDownInput<LabelPart> labelsField = new MultiselectDropDownInput<>(
+                ID_LABELS,
+                labelsSelectionModel,
+                labelsChoices,
+                labelRenderer
+        );
+        labelsField.setOutputMarkupId(true);
+        form.add(labelsField);
+
+        AjaxSubmitButton save = new AjaxSubmitButton(ID_SAVE, createStringResource("GizmoApplication.button.save")) {
 
             @Override
-            public void submitPerformed(AjaxRequestTarget target) {
+            protected void onSubmit(AjaxRequestTarget target) {
+                savePerformed(target, ProjectPartPanel.this.getModel());
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget target) {
+                target.add(form);
+            }
+        };
+        form.add(save);
+
+        AjaxButton cancel = new AjaxButton(ID_CANCEL, createStringResource("GizmoApplication.button.cancel")) {
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
                 cancelPerformed(target);
             }
         };
-
         form.add(cancel);
-
-        IconButton save = new IconButton(ID_SAVE,
-                createStringResource("GizmoApplication.button.save"),
-                createStringResource("fa fa-times"),
-                createStringResource("btn-default")) {
-
-            @Override
-            public void submitPerformed(AjaxRequestTarget target) {
-                savePerformed(target, ProjectPartPanel.this.getModel());
-            }
-        };
-
-        form.add(save);
     }
 
     protected void cancelPerformed(AjaxRequestTarget target) {

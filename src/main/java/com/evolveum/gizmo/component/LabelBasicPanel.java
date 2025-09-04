@@ -7,6 +7,7 @@ import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ProjectSearchSettings;
 import com.evolveum.gizmo.repository.PartRepository;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import java.util.List;
@@ -19,7 +20,7 @@ public class LabelBasicPanel extends SimplePanel<LabelPart>{
     @SpringBean private PartRepository partRepository;
 
     private final IModel<ProjectSearchSettings> cppModel =
-            org.apache.wicket.model.Model.of(new ProjectSearchSettings());
+            Model.of(new ProjectSearchSettings());
 
     public LabelBasicPanel(String id, IModel<LabelPart> model) {
         super(id, model);
