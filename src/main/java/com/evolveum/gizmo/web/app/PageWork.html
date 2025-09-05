@@ -21,7 +21,7 @@
 <wicket:extend>
     <form role="form" wicket:id="form">
         <div class="d-flex flex-wrap">
-            <div class="card col-6" wicket:id="works">
+            <div class="card col-12" wicket:id="works">
                 <div class="card-header border-transparent">
                     <h3 class="card-title">
                     </h3>
@@ -37,12 +37,11 @@
                             <label><wicket:message key="PageWork.date"/></label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                  <span class="input-group-text">
-                                    <i class="fa fa-calendar"></i>
-                                  </span>
+                                    <label wicket:id="dateLabel" class="input-group-text" role="button">
+                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                    </label>
                                 </div>
-                                <input type="text" class="form-control float-right"
-                                       wicket:id="date"/>
+                                <input type="text" class="form-control float-right" wicket:id="date"/>
                             </div>
                         </div>
 

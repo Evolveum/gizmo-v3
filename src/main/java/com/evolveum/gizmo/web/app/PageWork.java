@@ -34,9 +34,11 @@ import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
 import com.evolveum.gizmo.web.component.TimeField;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
@@ -44,6 +46,7 @@ import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.validation.validator.RangeValidator;
@@ -192,6 +195,11 @@ public class PageWork extends PageAppTemplate {
         from.add(new DateRangePickerBehavior());
         item.add(from);
 
+        WebMarkupContainer dateLabel = new WebMarkupContainer("dateLabel");
+        dateLabel.add(AttributeModifier.replace("for",
+                LoadableDetachableModel.of(from::getMarkupId)));
+        item.add(dateLabel);
+
         TextField<Double> invoice = new TextField<>(ID_INVOICE, new PropertyModel<>(workModel, WorkDto.F_INVOICE_LENGTH), Double.class);
         invoice.add(new RangeValidator<>(0.0, 2000.0));
         invoice.setOutputMarkupId(true);
@@ -267,7 +275,7 @@ public class PageWork extends PageAppTemplate {
     }
 
     private void cancelPerformed() {
-        setResponsePage(PageWorkReport.class);
+        setResponsePage(PageDashboard.class);
     }
 
     private void saveWorkPerformed(AjaxRequestTarget target) {
