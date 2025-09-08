@@ -280,19 +280,47 @@ public class PageWork extends PageAppTemplate {
 
     private void saveWorkPerformed(AjaxRequestTarget target) {
         try {
-            PartRepository repositoryPart = getProjectPartRepository();
-            List<WorkDto> preparedWorks = model.getObject();
+            PartRepository partRepo = getProjectPartRepository();
+            WorkRepository workRepo = getWorkRepository();
 
-            List<Work> works = preparedWorks.stream()
-                    .map(preparedWork -> preparedWork.createWorks(repositoryPart))
-                    .flatMap(Collection::stream)
-                    .toList();
+            List<WorkDto> dtos = model.getObject();
+            List<Work> toSave = new ArrayList<>();
 
-            getWorkRepository().saveAll(works);
+            for (WorkDto dto : dtos) {
+                if (dto.getId() != null) {
+                    Work entity = workRepo.findById(dto.getId())
+                            .orElseThrow(() -> new IllegalStateException("Work not found: " + dto.getId()));
+
+                    entity.setDate(dto.getDate());
+                    entity.setTrackId(dto.getTrackId());
+                    entity.setWorkLength(dto.getWorkLength());
+                    entity.setInvoiceLength(dto.getInvoiceLength());
+                    entity.setFrom(dto.getFrom());
+                    entity.setTo(dto.getTo());
+                    entity.setDescription(dto.getDescription());
+
+                    Integer partId = Optional.ofNullable(dto.getCustomerProjectPart())
+                            .flatMap(list -> list.stream().findFirst())
+                            .map(cpp -> cpp.getPartId())
+                            .orElse(null);
+
+                    if (partId != null) {
+                        entity.setPart(partRepo.getReferenceById(partId));
+                    }
+                    toSave.add(entity);
+
+                } else {
+                    List<Work> created = dto.createWorks(partRepo);
+                    toSave.addAll(created);
+                }
+            }
+
+            workRepo.saveAll(toSave);
 
             PageWorkReport response = new PageWorkReport();
             response.success(createStringResource("Message.workSavedSuccessfully").getString());
             setResponsePage(response);
+
         } catch (Exception ex) {
             handleGuiException(this, "Message.couldntSaveWork", ex, target);
         }
