@@ -63,8 +63,6 @@ public class WorkDto implements Editable {
 
         this.realizator = principal.getUser();
         this.date = LocalDate.now();
-        this.from = LocalTime.now();
-        this.to = LocalTime.now();
     }
 
 //    public WorkDto(AbstractTask work) {

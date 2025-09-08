@@ -52,6 +52,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.wicketstuff.annotation.mount.MountPath;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -206,20 +208,41 @@ public class PageWork extends PageAppTemplate {
         invoice.add(new EmptyOnChangeAjaxBehavior());
         item.add(invoice);
 
-        TextField<Double> length = new TextField<>(ID_LENGTH, new PropertyModel<>(workModel, WorkDto.F_WORK_LENGTH));
-        length.add(new RangeValidator<>(0.0, 2000.0));
-        length.setType(Double.class);
-        length.add(new EmptyOnChangeAjaxBehavior());
-        item.add(length);
-
         TimeField timeFrom = new TimeField(ID_FROM, new PropertyModel<>(workModel, WorkDto.F_FROM));
         timeFrom.setOutputMarkupId(true);
         timeFrom.add(new EmptyOnChangeAjaxBehavior());
         item.add(timeFrom);
+
         TimeField timeTo = new TimeField(ID_TO, new PropertyModel<>(workModel, WorkDto.F_TO));
         timeTo.setOutputMarkupId(true);
-        timeTo.add(new EmptyOnChangeAjaxBehavior());
         item.add(timeTo);
+
+        TextField<Double> length = new TextField<>(ID_LENGTH,
+                new PropertyModel<>(workModel, WorkDto.F_WORK_LENGTH));
+        length.setOutputMarkupId(true);
+        length.add(new RangeValidator<>(0.0, 2000.0));
+        length.setType(Double.class);
+        item.add(length);
+
+        timeFrom.add(new EmptyOnChangeAjaxBehavior() {
+            @Override protected void onUpdate(AjaxRequestTarget target) {
+                calculateLength(workModel, timeFrom, timeTo, length, target);
+                target.add(get(ID_FORM));
+            }
+        });
+        timeTo.add(new EmptyOnChangeAjaxBehavior() {
+            @Override protected void onUpdate(AjaxRequestTarget target) {
+                calculateLength(workModel, timeFrom, timeTo, length, target);
+                target.add(get(ID_FORM));
+            }
+        });
+
+        length.add(new EmptyOnChangeAjaxBehavior() {
+            @Override protected void onUpdate(AjaxRequestTarget target) {
+                checkLength(workModel, timeFrom, timeTo, length);
+                target.add(PageWork.this.getFeedbackPanel());
+            }
+        });
 
         TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(workModel, WorkDto.F_DESCRIPTION));
         description.add(new EmptyOnChangeAjaxBehavior());
@@ -243,6 +266,31 @@ public class PageWork extends PageAppTemplate {
             }
         });
         item.add(removeWork);
+    }
+
+    private void calculateLength(IModel<WorkDto> workModel,
+                              TimeField from, TimeField to,
+                              TextField<Double> lengthField,
+                              AjaxRequestTarget target) {
+        LocalTime f = from.getModelObject();
+        LocalTime t = to.getModelObject();
+        if (f != null && t != null) {
+            double hours = Duration.between(f, t).toMinutes() / 60.0;
+            workModel.getObject().setWorkLength(hours);
+            target.add(lengthField);
+        }
+    }
+
+    private void checkLength(IModel<WorkDto> workModel, TimeField from, TimeField to, TextField<Double> length){
+        LocalTime f = from.getModelObject();
+        LocalTime t = to.getModelObject();
+        Double l = length.getModelObject();
+        if (f != null && t != null && l!=null) {
+            double hours = Duration.between(f, t).toMinutes() / 60.0;
+            if (Double.compare(hours, l) != 0) {
+                warn(createStringResource("Message.lengthNotCorrect").getString());
+            }
+        }
     }
 
     protected boolean isMultiProjectEnabled() {
