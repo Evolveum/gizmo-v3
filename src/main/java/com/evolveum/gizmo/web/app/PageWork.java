@@ -23,6 +23,7 @@ import com.evolveum.gizmo.component.VisibleEnableBehaviour;
 import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
+import com.evolveum.gizmo.component.form.OnChangeUpdateBehavior;
 import com.evolveum.gizmo.data.Work;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ProjectSearchSettings;
@@ -58,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author lazyman
@@ -224,25 +226,17 @@ public class PageWork extends PageAppTemplate {
         length.setType(Double.class);
         item.add(length);
 
-        timeFrom.add(new EmptyOnChangeAjaxBehavior() {
-            @Override protected void onUpdate(AjaxRequestTarget target) {
-                calculateLength(workModel, timeFrom, timeTo, length, target);
-                target.add(get(ID_FORM));
-            }
-        });
-        timeTo.add(new EmptyOnChangeAjaxBehavior() {
-            @Override protected void onUpdate(AjaxRequestTarget target) {
-                calculateLength(workModel, timeFrom, timeTo, length, target);
-                target.add(get(ID_FORM));
-            }
-        });
+        Consumer<AjaxRequestTarget> calculateAndRefresh = (AjaxRequestTarget t) -> {
+            calculateLength(workModel, timeFrom, timeTo, length, t);
+            t.add(PageWork.this.getFeedbackPanel());
+        };
+        timeFrom.add(OnChangeUpdateBehavior.of(calculateAndRefresh));
+        timeTo.add(OnChangeUpdateBehavior.of(calculateAndRefresh));
 
-        length.add(new EmptyOnChangeAjaxBehavior() {
-            @Override protected void onUpdate(AjaxRequestTarget target) {
-                checkLength(workModel, timeFrom, timeTo, length);
-                target.add(PageWork.this.getFeedbackPanel());
-            }
-        });
+        length.add(OnChangeUpdateBehavior.of(t -> {
+            checkLength(workModel, timeFrom, timeTo, length);
+            t.add(PageWork.this.getFeedbackPanel());
+        }));
 
         TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(workModel, WorkDto.F_DESCRIPTION));
         description.add(new EmptyOnChangeAjaxBehavior());
@@ -276,8 +270,13 @@ public class PageWork extends PageAppTemplate {
         LocalTime t = to.getModelObject();
         if (f != null && t != null) {
             double hours = Duration.between(f, t).toMinutes() / 60.0;
-            workModel.getObject().setWorkLength(hours);
-            target.add(lengthField);
+            if (hours<0){
+                warn(createStringResource("Message.negativeDuration").getString());
+            }
+            else{
+                workModel.getObject().setWorkLength(hours);
+                target.add(lengthField);
+            }
         }
     }
 
