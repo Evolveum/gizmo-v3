@@ -33,6 +33,7 @@ import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
+import org.apache.wicket.PageReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
 import org.apache.wicket.markup.html.form.Form;
@@ -40,6 +41,7 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.wicketstuff.annotation.mount.MountPath;
 
@@ -67,10 +69,13 @@ public class PageBulk extends PageAppTemplate {
     private static final int MAX_BULK_CREATE = 20;
 
     private final IModel<BulkDto> model;
+    private final PageReference returnPage;
 
-    public PageBulk() {
-        model = new LoadableModel<>(false) {
+    private PageBulk(PageReference returnPage, PageParameters params) {
+        super(params);
+        this.returnPage = returnPage;
 
+        this.model = new LoadableModel<>(false) {
             @Override
             protected BulkDto load() {
                 BulkDto dto = new BulkDto();
@@ -78,12 +83,19 @@ public class PageBulk extends PageAppTemplate {
                 dto.setRealizator(principal.getUser());
                 dto.setFrom(LocalDate.now());
                 dto.setWorkLength(8);
-
                 return dto;
             }
         };
 
         initLayout();
+    }
+
+    public PageBulk(PageReference returnPage) {
+        this(returnPage, new PageParameters());
+    }
+
+    public PageBulk() {
+        this(null, new PageParameters());
     }
 
     @Override
@@ -154,7 +166,11 @@ public class PageBulk extends PageAppTemplate {
     }
 
     private void cancelPerformed() {
-        setResponsePage(PageDashboard.class);
+        if (returnPage != null && returnPage.getPage() != null) {
+            setResponsePage(returnPage.getPage());
+        } else {
+            setResponsePage(PageDashboard.class);
+        }
     }
 
     private void saveWorkPerformed(AjaxRequestTarget target) {
@@ -198,12 +214,16 @@ public class PageBulk extends PageAppTemplate {
                 }
             }
             repository.saveAll(works);
-            PageDashboard response = new PageDashboard();
-            response.success(createStringResource("Message.workSavedSuccessfully").getString());
+            getSession().success(createStringResource("Message.workSavedSuccessfully").getString());
             if (count > MAX_BULK_CREATE) {
-                response.warn(createStringResource("Message.bulkStopped", MAX_BULK_CREATE).getString());
+                getSession().warn(createStringResource("Message.bulkStopped", MAX_BULK_CREATE).getString());
             }
-            setResponsePage(response);
+
+            if (returnPage != null && returnPage.getPage() != null) {
+                setResponsePage(returnPage.getPage());
+            } else {
+                setResponsePage(PageDashboard.class);
+            }
         } catch (Exception ex) {
             handleGuiException(this, "Message.couldntSaveWork", ex, target);
         }

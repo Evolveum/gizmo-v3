@@ -134,11 +134,11 @@ public class PageDashboard extends PageAppTemplate {
         return fragment;
     }
     private void newWorkPerformed() {
-        setResponsePage(PageWork.class);
+        setResponsePage(new PageWork(this.getPageReference()));
     }
 
     private void newBulkPerformed() {
-        setResponsePage(PageBulk.class);
+        setResponsePage(new PageBulk(this.getPageReference()));
     }
 
     private void handleCalendarNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {

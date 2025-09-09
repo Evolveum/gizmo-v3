@@ -131,11 +131,11 @@ public class PageWorkReport extends PageAppTemplate {
     }
 
     private void newWorkPerformed() {
-        setResponsePage(PageWork.class);
+        setResponsePage(new PageWork(this.getPageReference()));
     }
 
     private void newBulkPerformed() {
-        setResponsePage(PageBulk.class);
+        setResponsePage(new PageBulk(this.getPageReference()));
     }
 
 

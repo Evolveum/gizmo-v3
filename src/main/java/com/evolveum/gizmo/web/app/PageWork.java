@@ -36,6 +36,7 @@ import com.evolveum.gizmo.util.GizmoUtils;
 import com.evolveum.gizmo.util.LoadableModel;
 import com.evolveum.gizmo.web.component.TimeField;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.PageReference;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
@@ -84,23 +85,32 @@ public class PageWork extends PageAppTemplate {
     private static final String ID_REMOVE_WORK = "removeWork";
 
     private final IModel<List<WorkDto>> model;
+    private final PageReference returnPage;
 
-    public PageWork() {
-        this(null);
-    }
-
-    public PageWork(PageParameters params) {
+    private PageWork(PageReference returnPage, PageParameters params) {
         super(params);
-        model = new LoadableModel<>(false) {
-
+        this.returnPage = returnPage;
+        this.model = new LoadableModel<>(false) {
             @Override
             protected List<WorkDto> load() {
                 return loadWorks();
             }
         };
-
         initLayout();
     }
+
+    public PageWork() {
+        this(null, new PageParameters());
+    }
+
+    public PageWork(PageParameters params) {
+        this(null, params);
+    }
+
+    public PageWork(PageReference returnPage) {
+        this(returnPage, new PageParameters());
+    }
+
 
     @Override
     protected IModel<String> createPageTitleModel() {
@@ -334,7 +344,11 @@ public class PageWork extends PageAppTemplate {
     }
 
     private void cancelPerformed() {
-        setResponsePage(PageDashboard.class);
+        if (returnPage != null && returnPage.getPage() != null) {
+            setResponsePage(returnPage.getPage());
+        } else {
+            setResponsePage(PageDashboard.class);
+        }
     }
 
     private void saveWorkPerformed(AjaxRequestTarget target) {
@@ -376,9 +390,16 @@ public class PageWork extends PageAppTemplate {
 
             workRepo.saveAll(toSave);
 
-            PageWorkReport response = new PageWorkReport();
-            response.success(createStringResource("Message.workSavedSuccessfully").getString());
-            setResponsePage(response);
+            String msg = createStringResource("Message.workSavedSuccessfully").getString();
+
+            if (returnPage != null && returnPage.getPage() != null) {
+                getSession().success(msg);
+                setResponsePage(returnPage.getPage());
+            } else {
+                PageWorkReport response = new PageWorkReport();
+                response.success(msg);
+                setResponsePage(response);
+            }
 
         } catch (Exception ex) {
             handleGuiException(this, "Message.couldntSaveWork", ex, target);
