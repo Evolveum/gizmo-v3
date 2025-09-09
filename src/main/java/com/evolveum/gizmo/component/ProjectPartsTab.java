@@ -37,10 +37,12 @@ import com.evolveum.gizmo.data.Project;
 import com.evolveum.gizmo.data.QPart;
 import com.evolveum.gizmo.web.app.PageAppTemplate;
 import com.evolveum.gizmo.web.app.PageProject;
+import com.evolveum.gizmo.data.LabelPart;
 import org.apache.wicket.markup.html.basic.Label;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author lazyman
@@ -103,6 +105,22 @@ public class ProjectPartsTab extends SimplePanel {
             }
         });
         columns.add(new PropertyColumn(createStringResource("Part.description"), Part.F_DESCRIPTION));
+
+        columns.add(new AbstractColumn<Part, String>(createStringResource("Part.labels")) {
+            @Override
+            public void populateItem(Item<ICellPopulator<Part>> cellItem,
+                                     String componentId,
+                                     IModel<Part> rowModel) {
+                Part p = rowModel.getObject();
+                String text = (p.getLabels() == null) ? "" :
+                        p.getLabels().stream()
+                                .map(LabelPart::getName)
+                                .sorted(String::compareToIgnoreCase)
+                                .collect(java.util.stream.Collectors.joining(", "));
+                cellItem.add(new Label(componentId, text));
+            }
+        });
+
         columns.add(new AbstractColumn<Part, String>(createStringResource("Part.color")) {
             @Override
             public void populateItem(Item<ICellPopulator<Part>> cellItem, String componentId, IModel<Part> rowModel) {
