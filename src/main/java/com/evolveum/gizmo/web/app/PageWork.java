@@ -226,17 +226,29 @@ public class PageWork extends PageAppTemplate {
         length.setType(Double.class);
         item.add(length);
 
-        Consumer<AjaxRequestTarget> calculateAndRefresh = (AjaxRequestTarget t) -> {
-            calculateLength(workModel, timeFrom, timeTo, length, t);
-            t.add(PageWork.this.getFeedbackPanel());
-        };
-        timeFrom.add(OnChangeUpdateBehavior.of(calculateAndRefresh));
-        timeTo.add(OnChangeUpdateBehavior.of(calculateAndRefresh));
+        timeFrom.add(new OnChangeUpdateBehavior() {
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                calculateLength(workModel, timeFrom, timeTo, length, target);
+                target.add(PageWork.this.getFeedbackPanel());
+            }
+        });
 
-        length.add(OnChangeUpdateBehavior.of(t -> {
-            checkLength(workModel, timeFrom, timeTo, length);
-            t.add(PageWork.this.getFeedbackPanel());
-        }));
+        timeTo.add(new OnChangeUpdateBehavior() {
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                calculateLength(workModel, timeFrom, timeTo, length, target);
+                target.add(PageWork.this.getFeedbackPanel());
+            }
+        });
+
+        length.add(new OnChangeUpdateBehavior() {
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                checkLength(workModel, timeFrom, timeTo, length);
+                target.add(PageWork.this.getFeedbackPanel());
+            }
+        });
 
         TextArea<String> description = new TextArea<>(ID_DESCRIPTION, new PropertyModel<>(workModel, WorkDto.F_DESCRIPTION));
         description.add(new EmptyOnChangeAjaxBehavior());
