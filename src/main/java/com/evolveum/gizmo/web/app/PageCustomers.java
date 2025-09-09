@@ -22,6 +22,7 @@ import com.querydsl.core.types.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.form.Form;
@@ -103,18 +104,14 @@ public class PageCustomers extends PageAppCustomers {
     }
 
     private void initButtons(Form form) {
-        IconButton search = new IconButton(ID_SEARCH,
-                createStringResource("PageCustomers.search"),
-                createStringResource("fa-search"),
-                createStringResource("btn-primary")) {
-
+        AjaxButton search = new AjaxButton(ID_SEARCH, form) {
             @Override
-            protected void submitPerformed(AjaxRequestTarget target) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 searchPerformed(target);
             }
         };
-        search.setRenderBodyOnly(true);
         form.add(search);
+        form.setDefaultButton(search);
 
     }
 

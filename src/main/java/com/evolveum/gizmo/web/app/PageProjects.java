@@ -22,6 +22,7 @@ import com.querydsl.core.types.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.form.Form;
@@ -32,7 +33,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.springframework.data.domain.Sort;
 import org.wicketstuff.annotation.mount.MountPath;
-import com.evolveum.gizmo.component.AjaxButton;
 import com.evolveum.gizmo.component.data.LinkColumn;
 import com.evolveum.gizmo.component.data.TablePanel;
 import com.evolveum.gizmo.component.form.IconButton;
@@ -125,18 +125,14 @@ public class PageProjects extends PageAppProjects {
 
 
     private void initButtons(Form form) {
-        IconButton search = new IconButton(ID_SEARCH,
-                createStringResource("PageProjects.search"),
-                createStringResource("fa-search"),
-                createStringResource("btn-primary")) {
-
+        AjaxButton search = new AjaxButton(ID_SEARCH, form) {
             @Override
-            protected void submitPerformed(AjaxRequestTarget target) {
+            protected void onSubmit(AjaxRequestTarget target) {
                 searchPerformed(target);
             }
         };
-        search.setRenderBodyOnly(true);
         form.add(search);
+        form.setDefaultButton(search);
     }
 
     private void newProjectPerformed(AjaxRequestTarget target) {

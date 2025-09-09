@@ -12,6 +12,7 @@ import com.querydsl.core.types.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -116,16 +117,14 @@ public class PageLabels extends PageAppTemplate {
     }
 
     private void initButtons(Form<?> form) {
-        IconButton search = new IconButton(ID_SEARCH,
-                createStringResource("PageLabels.search"),
-                createStringResource("fa-search"),
-                createStringResource("btn-primary")) {
-            @Override protected void submitPerformed(AjaxRequestTarget target) {
+        AjaxButton search = new AjaxButton(ID_SEARCH, form) {
+            @Override
+            protected void onSubmit(AjaxRequestTarget target) {
                 searchPerformed(target);
             }
         };
-        search.setOutputMarkupId(true);
         form.add(search);
+        form.setDefaultButton(search);
     }
 
     private void searchPerformed(AjaxRequestTarget target) {
