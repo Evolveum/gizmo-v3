@@ -19,11 +19,9 @@
 
 <html xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
-
-    <div class="progress">
-        <div wicket:id="progressBar" class="progress-bar" role="progressbar" style="width: 25%;" aria-valuemin="0" ></div>
+    <div class="progress" wicket:id="progress">
+        <div class="progress-bar" wicket:id="progressBar" role="progressbar" aria-valuemin="0"></div>
+        <span wicket:id="progressText"></span>
     </div>
-
-
 </wicket:panel>
 </html>
