@@ -32,6 +32,7 @@ public class ReportFilterDto implements Serializable {
     public static final String F_PROJECT_SEARCH_SETTINGS = "projectSearchSettings";
     public static final String F_CUSTOMER = "customer";
     public static final String F_REALIZATORS = "realizators";
+    public static final String F_INCLUDE_DISABLED = "includeDisabled";
     public static final String F_MONTH_YEAR = "monthYear";
     public static final String F_LABELS = "labels";
 
@@ -40,6 +41,7 @@ public class ReportFilterDto implements Serializable {
 
     private ProjectSearchSettings projectSearchSettings = new ProjectSearchSettings();
     private List<User> realizators;
+    private boolean includeDisabled;
     private WorkType workType = WorkType.ALL;
 
     private List<LabelPart> labels = new ArrayList<>();
@@ -83,6 +85,10 @@ public class ReportFilterDto implements Serializable {
     public void setRealizators(List<User> realizators) {
         this.realizators = realizators;
     }
+
+    public boolean isIncludeDisabled() { return includeDisabled; }
+
+    public void setIncludeDisabled(boolean includeDisabled) { this.includeDisabled = includeDisabled; }
 
     public WorkType getWorkType() {
         return workType;

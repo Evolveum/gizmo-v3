@@ -9,6 +9,7 @@ import com.evolveum.gizmo.component.modal.MainPopupDialog;
 import com.evolveum.gizmo.data.LabelPart;
 import com.evolveum.gizmo.data.User;
 import com.evolveum.gizmo.dto.ReportFilterDto;
+import com.evolveum.gizmo.repository.UserRepository;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
@@ -19,6 +20,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
 import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
 import org.apache.wicket.markup.html.WebPage;
@@ -26,6 +28,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -98,13 +101,40 @@ public abstract class AbstractReportTab extends SimplePanel<ReportFilterDto> {
         to.add(new DateRangePickerBehavior());
         form.add(to);
 
-        MultiselectDropDownInput<User> realizators = new MultiselectDropDownInput<>(ID_REALIZATOR,
+        IModel<List<User>> usersModel = new LoadableDetachableModel<>() {
+            @Override
+            protected List<User> load() {
+                UserRepository repository = getPageTemplate().getUserRepository();
+                boolean includeDisabled = Boolean.TRUE.equals(
+                        new PropertyModel<Boolean>(model, ReportFilterDto.F_INCLUDE_DISABLED).getObject()
+                );
+                List<User> out = includeDisabled
+                        ? repository.findAllByOrderByNameAsc()
+                        : repository.findAllEnabledUsers();
+                return out;
+            }
+        };
+
+        MultiselectDropDownInput<User> realizators = new MultiselectDropDownInput<>(
+                ID_REALIZATOR,
                 new PropertyModel<>(model, ReportFilterDto.F_REALIZATORS),
-                GizmoUtils.createUsersModel(getPageTemplate()),
+                usersModel,
                 GizmoUtils.createUserChoiceRenderer());
         realizators.setOutputMarkupId(true);
-        realizators.add(new EmptyOnChangeAjaxBehavior());
         form.add(realizators);
+
+       CheckBox includeDisabled = new CheckBox("includeDisabled",
+                new PropertyModel<>(model, ReportFilterDto.F_INCLUDE_DISABLED));
+        includeDisabled.setOutputMarkupId(true);
+
+        includeDisabled.add(new AjaxFormComponentUpdatingBehavior("change") {
+            @Override protected void onUpdate(AjaxRequestTarget target) {
+                usersModel.detach();
+                realizators.modelChanged();
+                target.add(realizators);
+            }
+        });
+        form.add(includeDisabled);
 
         CustomerProjectPartSearchPanel customerProjectSearchPanel = new CustomerProjectPartSearchPanel(ID_CUSTOMER, new PropertyModel<>(getFilterModel(), ReportFilterDto.F_PROJECT_SEARCH_SETTINGS));
         customerProjectSearchPanel.add(new VisibleEnableBehaviour() {
