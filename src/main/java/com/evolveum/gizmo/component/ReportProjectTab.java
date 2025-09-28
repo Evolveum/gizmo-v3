@@ -18,7 +18,7 @@ public class ReportProjectTab extends AbstractReportTab {
         SummaryPartsDataProvider provider = new SummaryPartsDataProvider(getPageTemplate());
         summaryPanel = new SummaryPartsPanel(ID_SUMMARY, provider, getFilterModel());
         summaryPanel.setOutputMarkupId(true);
-        addOrReplace(summaryPanel);
+        add(summaryPanel);
     }
 
     @Override protected void onPreview(AjaxRequestTarget target) {

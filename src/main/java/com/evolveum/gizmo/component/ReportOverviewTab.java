@@ -4,6 +4,7 @@ import com.evolveum.gizmo.component.calendar.CalendarEventsProvider;
 import com.evolveum.gizmo.component.calendar.CalendarPanel;
 import com.evolveum.gizmo.component.data.WorkDataTable;
 import com.evolveum.gizmo.component.modal.DownloadOverviewReportConfigPanel;
+import com.evolveum.gizmo.data.provider.SummaryPartsDataProvider;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import com.evolveum.gizmo.security.GizmoAuthWebSession;
 import org.apache.wicket.Component;
@@ -31,7 +32,7 @@ public class ReportOverviewTab extends AbstractReportTab {
     private List<ITab> createTabs() {
         List<ITab> tabList = new ArrayList<>();
 
-        tabList.add(new AbstractTab(createStringResource("ReportOverviewTab.tab.summary")) {
+        tabList.add(new AbstractTab(createStringResource("ReportOverviewTab.tab.calendar")) {
 
             @Override
             public WebMarkupContainer getPanel(String panelId) {
@@ -50,6 +51,17 @@ public class ReportOverviewTab extends AbstractReportTab {
                 WorkDataTable table = new WorkDataTable(panelId, getFilterModel(), false);
                 table.setOutputMarkupId(true);
                 return table;
+            }
+        });
+
+        tabList.add(new AbstractTab(createStringResource("ReportOverviewTab.tab.summary")) {
+
+            @Override
+            public WebMarkupContainer getPanel(String panelId) {
+                SummaryPartsDataProvider provider = new SummaryPartsDataProvider(getPageTemplate());
+                SummaryPartsPanel summaryPanel = new SummaryPartsPanel(panelId, provider, getFilterModel());
+                summaryPanel.setOutputMarkupId(true);
+                return summaryPanel;
             }
         });
 

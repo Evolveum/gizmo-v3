@@ -19,6 +19,7 @@ package com.evolveum.gizmo.web.app;
 
 
 import com.evolveum.gizmo.component.SummaryChartPanel;
+import com.evolveum.gizmo.component.SummaryPartsPanel;
 import com.evolveum.gizmo.component.calendar.CalendarEventsProvider;
 import com.evolveum.gizmo.component.calendar.CalendarPanel;
 import com.evolveum.gizmo.component.data.MonthNavigationPanel;
@@ -47,6 +48,7 @@ public class PageDashboard extends PageAppTemplate {
     private static final String ID_BTN_NEW_WORK = "newWork";
     private static final String ID_BTN_NEW_BULK = "newBulk";
 
+    private static final String ID_SUMMARY = "summary";
     private static final String ID_CALENDAR = "calendar";
 
     private final IModel<ReportFilterDto> filter;
@@ -100,6 +102,10 @@ public class PageDashboard extends PageAppTemplate {
         SummaryChartPanel chart = new SummaryChartPanel(ID_SUMMARY_PARTS, partsProvider, getFilterModel());
         chart.setOutputMarkupId(true);
         add(chart);
+
+        SummaryPartsPanel summaryPanel = new SummaryPartsPanel(ID_SUMMARY, partsProvider, getFilterModel());
+        summaryPanel.setOutputMarkupId(true);
+        add(summaryPanel);
 
         CalendarEventsProvider eventsProvider = new CalendarEventsProvider(PageDashboard.this, getFilterModel());
         CalendarPanel calendarPanel = new CalendarPanel(ID_CALENDAR, eventsProvider);
