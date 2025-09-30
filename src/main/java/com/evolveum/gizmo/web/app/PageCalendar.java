@@ -87,7 +87,7 @@ public class PageCalendar extends PageAppTemplate {
         MultiselectDropDownInput<User> realizators = new
                 MultiselectDropDownInput<>(ID_REALIZATOR,
                 new PropertyModel<>(model, ReportFilterDto.F_REALIZATORS),
-                GizmoUtils.createUsersModel(this),
+                GizmoUtils.createUsersModel(this, model),
                 GizmoUtils.createUserChoiceRenderer());
         realizators.setOutputMarkupId(true);
         form.add(realizators);

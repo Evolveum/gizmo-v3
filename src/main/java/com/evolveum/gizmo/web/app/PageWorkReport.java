@@ -84,6 +84,11 @@ public class PageWorkReport extends PageAppTemplate {
             protected boolean isProgressPanelVisible() {
                 return true;
             }
+
+            @Override
+            protected boolean isCustomDateRangeVisible() {
+                return true;
+            }
         };
         monthNavigationPanel.setOutputMarkupId(true);
         add(monthNavigationPanel);

@@ -51,9 +51,9 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
     private Integer projectId;
     private Integer partId;
 
-    private boolean customerSearch = true;
-    private boolean projectSearch = true;
-    private boolean partSearch = true;
+//    private boolean customerSearch = true;
+//    private boolean projectSearch = true;
+//    private boolean partSearch = true;
 
     public CustomerProjectPartDto() {
     }

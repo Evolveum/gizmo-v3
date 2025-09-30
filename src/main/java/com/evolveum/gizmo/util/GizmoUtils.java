@@ -125,6 +125,14 @@ public class GizmoUtils {
         return LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
     }
 
+    public static LocalDate computeWorkTo(LocalDate from) {
+        return from.with(TemporalAdjusters.lastDayOfMonth());
+    }
+
+    public static LocalDate computeWorkFrom(LocalDate from) {
+        return from.with(TemporalAdjusters.firstDayOfMonth());
+    }
+
     public static <T extends Enum<?>> IModel<List<T>> createReadonlyModelFromEnum(final Class<T> type) {
         return () -> {
             List<T> list = new ArrayList<>();
@@ -188,15 +196,17 @@ public class GizmoUtils {
         };
     }
 
-    public static IModel<List<User>> createUsersModel(final PageTemplate page) {
+    public static LoadableModel<List<User>> createUsersModel(final PageTemplate page, IModel<ReportFilterDto> model) {
         return new LoadableModel<>(false) {
 
             @Override
             protected List<User> load() {
                 try {
                     UserRepository repository = page.getUserRepository();
-
-                    return repository.findAllEnabledUsers();
+                    if (model == null) {
+                        return repository.findAllEnabledUsers();
+                    }
+                    return model.getObject().isIncludeDisabled() ? repository.listUsers() : repository.findAllEnabledUsers();
                 } catch (Exception ex) {
                     handleModelException(page, "Message.couldntLoadUsers", ex);
                 }
@@ -205,6 +215,35 @@ public class GizmoUtils {
             }
         };
     }
+
+    public static IChoiceRenderer<LabelPart> createCategoriesChoiceRenderer() {
+
+        return new IChoiceRenderer<>() {
+
+            @Override
+            public Object getDisplayValue(LabelPart l) {
+                return l.getCode() + " — " + l.getName();
+            }
+
+            @Override
+            public String getIdValue(LabelPart l, int index) {
+                return String.valueOf(l.getId());
+            }
+
+            @Override
+            public LabelPart getObject(String id, IModel<? extends List<? extends LabelPart>> choices) {
+                Long lid = Long.valueOf(id);
+                for (LabelPart lp : choices.getObject()) if (lp != null && lid.equals(lp.getId())) return lp;
+                return null;
+            }
+        };
+    }
+
+   public static LoadableModel<List<LabelPart>> createCategoriesChoices(PageTemplate pageTemplate) {
+       return new LoadableModel<>(false) {
+           @Override protected List<LabelPart> load() { return pageTemplate.getLabelPartRepository().listLabels(); }
+       };
+   }
 
     public static LoadableModel<List<CustomerProjectPartDto>> createCustomerProjectPartList(final PageTemplate page,
                                                                                      IModel<ProjectSearchSettings> settings) {

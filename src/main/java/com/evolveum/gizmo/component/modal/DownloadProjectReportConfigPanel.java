@@ -28,7 +28,7 @@ public class DownloadProjectReportConfigPanel extends AbstractExcelDownloadPanel
     @Override protected boolean supportsPerUser() { return false; }
 
     @Override
-    protected void generateWorkbook(XSSFWorkbook wb, ReportFilterDto filter, boolean perUser) {
+    protected void generateWorkbook(XSSFWorkbook wb, ReportFilterDto filter) {
         XSSFSheet sheet = getSheet(wb, "Project summary");
         CellStyle header = headerStyle(wb);
         CellStyle text = textStyle(wb);

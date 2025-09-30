@@ -18,6 +18,7 @@
 package com.evolveum.gizmo.web;
 
 import com.evolveum.gizmo.repository.*;
+import com.evolveum.gizmo.util.LabelService;
 import org.apache.commons.lang3.Validate;
 import org.apache.wicket.devutils.debugbar.DebugBar;
 import org.apache.wicket.injection.Injector;
@@ -62,6 +63,10 @@ public class PageTemplate extends WebPage {
     private Environment environment;
     @SpringBean
     private LabelRepository labelRepository;
+
+//    @SpringBean
+//    private LabelService labelService;
+
 
     public PageTemplate() {
         this(null);

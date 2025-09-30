@@ -42,6 +42,6 @@ public class LabelBasicPanel extends SimplePanel<LabelPart>{
 
     public List<CustomerProjectPartDto> getSelectedTriples() {
         var s = cppModel.getObject();
-        return (s != null && s.getCustomer() != null) ? s.getCustomer() : List.of();
+        return (s != null && s.getCustomerProjectPartDtoList() != null) ? s.getCustomerProjectPartDtoList() : List.of();
     }
 }

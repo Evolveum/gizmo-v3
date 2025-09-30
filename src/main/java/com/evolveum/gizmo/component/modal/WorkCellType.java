@@ -23,22 +23,22 @@ import java.util.Arrays;
 import java.util.List;
 
 enum WorkCellType {
-    DATE("Date", LocalDate.class, "getDate", new ReportType[]{ReportType.GENERIC, ReportType.CUSTOMER}),
-    FROM("From", LocalTime.class, "getFrom", new ReportType[]{ReportType.GENERIC, ReportType.CUSTOMER}),
-    TO("To", LocalTime.class, "getTo", new ReportType[]{ReportType.GENERIC, ReportType.CUSTOMER}),
-    REALIZATOR("Realizator", String.class, "getRealizator.getFullName", new ReportType[]{ReportType.GENERIC, ReportType.CUSTOMER}),
-    CUSTOMER("Customer", String.class, "getPart.getProject.getCustomer.getName", new ReportType[]{ReportType.GENERIC}),
-    PROJECT("Project", String.class, "getPart.getProject.getName", new ReportType[]{ReportType.CUSTOMER, ReportType.GENERIC}),
-    PART("Part", String.class, "getPart.getName", new ReportType[]{ReportType.CUSTOMER, ReportType.GENERIC}),
-    TRACK_ID("Track ID", String.class, "getTrackId", new ReportType[]{ReportType.GENERIC}),
-    DESCRIPTION("Description", String.class, "getDescription", new ReportType[]{ReportType.CUSTOMER, ReportType.GENERIC}),
-    WORK_LENGTH("Length", double.class, "getWorkLength", new ReportType[]{ReportType.CUSTOMER, ReportType.GENERIC, ReportType.INTERNAL}),
+    DATE("Date", LocalDate.class, "getDate", new ReportType[]{ReportType.WORK_REPORT, ReportType.CUSTOMER}),
+    FROM("From", LocalTime.class, "getFrom", new ReportType[]{ReportType.WORK_REPORT}),
+    TO("To", LocalTime.class, "getTo", new ReportType[]{ReportType.WORK_REPORT}),
+    REALIZATOR("Realizator", String.class, "getRealizator.getFullName", new ReportType[]{ReportType.WORK_REPORT, ReportType.CUSTOMER}),
+    CUSTOMER("Customer", String.class, "getPart.getProject.getCustomer.getName", new ReportType[]{ReportType.WORK_REPORT}),
+    PROJECT("Project", String.class, "getPart.getProject.getName", new ReportType[]{ReportType.CUSTOMER, ReportType.WORK_REPORT}),
+    PART("Part", String.class, "getPart.getName", new ReportType[]{ReportType.CUSTOMER, ReportType.WORK_REPORT}),
+    TRACK_ID("Track ID", String.class, "getTrackId", new ReportType[]{ReportType.WORK_REPORT}),
+    DESCRIPTION("Description", String.class, "getDescription", new ReportType[]{ReportType.CUSTOMER, ReportType.WORK_REPORT}),
+    WORK_LENGTH("Length", double.class, "getWorkLength", new ReportType[]{ReportType.CUSTOMER, ReportType.WORK_REPORT}),
 //    INVOICE_LENGTH("Invoice", double.class, "getInvoiceLength", new ReportType[]{ReportType.CUSTOMER}),
 
-    USER("Realizator", String.class, "getFullName", new ReportType[]{ReportType.SUMMARY}),
-    PART_NAME("Project", String.class, "getName", new ReportType[]{ReportType.SUMMARY}),
-    SUMMARY_WORK_LENGTH("Work", String.class, "getLength", new ReportType[]{ReportType.SUMMARY}),
-    SUMMARY_INVOICE_LENGTH("Invoice", String.class, "getInvoice", new ReportType[]{ReportType.SUMMARY})
+//    USER("Realizator", String.class, "getFullName", new ReportType[]{ReportType.SUMMARY, ReportType.CUSTOMER}),
+//    PART_NAME("Project", String.class, "getName", new ReportType[]{ReportType.SUMMARY, ReportType.CUSTOMER}),
+//    SUMMARY_WORK_LENGTH("Work", String.class, "getLength", new ReportType[]{ReportType.SUMMARY, ReportType.CUSTOMER}),
+//    SUMMARY_INVOICE_LENGTH("Invoice", String.class, "getInvoice", new ReportType[]{ReportType.SUMMARY, ReportType.CUSTOMER})
     ;
 
     private String displayName;
@@ -70,6 +70,6 @@ enum WorkCellType {
     }
 
     public static List<WorkCellType> getCellsForReport(ReportType reportType) {
-        return Arrays.stream(values()).filter(r -> Arrays.stream(r.reportType).anyMatch(type -> ReportType.ALL == type || type == reportType)).toList();
+        return Arrays.stream(values()).filter(r -> Arrays.stream(r.reportType).anyMatch(type -> type == reportType)).toList();
     }
 }

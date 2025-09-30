@@ -123,44 +123,37 @@ public class ReportDataProvider extends SortableDataProvider<WorkDto, String> {
             list.add(task.type.eq(filter.getWorkType().getType()));
         }
 
-        p = createProjectListPredicate(filter.getCustomerProjectPartDtos(), task);
+        List<LabelPart> labelParts = filter.getLabels();
+        p = createLabelsPredicate(labelParts);
         if (p != null) {
             list.add(p);
         }
 
+        List<CustomerProjectPartDto> allFilter = filter.getCustomerProjectPartDtos();
+        p = createProjectListPredicate(allFilter);
+        if (p != null) {
+            list.add(p);
+        }
 
-        if (filter.getLabelIds() != null && !filter.getLabelIds().isEmpty()) {
-            list.add(task.type.eq(WorkType.WORK.getType()));
-            QWork w = QWork.work;
-            list.add(
-                    JPAExpressions.selectOne()
-                            .from(w)
-                            .where(
-                                    w.id.eq(task.id)
-                                            .and(w.part.isNotNull())
-                                            .and(w.part.labels.any().id.in(filter.getLabelIds()))
-                            )
-                            .exists()
-            );
-        }
-        BooleanBuilder date = new BooleanBuilder();
         if (filter.getDateFrom() != null) {
-            date.and(task.date.goe(filter.getDateFrom()));
+            list.add(task.date.goe(filter.getDateFrom()));
         }
-        if (filter.getDateTo()   != null) {
-            date.and(task.date.loe(filter.getDateTo()));
+
+        if (filter.getDateTo() != null) {
+            list.add(task.date.loe(filter.getDateTo()));
         }
-        if (date.getValue() != null) {
-            list.add(date);
-        }
+
+        BooleanBuilder allWork = new BooleanBuilder();
 
         if (list.isEmpty()) {
             return null;
         }
 
-        BooleanBuilder where = new BooleanBuilder();
-        for (Predicate pr : list) { where.and(pr); }
-        return where;
+
+//        if (!list.isEmpty()) {
+        allWork.orAllOf(list.toArray(new Predicate[0]));
+//        }
+        return allWork;
     }
 
     public static List<Predicate> createTimeOffPredicates(ReportFilterDto filter) {
@@ -183,6 +176,34 @@ public class ReportDataProvider extends SortableDataProvider<WorkDto, String> {
         }
 
         return list;
+    }
+
+    private static Predicate createProjectListPredicate(List<CustomerProjectPartDto> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+
+//        if (labelParts != null && !labelParts.isEmpty()) {
+//            if (list == null) {
+//                list = new ArrayList<>();
+//            }
+//            for (LabelPart lp : labelParts) {
+//                CustomerProjectPartDto dto = new CustomerProjectPartDto();
+//                dto.setLabelId(lp.getId());
+//                list.add(dto);
+//            }
+//        }
+
+        if (list.size() == 1) {
+            return createPredicate(list.get(0));
+        }
+
+        BooleanBuilder bb = new BooleanBuilder();
+        for (CustomerProjectPartDto dto : list) {
+            bb.or(createPredicate(dto));
+        }
+
+        return bb;
     }
 
     private static Predicate createProjectListPredicate(List<CustomerProjectPartDto> list, QAbstractTask task) {
@@ -233,16 +254,29 @@ public class ReportDataProvider extends SortableDataProvider<WorkDto, String> {
         BooleanBuilder bb = new BooleanBuilder();
 
         QAbstractTask task = QAbstractTask.abstractTask;
-        QWork work = task.as(QWork.class);
         QLog log = task.as(QLog.class);
+        bb.or(log.customer.id.eq(dto.getCustomerId()));
 
+        QWork work = task.as(QWork.class);
         if (dto.getPartId() != null) {
             bb.or(work.part.id.eq(dto.getPartId()));
         } else if (dto.getProjectId() != null) {
             bb.or(work.part.project.id.eq(dto.getProjectId()));
+        } else if (dto.getCustomerId() != null) {
+            bb.or(work.part.project.customer.id.eq(dto.getCustomerId()));
         }
-        if (dto.getCustomerId() != null) {
-            bb.or(log.customer.id.eq(dto.getCustomerId()));
+
+        return bb;
+    }
+
+    public static Predicate createLabelsPredicate(List<LabelPart> labels) {
+        BooleanBuilder bb = new BooleanBuilder();
+
+        QAbstractTask task = QAbstractTask.abstractTask;
+
+        QWork work = task.as(QWork.class);
+        if (!labels.isEmpty()) {
+            bb.or(work.part.labels.any().in(labels));
         }
         return bb;
     }

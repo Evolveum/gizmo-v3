@@ -23,26 +23,34 @@ import java.util.Date;
 public class DownloadSettingsDto implements Serializable {
 
     public static final String F_PER_USER = "perUser";
+    public static final String F_PER_CUSTOMER = "perCustomer";
     public static final String F_SUMMARY = "summary";
     public static final String F_REPORT_NAME = "reportName";
+    public static final String F_REPORT_TYPE = "reportType";
     public static final String F_CUSTOMER_REPORT = "customerReport";
 
     private boolean perUser = true;
-    private boolean summary;
-    private boolean customerReport = true;
+    private boolean perCustomer = true;
+//    private boolean summary;
+//    private boolean customerReport = true;
     private String reportName;
+    private ReportType reportType = ReportType.WORK_REPORT;
 
 
     public DownloadSettingsDto() {
         this.reportName = "Export_" + new Date(System.currentTimeMillis()) + ".xlsx";
     }
 
-    public boolean isSummary() {
-        return summary;
-    }
+//    public boolean isSummary() {
+//        return summary;
+//    }
 
     public boolean isPerUser() {
         return perUser;
+    }
+
+    public boolean isPerCustomer() {
+        return perCustomer;
     }
 
     public void setReportName(String reportName) { this.reportName = reportName; }
@@ -51,4 +59,11 @@ public class DownloadSettingsDto implements Serializable {
 
     public void setPerUser(boolean perUser) { this.perUser = perUser; }
 
+    public ReportType getReportType() {
+        return reportType;
+    }
+
+    public void setReportType(ReportType reportType) {
+        this.reportType = reportType;
+    }
 }

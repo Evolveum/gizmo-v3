@@ -4,10 +4,22 @@
             <label wicket:for="reportName">File name</label>
             <input wicket:id="reportName" type="text" class="form-control"/>
         </div>
-        <div class="custom-control custom-switch mb-3">
-            <input type="checkbox" wicket:id="perUser" class="custom-control-input"/>
-            <label wicket:id="perUserLabel" class="custom-control-label">Per user (user per sheet)</label>
-        </div>
+        <div wicket:id="reportType"></div>
+
+        <wicket:enclosure child="perUser">
+            <div class="custom-control custom-switch mb-3">
+                <input type="checkbox" wicket:id="perUser" class="custom-control-input"/>
+                <label class="custom-control-label">Per user (user per sheet)</label>
+            </div>
+        </wicket:enclosure>
+
+        <wicket:enclosure child="perCustomer">
+            <div class="custom-control custom-switch mb-3">
+                <input type="checkbox" wicket:id="perCustomer" class="custom-control-input"/>
+                <label class="custom-control-label">Per customer (customer per sheet)</label>
+            </div>
+        </wicket:enclosure>
+
         <a wicket:id="export" class="btn btn-primary">Download</a>
     </form>
 </wicket:panel>

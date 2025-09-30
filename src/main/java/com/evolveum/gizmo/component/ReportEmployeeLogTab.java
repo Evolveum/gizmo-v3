@@ -22,13 +22,13 @@ public class ReportEmployeeLogTab extends AbstractReportTab {
 
     @Override protected void buildResultsUI() {
         SummaryUserDataProvider provider = new SummaryUserDataProvider(getPageTemplate());
-        summaryPanel = new SummaryUsersPanel(ID_SUMMARY, provider, getFilterModel());
+        summaryPanel = new SummaryUsersPanel(ID_SUMMARY, provider, getModel());
         summaryPanel.setOutputMarkupId(true);
         addOrReplace(summaryPanel);
     }
 
     @Override protected void onPreview(AjaxRequestTarget target) {
-        setFilterToSession(getFilterModel().getObject());
+        setFilterToSession(getModel().getObject());
         targetAddFeedback(target);
         target.add(summaryPanel);
     }
@@ -48,8 +48,8 @@ public class ReportEmployeeLogTab extends AbstractReportTab {
         GizmoAuthWebSession.getSession().setEmployeeReportFilterDto(filter);
     }
 
-    @Override protected Component createDownloadContent(String contentId) {
-        return new DownloadTimeoffReportConfigPanel(contentId, getFilterModel());
+    @Override protected Component createDownloadContent() {
+        return new DownloadTimeoffReportConfigPanel(org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog.CONTENT_ID, getModel());
     }
 
     @Override

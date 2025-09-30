@@ -67,12 +67,20 @@ public class ReportFilterDto implements Serializable {
        return projectSearchSettings.getCustomerProjectPartDtoList();
     }
 
+    public ProjectSearchSettings getProjectSearchSettings() {
+        return projectSearchSettings;
+    }
+
     public void setCustomerProjectPartDtos(List<CustomerProjectPartDto> customerProjectPartDtos) {
-        if (customerProjectPartDtos == null) {
-            projectSearchSettings.setCustomerProjectPartDtoList(new ArrayList<>());
-        } else {
-            projectSearchSettings.setCustomerProjectPartDtoList(new ArrayList<>(customerProjectPartDtos));
-        }
+//        if (customerProjectPartDtos == null) {
+            projectSearchSettings.setCustomerProjectPartDtoList(customerProjectPartDtos);
+//        } else {
+//            projectSearchSettings.setCustomerProjectPartDtoList(new ArrayList<>(customerProjectPartDtos));
+//        }
+    }
+
+    public void setupProjectSearchSettings(ProjectSearchSettings projectSearchSettings) {
+        this.projectSearchSettings = projectSearchSettings;
     }
 
     public List<User> getRealizators() {

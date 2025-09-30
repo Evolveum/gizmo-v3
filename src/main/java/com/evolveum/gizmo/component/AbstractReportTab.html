@@ -8,27 +8,7 @@
         </div>
 
 
-        <div class="d-flex justify-content-center mb-3">
-            <div class="form-group mr-3">
-                <label><wicket:message key="PageReports.dateFrom"/></label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                    </div>
-                    <input type="text" class="form-control float-right" wicket:id="from"/>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label><wicket:message key="PageReports.dateTo"/></label>
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                    </div>
-                    <input type="text" class="form-control float-right" wicket:id="to"/>
-                </div>
-            </div>
-        </div>
 
         <div class="d-flex justify-content-center mb-3">
             <div class="w-100" style="max-width: 600px;">
@@ -39,12 +19,12 @@
                 <div class="mb-3">
                     <select wicket:id="realizator" multiple class="form-control"></select>
                 </div>
-                <div>
-                    <div wicket:id="customer"></div>
-                </div>
                 <div class="form-group">
                     <label>Labels</label>
                     <select wicket:id="labels" class="form-select" style="width: 600px;"></select>
+                </div>
+                <div>
+                    <div wicket:id="customer"></div>
                 </div>
             </div>
         </div>

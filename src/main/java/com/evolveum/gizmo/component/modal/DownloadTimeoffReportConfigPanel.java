@@ -26,7 +26,7 @@ public class DownloadTimeoffReportConfigPanel extends AbstractExcelDownloadPanel
     @Override protected boolean supportsPerUser() { return false; }
 
     @Override
-    protected void generateWorkbook(XSSFWorkbook wb, ReportFilterDto filter, boolean perUser) {
+    protected void generateWorkbook(XSSFWorkbook wb, ReportFilterDto filter) {
         XSSFSheet sheet = getSheet(wb, "User summary");
         CellStyle header = headerStyle(wb);
         CellStyle dateStyle = dateStyle(wb);

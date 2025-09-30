@@ -24,7 +24,6 @@ import com.evolveum.gizmo.util.LoadableModel;
 import com.evolveum.wicket.chartjs.*;
 import org.apache.wicket.model.IModel;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -96,7 +95,7 @@ public class SummaryChartPanel extends SimplePanel<ReportFilterDto> {
     private ChartOptions createChartOptions() {
         ChartOptions options = new ChartOptions();
         options.setAnimation(createAnimation());
-        ChartPlugins plugins = new ChartPlugins();
+        ChartPluginsOption plugins = new ChartPluginsOption();
         plugins.setLegend(createChartLegend());
         options.setPlugins(plugins);
         options.setResponsive(true);
@@ -113,7 +112,6 @@ public class SummaryChartPanel extends SimplePanel<ReportFilterDto> {
         ChartLegendOption legend = new ChartLegendOption();
         legend.setPosition("right");
         ChartLegendLabel label = new ChartLegendLabel();
-//        label.setBoxWidth(15);
         legend.setLabels(label);
         return legend;
     }

@@ -36,7 +36,7 @@ public class ReportOverviewTab extends AbstractReportTab {
 
             @Override
             public WebMarkupContainer getPanel(String panelId) {
-                CalendarEventsProvider eventsProvider = new CalendarEventsProvider(getPageTemplate(), getFilterModel());
+                CalendarEventsProvider eventsProvider = new CalendarEventsProvider(getPageTemplate(), getModel());
                 CalendarPanel calendarPanel = new CalendarPanel(panelId, eventsProvider);
                 calendarPanel.setOutputMarkupId(true);
                 return calendarPanel;
@@ -48,7 +48,7 @@ public class ReportOverviewTab extends AbstractReportTab {
             @Override
             public WebMarkupContainer getPanel(String panelId) {
 
-                WorkDataTable table = new WorkDataTable(panelId, getFilterModel(), false);
+                WorkDataTable table = new WorkDataTable(panelId, getModel(), false);
                 table.setOutputMarkupId(true);
                 return table;
             }
@@ -59,7 +59,7 @@ public class ReportOverviewTab extends AbstractReportTab {
             @Override
             public WebMarkupContainer getPanel(String panelId) {
                 SummaryPartsDataProvider provider = new SummaryPartsDataProvider(getPageTemplate());
-                SummaryPartsPanel summaryPanel = new SummaryPartsPanel(panelId, provider, getFilterModel());
+                SummaryPartsPanel summaryPanel = new SummaryPartsPanel(panelId, provider, getModel());
                 summaryPanel.setOutputMarkupId(true);
                 return summaryPanel;
             }
@@ -69,7 +69,7 @@ public class ReportOverviewTab extends AbstractReportTab {
     }
 
     @Override protected void onPreview(AjaxRequestTarget target) {
-        GizmoAuthWebSession.getSession().setReportFilterDto(getFilterModel().getObject());
+        GizmoAuthWebSession.getSession().setReportFilterDto(getModel().getObject());
         targetAddFeedback(target);
         target.add(get(ID_OVERVIEW_TABS));
     }
@@ -88,8 +88,8 @@ public class ReportOverviewTab extends AbstractReportTab {
         GizmoAuthWebSession.getSession().setOverviewReportFilterDto(filter);
     }
 
-    @Override protected Component createDownloadContent(String contentId) {
-        return new DownloadOverviewReportConfigPanel(contentId, getFilterModel());
+    @Override protected Component createDownloadContent() {
+        return new DownloadOverviewReportConfigPanel(org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog.CONTENT_ID, getModel());
     }
 
 }

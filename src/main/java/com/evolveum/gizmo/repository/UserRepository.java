@@ -41,5 +41,5 @@ public interface UserRepository extends JpaRepository<User, Integer>, QuerydslPr
     @Query("from User u where u.enabled = true order by u.givenName asc, u.familyName asc")
     List<User> findAllEnabledUsers();
 
-    List<User> findAllByOrderByNameAsc();
+//    List<User> findAllByOrderByNameAsc();
 }

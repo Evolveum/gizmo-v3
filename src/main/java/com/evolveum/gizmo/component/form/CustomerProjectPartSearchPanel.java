@@ -43,9 +43,7 @@ public class CustomerProjectPartSearchPanel extends SimplePanel<ProjectSearchSet
 
     public CustomerProjectPartSearchPanel(String id, IModel<ProjectSearchSettings> model) {
         super(id, model);
-
     }
-
 
     protected void initLayout() {
 
@@ -100,6 +98,7 @@ public class CustomerProjectPartSearchPanel extends SimplePanel<ProjectSearchSet
                 availabelProjects,
                 GizmoUtils.createCustomerProjectPartRenderer());
         customerCombo.setOutputMarkupId(true);
+        customerCombo.add(new EmptyOnChangeAjaxBehavior());
         add(customerCombo);
 
         WebMarkupContainer customerContainer = new WebMarkupContainer("label");
@@ -111,5 +110,9 @@ public class CustomerProjectPartSearchPanel extends SimplePanel<ProjectSearchSet
     private void refreshSearch(AjaxRequestTarget target) {
         availabelProjects.reset();
         target.add(CustomerProjectPartSearchPanel.this);
+    }
+
+    public void update(AjaxRequestTarget target) {
+        refreshSearch(target);
     }
 }

@@ -16,13 +16,13 @@ public class ReportProjectTab extends AbstractReportTab {
 
     @Override protected void buildResultsUI() {
         SummaryPartsDataProvider provider = new SummaryPartsDataProvider(getPageTemplate());
-        summaryPanel = new SummaryPartsPanel(ID_SUMMARY, provider, getFilterModel());
+        summaryPanel = new SummaryPartsPanel(ID_SUMMARY, provider, getModel());
         summaryPanel.setOutputMarkupId(true);
         add(summaryPanel);
     }
 
     @Override protected void onPreview(AjaxRequestTarget target) {
-        ReportFilterDto rf = getFilterModel().getObject();
+        ReportFilterDto rf = getModel().getObject();
         GizmoAuthWebSession.getSession().setReportFilterDto(rf);
         targetAddFeedback(target);
         target.add(summaryPanel);
@@ -43,7 +43,7 @@ public class ReportProjectTab extends AbstractReportTab {
         GizmoAuthWebSession.getSession().setProjectReportFilterDto(filter);
     }
 
-    @Override protected Component createDownloadContent(String contentId) {
-        return new DownloadProjectReportConfigPanel(contentId, getFilterModel());
+    @Override protected Component createDownloadContent() {
+        return new DownloadProjectReportConfigPanel(org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog.CONTENT_ID, getModel());
     }
 }

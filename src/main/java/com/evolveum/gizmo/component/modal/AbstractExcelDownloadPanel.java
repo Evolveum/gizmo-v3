@@ -2,6 +2,8 @@ package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.AjaxSubmitButton;
 import com.evolveum.gizmo.component.SimplePanel;
+import com.evolveum.gizmo.component.VisibleEnableBehaviour;
+import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.dto.ReportFilterDto;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -72,11 +74,10 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
 
     protected boolean supportsPerUser() { return false; }
 
-    protected abstract void generateWorkbook(XSSFWorkbook wb, ReportFilterDto filter, boolean perUser);
+    protected abstract void generateWorkbook(XSSFWorkbook wb, ReportFilterDto filter);
 
 
     protected void buildFields(Form<?> form) {
-        if (supportsPerUser()) {
             downloadModel = new LoadableDetachableModel<>() {
                 private DownloadSettingsDto cache;
                 @Override protected DownloadSettingsDto load() {
@@ -91,6 +92,7 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
             reportNameField = new TextField<>(ID_REPORT_NAME,
                     new PropertyModel<>(downloadModel, DownloadSettingsDto.F_REPORT_NAME));
             reportNameField.setOutputMarkupId(true);
+            reportNameField.add(new EmptyOnChangeAjaxBehavior());
             form.add(reportNameField);
 
             AjaxCheckBox perUser = new AjaxCheckBox(ID_PER_USER,
@@ -98,22 +100,10 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
                 @Override protected void onUpdate(AjaxRequestTarget target) { target.add(reportNameField); }
             };
             perUser.setOutputMarkupId(true);
+            perUser.add(new VisibleEnableBehaviour() {
+                @Override public boolean isVisible() { return supportsPerUser(); }
+            });
             form.add(perUser);
-
-            form.add(new FormComponentLabel("perUserLabel", perUser));
-        } else {
-            IModel<String> nameModel = new LoadableDetachableModel<>() {
-                @Override protected String load() {
-                    return defaultFileName(getModelObject());
-                }
-            };
-            reportNameField = new TextField<>(ID_REPORT_NAME, nameModel) {
-                @Override public String getInputName() { return ID_REPORT_NAME; }
-            };
-            reportNameField.setOutputMarkupId(true);
-            form.add(reportNameField);
-
-        }
     }
 
     protected IModel<File> createDownloadModel() {
@@ -122,8 +112,7 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
                 try {
                     File tmp = new File(filePrefix() + ".xlsx");
                     try (XSSFWorkbook wb = new XSSFWorkbook()) {
-                        boolean perUser = supportsPerUser() && downloadModel.getObject().isPerUser();
-                        generateWorkbook(wb, getModelObject(), perUser);
+                        generateWorkbook(wb, getModelObject());
                         try (FileOutputStream os = new FileOutputStream(tmp)) {
                             wb.write(os);
                         }

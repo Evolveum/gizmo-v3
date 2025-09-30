@@ -32,7 +32,7 @@ public class ProjectSearchSettings implements Serializable {
     private boolean customerSearch = true;
     private boolean projectSearch = true;
     private boolean partSearch = false;
-    private List<CustomerProjectPartDto> customerProjectPartDtoList = new ArrayList<>();
+    private List<CustomerProjectPartDto> customerProjectPartDtoList;// = new ArrayList<>();
 
     public ProjectSearchSettings(boolean customerSearch, boolean projectSearch, boolean partSearch) {
         this.customerSearch = customerSearch;
@@ -57,6 +57,9 @@ public class ProjectSearchSettings implements Serializable {
 
 
     public List<CustomerProjectPartDto> getCustomerProjectPartDtoList() {
+        if (customerProjectPartDtoList == null) {
+            customerProjectPartDtoList = new ArrayList<>();
+        }
         return customerProjectPartDtoList;
     }
 
@@ -65,15 +68,12 @@ public class ProjectSearchSettings implements Serializable {
     }
 
     public void setCustomerProjectPartDtoList(List<CustomerProjectPartDto> customerProjectPartDtoList) {
-        if (customerProjectPartDtoList == null) {
-            this.customerProjectPartDtoList = new ArrayList<>();
-        } else {
-            this.customerProjectPartDtoList = new ArrayList<>(customerProjectPartDtoList);
-        }
+        this.customerProjectPartDtoList = customerProjectPartDtoList;
+//        if (customerProjectPartDtoList == null) {
+//            this.customerProjectPartDtoList = new ArrayList<>();
+//        } else {
+//            this.customerProjectPartDtoList = new ArrayList<>(customerProjectPartDtoList);
+//        }
     }
 
-
-    public List<CustomerProjectPartDto> getCustomer() {
-        return this.customerProjectPartDtoList;
-    }
 }

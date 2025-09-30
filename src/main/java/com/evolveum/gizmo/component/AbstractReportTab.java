@@ -1,6 +1,5 @@
 package com.evolveum.gizmo.component;
 
-import com.evolveum.gizmo.component.behavior.DateRangePickerBehavior;
 import com.evolveum.gizmo.component.data.MonthNavigationPanel;
 import com.evolveum.gizmo.component.form.CustomerProjectPartSearchPanel;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
@@ -8,12 +7,13 @@ import com.evolveum.gizmo.component.form.MultiselectDropDownInput;
 import com.evolveum.gizmo.component.modal.MainPopupDialog;
 import com.evolveum.gizmo.data.LabelPart;
 import com.evolveum.gizmo.data.User;
+import com.evolveum.gizmo.data.provider.LabelsDataProvider;
+import com.evolveum.gizmo.dto.CustomerProjectPartDto;
+import com.evolveum.gizmo.dto.ProjectSearchSettings;
 import com.evolveum.gizmo.dto.ReportFilterDto;
-import com.evolveum.gizmo.repository.UserRepository;
 import com.evolveum.gizmo.security.GizmoPrincipal;
 import com.evolveum.gizmo.security.SecurityUtils;
 import com.evolveum.gizmo.util.GizmoUtils;
-import com.evolveum.gizmo.util.LabelService;
 import com.evolveum.gizmo.util.LoadableModel;
 import com.evolveum.gizmo.web.app.PageAppTemplate;
 import org.apache.wicket.AttributeModifier;
@@ -21,27 +21,19 @@ import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.extensions.ajax.markup.html.modal.ModalDialog;
-import org.apache.wicket.extensions.markup.html.form.datetime.LocalDateTextField;
+import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.IChoiceRenderer;
-import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractReportTab extends SimplePanel<ReportFilterDto> {
 
     protected static final String ID_FORM = "form";
-    protected static final String ID_FROM = "from";
-    protected static final String ID_TO = "to";
     protected static final String ID_REALIZATOR = "realizator";
     protected static final String ID_CUSTOMER = "customer";
     protected static final String ID_LABELS = "labels";
@@ -50,9 +42,6 @@ public abstract class AbstractReportTab extends SimplePanel<ReportFilterDto> {
     protected static final String ID_EXPORT = "export";
     protected static final String ID_DOWNLOAD_MODAL = "confirmDownload";
 
-
-    @SpringBean
-    private LabelService labelService;
     private final IModel<ReportFilterDto> model;
 
     @Override
@@ -82,89 +71,58 @@ public abstract class AbstractReportTab extends SimplePanel<ReportFilterDto> {
             protected void handleCalendarNavigation(AjaxRequestTarget target, ReportFilterDto workFilter) {
                 AbstractReportTab.this.handleCalendarNavigation(target, workFilter);
             }
+
+            @Override
+            protected boolean isCustomDateRangeVisible() {
+                return true;
+            }
         };
         monthNavigation.setOutputMarkupId(true);
         form.add(monthNavigation);
 
-        LocalDateTextField from = new LocalDateTextField(ID_FROM,
-                new PropertyModel<>(getFilterModel(), ReportFilterDto.F_DATE_FROM), "dd/MM/yyyy");
-        from.setOutputMarkupId(true);
-        from.add(new EmptyOnChangeAjaxBehavior());
-        from.add(new DateRangePickerBehavior() {
-            @Override protected void onEvent(AjaxRequestTarget target) { setDateTo(target); }
-        });
-        form.add(from);
-
-        LocalDateTextField to = new LocalDateTextField(ID_TO,
-                new PropertyModel<>(getFilterModel(), ReportFilterDto.F_DATE_TO), "dd/MM/yyyy");
-        to.setOutputMarkupId(true);
-        to.add(new DateRangePickerBehavior());
-        form.add(to);
-
-        IModel<List<User>> usersModel = new LoadableDetachableModel<>() {
-            @Override
-            protected List<User> load() {
-                UserRepository repository = getPageTemplate().getUserRepository();
-                boolean includeDisabled = Boolean.TRUE.equals(
-                        new PropertyModel<Boolean>(model, ReportFilterDto.F_INCLUDE_DISABLED).getObject()
-                );
-                List<User> out = includeDisabled
-                        ? repository.findAllByOrderByNameAsc()
-                        : repository.findAllEnabledUsers();
-                return out;
-            }
-        };
-
+        LoadableModel<List<User>> usersModel = GizmoUtils.createUsersModel(getPageTemplate(), model);
         MultiselectDropDownInput<User> realizators = new MultiselectDropDownInput<>(
                 ID_REALIZATOR,
                 new PropertyModel<>(model, ReportFilterDto.F_REALIZATORS),
                 usersModel,
                 GizmoUtils.createUserChoiceRenderer());
         realizators.setOutputMarkupId(true);
+        realizators.add(new EmptyOnChangeAjaxBehavior());
         form.add(realizators);
 
-       CheckBox includeDisabled = new CheckBox("includeDisabled",
-                new PropertyModel<>(model, ReportFilterDto.F_INCLUDE_DISABLED));
+       AjaxCheckBox includeDisabled = new AjaxCheckBox("includeDisabled",
+               new PropertyModel<>(model, ReportFilterDto.F_INCLUDE_DISABLED)) {
+           @Override
+           protected void onUpdate(AjaxRequestTarget target) {
+               usersModel.reset();
+               target.add(realizators);
+           }
+       };
         includeDisabled.setOutputMarkupId(true);
-
-        includeDisabled.add(new AjaxFormComponentUpdatingBehavior("change") {
-            @Override protected void onUpdate(AjaxRequestTarget target) {
-                usersModel.detach();
-                realizators.modelChanged();
-                target.add(realizators);
-            }
-        });
         form.add(includeDisabled);
 
-        CustomerProjectPartSearchPanel customerProjectSearchPanel = new CustomerProjectPartSearchPanel(ID_CUSTOMER, new PropertyModel<>(getFilterModel(), ReportFilterDto.F_PROJECT_SEARCH_SETTINGS));
+        CustomerProjectPartSearchPanel customerProjectSearchPanel = new CustomerProjectPartSearchPanel(ID_CUSTOMER, new PropertyModel<>(model, ReportFilterDto.F_PROJECT_SEARCH_SETTINGS));
         customerProjectSearchPanel.add(new VisibleEnableBehaviour() {
-            @Override public boolean isVisible() { return includeCustomerSearch(); }
+            @Override public boolean isVisible() {
+                return includeCustomerSearch();
+            }
         });
         customerProjectSearchPanel.setOutputMarkupId(true);
         form.add(customerProjectSearchPanel);
 
-        IChoiceRenderer<LabelPart> labelRenderer = new IChoiceRenderer<>() {
-            @Override public Object getDisplayValue(LabelPart l) { return l.getCode() + " — " + l.getName(); }
-            @Override public String getIdValue(LabelPart l, int index) { return String.valueOf(l.getId()); }
-            @Override public LabelPart getObject(String id, IModel<? extends List<? extends LabelPart>> choices) {
-                Long lid = Long.valueOf(id);
-                for (LabelPart lp : choices.getObject()) if (lp != null && lid.equals(lp.getId())) return lp;
-                return null;
-            }
-        };
-
-        LoadableModel<List<LabelPart>> labelsChoices = new LoadableModel<>(false) {
-            @Override protected List<LabelPart> load() { return labelService.findAllOrdered(); }
-        };
-
-        ListMultipleChoice<LabelPart> labelsField = new MultiselectDropDownInput<>(
+        MultiselectDropDownInput<LabelPart> labelsField = new MultiselectDropDownInput<>(
                 ID_LABELS,
                 new PropertyModel<>(model, ReportFilterDto.F_LABELS),
-                labelsChoices,
-                labelRenderer
-        );
-        labelsField.add(new EmptyOnChangeAjaxBehavior());
+                GizmoUtils.createCategoriesChoices(getPageTemplate()),
+                GizmoUtils.createCategoriesChoiceRenderer());
         labelsField.setOutputMarkupId(true);
+        labelsField.add(new AjaxFormComponentUpdatingBehavior("change") {
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                updateCustomerProjectPart(target);
+            }
+        });
         form.add(labelsField);
 
         form.add(new AjaxSubmitButton(ID_PREVIEW, createStringResource("PageReports.button.preview")) {
@@ -186,6 +144,19 @@ public abstract class AbstractReportTab extends SimplePanel<ReportFilterDto> {
         addDownloadButton(form);
     }
 
+    private void updateCustomerProjectPart(AjaxRequestTarget target) {
+        ProjectSearchSettings settings = new ProjectSearchSettings(true, true, true);
+
+        ReportFilterDto filter = model.getObject();
+        List<CustomerProjectPartDto> customerProjectPartDtos = LabelsDataProvider.selectCustomerProjectPartDtos(null, null, getPageTemplate(), filter);
+        settings.setCustomerProjectPartDtoList(customerProjectPartDtos);
+
+        filter.setupProjectSearchSettings(settings);
+        model.setObject(filter);
+        CustomerProjectPartSearchPanel customerProjectPartSearchPanel = (CustomerProjectPartSearchPanel) get(createComponentPath(ID_FORM, ID_CUSTOMER));
+        customerProjectPartSearchPanel.update(target);
+    }
+
     @Override
     protected void initLayout() {
         initPanelLayout();
@@ -199,22 +170,9 @@ public abstract class AbstractReportTab extends SimplePanel<ReportFilterDto> {
 
     protected abstract void onPreview(AjaxRequestTarget target);
 
-    protected abstract Component createDownloadContent(String contentId);
-
-    protected void beforeOpenDownload(AjaxRequestTarget target) {
-    }
+    protected abstract Component createDownloadContent();
 
     protected void afterCalendarNavigation(AjaxRequestTarget target) {}
-
-
-    protected IModel<ReportFilterDto> getFilterModel() { return model; }
-
-    protected void setDateTo(AjaxRequestTarget target) {
-        ReportFilterDto f = getFilterModel().getObject();
-        f.setDateTo(f.getDateFrom().with(TemporalAdjusters.lastDayOfMonth()));
-        LocalDateTextField dateTo = (LocalDateTextField) get(ID_FORM + ":" + ID_TO);
-        target.add(dateTo);
-    }
 
     private void handleCalendarNavigation(AjaxRequestTarget target, ReportFilterDto f) {
         setFilterToSession(f);
@@ -225,7 +183,6 @@ public abstract class AbstractReportTab extends SimplePanel<ReportFilterDto> {
     protected void addDownloadButton(Form<?> form) {
         form.add(new AjaxSubmitButton(ID_EXPORT, createStringResource("PageReports.download")) {
             @Override protected void onSubmit(AjaxRequestTarget target) {
-                beforeOpenDownload(target);
                 showDownloadPanel(target);
             }
             @Override protected void onError(AjaxRequestTarget target) {
@@ -237,7 +194,8 @@ public abstract class AbstractReportTab extends SimplePanel<ReportFilterDto> {
 
     private void showDownloadPanel(AjaxRequestTarget target) {
 
-        Component content = createDownloadContent(ModalDialog.CONTENT_ID);
+        Component content = createDownloadContent();
+        content.setOutputMarkupId(true);
         content.add(AttributeModifier.append("class", "modal-content"));
 
 
