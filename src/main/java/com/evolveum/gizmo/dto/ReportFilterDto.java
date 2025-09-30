@@ -30,7 +30,6 @@ public class ReportFilterDto implements Serializable {
     public static final String F_DATE_FROM = "dateFrom";
     public static final String F_DATE_TO = "dateTo";
     public static final String F_PROJECT_SEARCH_SETTINGS = "projectSearchSettings";
-    public static final String F_CUSTOMER = "customer";
     public static final String F_REALIZATORS = "realizators";
     public static final String F_INCLUDE_DISABLED = "includeDisabled";
     public static final String F_MONTH_YEAR = "monthYear";
@@ -72,11 +71,7 @@ public class ReportFilterDto implements Serializable {
     }
 
     public void setCustomerProjectPartDtos(List<CustomerProjectPartDto> customerProjectPartDtos) {
-//        if (customerProjectPartDtos == null) {
             projectSearchSettings.setCustomerProjectPartDtoList(customerProjectPartDtos);
-//        } else {
-//            projectSearchSettings.setCustomerProjectPartDtoList(new ArrayList<>(customerProjectPartDtos));
-//        }
     }
 
     public void setupProjectSearchSettings(ProjectSearchSettings projectSearchSettings) {

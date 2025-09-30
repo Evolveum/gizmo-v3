@@ -30,18 +30,12 @@ import java.util.List;
  */
 public class CustomerProjectPartDto implements Serializable, Comparable<CustomerProjectPartDto> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CustomerProjectPartDto.class);
-
     public static final String F_CUSTOMER_NAME = "customerName";
     public static final String F_PROJECT_NAME = "projectName";
     public static final String F_PART_NAME = "partName";
     public static final String F_CUSTOMER_ID = "customerId";
     public static final String F_PROJECT_ID = "projectId";
     public static final String F_PART_ID = "partId";
-    public static final String F_CUSTOMER_SEARCH = "customerSearch";
-    public static final String F_PROJECT_SEARCH = "projectSearch";
-    public static final String F_PART_SEARCH = "partSearch";
-
 
     private String customerName;
     private String projectName;
@@ -50,10 +44,6 @@ public class CustomerProjectPartDto implements Serializable, Comparable<Customer
     private Integer customerId;
     private Integer projectId;
     private Integer partId;
-
-//    private boolean customerSearch = true;
-//    private boolean projectSearch = true;
-//    private boolean partSearch = true;
 
     public CustomerProjectPartDto() {
     }

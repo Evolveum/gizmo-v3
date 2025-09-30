@@ -2,7 +2,6 @@ package com.evolveum.gizmo.component.modal;
 
 import com.evolveum.gizmo.component.VisibleEnableBehaviour;
 import com.evolveum.gizmo.component.form.DropDownFormGroup;
-import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
 import com.evolveum.gizmo.data.AbstractTask;
 import com.evolveum.gizmo.data.QAbstractTask;
 import com.evolveum.gizmo.data.User;
@@ -19,22 +18,22 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.*;
-
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class DownloadOverviewReportConfigPanel extends AbstractExcelDownloadPanel {
 
@@ -172,9 +171,6 @@ public class DownloadOverviewReportConfigPanel extends AbstractExcelDownloadPane
         }
 
         generateExcel(workbook, sheetName, tasks, reportType);
-
-//        List<AbstractTask> tasks = listLoggedWork(filterDto);
-//        generateExcel(workbook, sheetName, tasks, ReportType.GENERIC);
     }
 
     private void writeSummaryTable(XSSFWorkbook workbook, XSSFSheet sheet, ReportFilterDto filterDto) {
@@ -250,9 +246,9 @@ public class DownloadOverviewReportConfigPanel extends AbstractExcelDownloadPane
 
     private static <T> Predicate createListPredicate(List<T> list, EntityPathBase<T> base) {
         if (list == null || list.isEmpty()) return null;
-        if (list.size() == 1) return base.eq(list.get(0));
+        if (list.size() == 1) return base.eq(list.getFirst());
 
-        BooleanExpression expr = base.eq(list.get(0));
+        BooleanExpression expr = base.eq(list.getFirst());
         for (int i = 1; i < list.size(); i++) {
             expr = expr.or(base.eq(list.get(i)));
         }

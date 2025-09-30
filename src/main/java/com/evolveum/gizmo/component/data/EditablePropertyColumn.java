@@ -18,7 +18,6 @@
 package com.evolveum.gizmo.component.data;
 
 import com.evolveum.gizmo.data.Editable;
-import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.basic.Label;
@@ -29,10 +28,6 @@ public class EditablePropertyColumn<T extends Editable> extends PropertyColumn<T
 
     public EditablePropertyColumn(IModel<String> displayModel, String propertyExpression) {
         super(displayModel, propertyExpression);
-    }
-
-    public EditablePropertyColumn(IModel<String> displayModel, String sortProperty, String propertyExpression) {
-        super(displayModel, sortProperty, propertyExpression);
     }
 
     @Override

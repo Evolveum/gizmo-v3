@@ -1,6 +1,5 @@
 package com.evolveum.gizmo.component.modal;
 
-import com.evolveum.gizmo.component.AjaxSubmitButton;
 import com.evolveum.gizmo.component.SimplePanel;
 import com.evolveum.gizmo.component.VisibleEnableBehaviour;
 import com.evolveum.gizmo.component.form.EmptyOnChangeAjaxBehavior;
@@ -11,12 +10,10 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponentLabel;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.model.IModel;
@@ -37,10 +34,6 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
     protected static final String ID_FORM = "form";
     protected static final String ID_REPORT_NAME = "reportName";
     protected static final String ID_PER_USER = "perUser";
-
-    protected static final String ID_EXPORT = "export";
-    protected static final String ID_CONFIRM_DOWNLOAD = "confirmDownload";
-
 
     protected TextField<String> reportNameField;
     protected IModel<DownloadSettingsDto> downloadModel;
@@ -107,22 +100,20 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
     }
 
     protected IModel<File> createDownloadModel() {
-        return new IModel<>() {
-            @Override public File getObject() {
-                try {
-                    File tmp = new File(filePrefix() + ".xlsx");
-                    try (XSSFWorkbook wb = new XSSFWorkbook()) {
-                        generateWorkbook(wb, getModelObject());
-                        try (FileOutputStream os = new FileOutputStream(tmp)) {
-                            wb.write(os);
-                        }
+        return () -> {
+            try {
+                File tmp = new File(filePrefix() + ".xlsx");
+                try (XSSFWorkbook wb = new XSSFWorkbook()) {
+                    generateWorkbook(wb, getModelObject());
+                    try (FileOutputStream os = new FileOutputStream(tmp)) {
+                        wb.write(os);
                     }
-                    return tmp;
-                } catch (Exception e) {
-                    handleGuiExceptionFromPanel("Message.couldntGenerateReport",
-                            e, RequestCycle.get().find(AjaxRequestTarget.class).orElse(null));
-                    return new File(filePrefix() + "-error.xlsx");
                 }
+                return tmp;
+            } catch (Exception e) {
+                handleGuiExceptionFromPanel("Message.couldntGenerateReport",
+                        e, RequestCycle.get().find(AjaxRequestTarget.class).orElse(null));
+                return new File(filePrefix() + "-error.xlsx");
             }
         };
     }
@@ -142,15 +133,6 @@ public abstract class AbstractExcelDownloadPanel extends SimplePanel<ReportFilte
         }
         return defaultFileName(getModelObject());
     }
-
-
-    public void syncReportNameWithFilter(AjaxRequestTarget target) {
-        if (supportsPerUser() && downloadModel != null) {
-            downloadModel.getObject().setReportName(defaultFileName(getModelObject()));
-            if (reportNameField != null) target.add(reportNameField);
-        }
-    }
-
 
     protected XSSFSheet getSheet(XSSFWorkbook wb, String name) {
         XSSFSheet sheet = wb.getSheet(name);

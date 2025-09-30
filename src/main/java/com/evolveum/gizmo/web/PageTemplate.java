@@ -18,11 +18,10 @@
 package com.evolveum.gizmo.web;
 
 import com.evolveum.gizmo.repository.*;
-import com.evolveum.gizmo.util.LabelService;
+import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.Validate;
 import org.apache.wicket.devutils.debugbar.DebugBar;
 import org.apache.wicket.injection.Injector;
-import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
@@ -30,8 +29,6 @@ import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.springframework.core.env.Environment;
-
-import jakarta.persistence.EntityManager;
 
 /**
  * @author lazyman

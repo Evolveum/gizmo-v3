@@ -23,8 +23,6 @@ public class DownloadTimeoffReportConfigPanel extends AbstractExcelDownloadPanel
         return f.getRealizators().size() == 1 ? slug(f.getRealizators().getFirst().getFamilyName()) : "";
     }
 
-    @Override protected boolean supportsPerUser() { return false; }
-
     @Override
     protected void generateWorkbook(XSSFWorkbook wb, ReportFilterDto filter) {
         XSSFSheet sheet = getSheet(wb, "User summary");

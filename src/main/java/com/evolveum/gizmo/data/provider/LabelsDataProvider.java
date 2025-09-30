@@ -20,21 +20,14 @@ package com.evolveum.gizmo.data.provider;
 import com.evolveum.gizmo.data.*;
 import com.evolveum.gizmo.dto.CustomerProjectPartDto;
 import com.evolveum.gizmo.dto.ReportFilterDto;
-import com.evolveum.gizmo.dto.WorkDto;
-import com.evolveum.gizmo.dto.WorkType;
 import com.evolveum.gizmo.web.PageTemplate;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.springframework.security.core.parameters.P;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +39,7 @@ import java.util.List;
  */
 public class LabelsDataProvider extends SortableDataProvider<CustomerProjectPartDto, String> {
 
-    private PageTemplate page;
+    private final PageTemplate page;
     private ReportFilterDto filter;
 
     public LabelsDataProvider(PageTemplate page) {
@@ -110,12 +103,6 @@ public class LabelsDataProvider extends SortableDataProvider<CustomerProjectPart
     public long size() {
         QPart part = QPart.part;
         JPAQuery<?> query = query(part, page.getEntityManager(), filter);
-//        JPAQuery query = new JPAQuery(page.getEntityManager());
-//        QAbstractTask task = QAbstractTask.abstractTask;
-//        QWork work = task.as(QWork.class);
-//        query.from(QAbstractTask.abstractTask).leftJoin(work.part.project);
-//        query.where(createPredicates(filter));
-
         return query.select(part).fetchCount();
     }
 
@@ -134,15 +121,9 @@ public class LabelsDataProvider extends SortableDataProvider<CustomerProjectPart
 
         List<LabelPart> labelParts = filter.getLabels();
         Predicate p = createLabelsPredicate(labelParts, labelPart);
-        if (p != null) {
-            list.add(p);
-        }
+        list.add(p);
 
         BooleanBuilder allParts = new BooleanBuilder();
-
-        if (list.isEmpty()) {
-            return null;
-        }
 
         allParts.orAllOf(list.toArray(new Predicate[0]));
         return allParts;
@@ -151,13 +132,8 @@ public class LabelsDataProvider extends SortableDataProvider<CustomerProjectPart
 
     public static Predicate createLabelsPredicate(List<LabelPart> labels, QLabelPart labelPart) {
         BooleanBuilder bb = new BooleanBuilder();
-
-//        QAbstractTask task = QAbstractTask.abstractTask;
-
-//        QWork work = task.as(QWork.class);
         if (!labels.isEmpty()) {
             bb.or(labelPart.in(labels));
-//            bb.or(work.part.labels.any().in(labels));
         }
         return bb;
     }

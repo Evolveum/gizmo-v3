@@ -17,8 +17,6 @@ public class LabelBasicPanel extends SimplePanel<LabelPart>{
     private static final String ID_CODE = "code";
     private static final String ID_CPP = "cpp";
 
-    @SpringBean private PartRepository partRepository;
-
     private final IModel<ProjectSearchSettings> cppModel =
             Model.of(new ProjectSearchSettings());
 

@@ -20,7 +20,7 @@ package com.evolveum.gizmo.component.modal;
 public enum ReportType {
 
     CUSTOMER,
-    WORK_REPORT;
+    WORK_REPORT
 //    INTERNAL,
 //    ALL,
 //    SUMMARY,
