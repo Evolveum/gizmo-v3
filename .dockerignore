@@ -1,0 +1,10 @@
+target/
+node_modules/
+.git/
+.gitignore
+.DS_Store
+Thumbs.db
+*.iml
+.idea/
+.vscode/
+db/*.dump
