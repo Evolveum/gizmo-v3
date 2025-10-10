@@ -17,12 +17,12 @@
 
 package com.evolveum.gizmo.web.app;
 
+import com.evolveum.gizmo.component.EnterIconButton;
 import com.evolveum.gizmo.data.provider.BasicDataProvider;
 import com.querydsl.core.types.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.form.Form;
@@ -35,7 +35,6 @@ import org.springframework.data.domain.Sort;
 import org.wicketstuff.annotation.mount.MountPath;
 import com.evolveum.gizmo.component.data.LinkColumn;
 import com.evolveum.gizmo.component.data.TablePanel;
-import com.evolveum.gizmo.component.form.IconButton;
 import com.evolveum.gizmo.data.Customer;
 import com.evolveum.gizmo.data.QCustomer;
 
@@ -104,15 +103,16 @@ public class PageCustomers extends PageAppCustomers {
     }
 
     private void initButtons(Form form) {
-        AjaxButton search = new AjaxButton(ID_SEARCH, form) {
+        EnterIconButton search = new EnterIconButton(ID_SEARCH,
+                createStringResource("PageCustomers.search"),
+                createStringResource("fa-search"),
+                createStringResource("btn-primary")) {
             @Override
-            protected void onSubmit(AjaxRequestTarget target) {
+            protected void submitPerformed(AjaxRequestTarget target) {
                 searchPerformed(target);
             }
         };
         form.add(search);
-        form.setDefaultButton(search);
-
     }
 
     @Override

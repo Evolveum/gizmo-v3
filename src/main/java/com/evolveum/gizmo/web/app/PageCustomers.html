@@ -25,11 +25,9 @@
             <div class="input-group">
                 <input type="text" class="form-control input-sm" wicket:id="searchText"
                        wicket:message="placeholder:PageCustomers.searchText">
-
-                <button type="submit" wicket:id="search" class="btn btn-primary">
-                    <i class="fa fa-search"></i>
-                    <wicket:message key="PageCustomers.search"/>
-                </button>
+                <span class="input-group-btn">
+                    <div wicket:id="search"></div>
+                </span>
             </div>
         </div>
     </form>
