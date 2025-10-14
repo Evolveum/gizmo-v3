@@ -1,4 +1,4 @@
-FROM maven:3.9-eclipse-temurin-24 AS build
+FROM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /build
 
 COPY pom.xml ./
@@ -9,7 +9,7 @@ COPY . .
 RUN --mount=type=cache,target=/root/.m2 \
     mvn -B -q -DskipTests package
 
-FROM eclipse-temurin:24 AS runtime
+FROM eclipse-temurin:25 AS runtime
 WORKDIR /opt/app
 
 RUN mkdir -p /opt/app/logs
