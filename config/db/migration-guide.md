@@ -6,7 +6,7 @@
 ## Backup
 Make full backup of your current database:
 ```bash
-pg_dump -C -b gizmo > gizmo_backup.sql
+pg_dump -C -b gizmo > 01-gizmo_backup.sql
 ```
 Ensure you have access to the sql scripts located in:
 ```bash
@@ -21,16 +21,16 @@ config/db/
 ```
 2. Run migration script
 ```bash
-   \i config/db/migrate.sql
+   \i config/db/migrate.sql.manual
 ```
 3. Drop old tables
 ```bash
-   \i config/db/drop-old.sql
+   \i config/db/drop-old.sql.manual
 ```
 ## Upgrade
 1. Run the upgrade script
 ```bash
-   psql -U gizmo_user -d gizmo -f config/db/upgrade.sql
+   psql -U gizmo_user -d gizmo -f config/db/02-upgrade.sql
 ```
 2. Update your configuration file
 ```bash

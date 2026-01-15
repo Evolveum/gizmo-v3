@@ -1,12 +1,3 @@
-CREATE DATABASE gizmo4 WITH OWNER = gizmo
-  ENCODING = 'UTF8'
-  TABLESPACE = pg_default
-  LC_COLLATE = 'en_US.UTF-8'
-  LC_CTYPE = 'en_US.UTF-8'
-  CONNECTION LIMIT = -1;
-
-COMMENT ON DATABASE gizmo4 IS 'gizmo v3 database';
-
 CREATE TABLE g_emailLog_customer (
   emailLog_id     INT4 NOT NULL,
   customerList_id INT4 NOT NULL,

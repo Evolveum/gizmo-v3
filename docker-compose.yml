@@ -3,39 +3,35 @@ services:
     image: postgres:16
     container_name: gizmo-postgres
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-gizmo4}
-      POSTGRES_USER: ${POSTGRES_USER:-gizmo}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB:  ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./config/db:/docker-entrypoint-initdb.d:ro
+      - postgres-data:/var/lib/postgresql/data
+      - ./config/db:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
-      retries: 20
-    ports:
-      - "55432:5432"
+      retries: 5
 
-  gizmo:
-    build:
-      context: .
-      dockerfile: Dockerfile
+
+
+  app:
+    build: .
     container_name: gizmo-app
-    environment:
-      SERVER_SERVLET_CONTEXT_PATH: /gizmo
-      SPRING_PROFILES_ACTIVE: local
-      LOG_DIR: /opt/app/logs
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-gizmo4}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-gizmo}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD-password}
-      DB_SCHEMA: ${DB_SCHEMA:-public}
     depends_on:
       postgres:
         condition: service_healthy
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${SERVER_PORT:-8080}:8080"
-    restart: unless-stopped
+      - "${SERVER_PORT}:8080"
+
 
 volumes:
-  pgdata:
+  postgres-data:
