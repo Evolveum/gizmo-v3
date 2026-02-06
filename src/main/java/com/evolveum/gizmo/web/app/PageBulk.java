@@ -47,6 +47,7 @@ import org.wicketstuff.annotation.mount.MountPath;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -180,6 +181,19 @@ public class PageBulk extends PageAppTemplate {
 
             PartRepository partsRepository = getProjectPartRepository();
             List<CustomerProjectPartDto> parts = bulk.getPart();
+
+            if (bulk.getFrom() == null || bulk.getTo() == null) {
+                error(createStringResource("Message.SetFromAndTo").getString());
+                target.add(getFeedbackPanel());
+                return;
+            }
+
+            if (bulk.getFrom().isAfter(bulk.getTo())) {
+                error(createStringResource("Message.ToBeforeAfter").getString());
+                target.add(getFeedbackPanel());
+                return;
+            }
+
             if (parts.size() > 1) {
                 error(createStringResource("Message.onlyOnePartAllowed").getString());
                 target.add(getFeedbackPanel());
@@ -193,30 +207,36 @@ public class PageBulk extends PageAppTemplate {
             }
 
             LocalDate date = bulk.getFrom();
-            LocalDate to = bulk.getTo();
+            LocalDate end = bulk.getTo();
 
-            int count = 0;
+            LocalTime startTime = LocalTime.of(8, 0);
+
             List<Work> works = new ArrayList<>();
-            while (date.isBefore(to)) {
+            int count = 0;
+
+            while (!date.isAfter(end)) {
+
                 if (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY || !GizmoUtils.isNotHoliday(date)) {
                     date = date.plusDays(1);
                     continue;
                 }
-
-                Work work = createWork(bulk, part, date);
+                Work work = createWork(bulk, part, date, startTime);
                 works.add(work);
-
                 count++;
-                date = date.plusDays(1);
 
-                if (count > MAX_BULK_CREATE) {
+                if (count >= MAX_BULK_CREATE) {
                     break;
                 }
+
+                date = date.plusDays(1);
             }
+
             repository.saveAll(works);
-            getSession().success(createStringResource("Message.workSavedSuccessfully").getString());
-            if (count > MAX_BULK_CREATE) {
-                getSession().warn(createStringResource("Message.bulkStopped", MAX_BULK_CREATE).getString());
+
+            success(createStringResource("Message.workSavedSuccessfully").getString());
+
+            if (count >= MAX_BULK_CREATE) {
+                warn(createStringResource("Message.bulkStopped", MAX_BULK_CREATE).getString());
             }
 
             if (returnPage != null && returnPage.getPage() != null) {
@@ -229,14 +249,16 @@ public class PageBulk extends PageAppTemplate {
         }
     }
 
-    private Work createWork(BulkDto bulk, Part part, LocalDate date) {
+    private Work createWork(BulkDto bulk, Part part, LocalDate date, LocalTime startTime) {
         Work work = new Work();
         work.setRealizator(bulk.getRealizator());
         work.setPart(part);
         work.setDate(date);
-        work.setDescription(bulk.getDescription());
-        work.setInvoiceLength(0);
+        work.setFrom(startTime);
+        work.setTo(startTime.plusMinutes((long) (bulk.getWorkLength() * 60)));
         work.setWorkLength(bulk.getWorkLength());
+        work.setInvoiceLength(0);
+        work.setDescription(bulk.getDescription());
         work.setType(TaskType.WORK);
 
         return work;

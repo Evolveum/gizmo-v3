@@ -69,7 +69,6 @@ public class DateRangePickerBehavior extends AjaxEventBehavior {
 
     @Override
     protected void onEvent(AjaxRequestTarget target) {
-        System.out.println("asdasda");
     }
 
 //    @Override
