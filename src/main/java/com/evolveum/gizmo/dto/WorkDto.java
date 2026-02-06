@@ -46,7 +46,7 @@ public class WorkDto implements Editable {
     private Integer id;
     private User realizator;
     private double invoiceLength;
-    private double workLength;
+    private Double workLength;
     private LocalTime from;
     private LocalTime to;
     private LocalDate date;
@@ -110,7 +110,7 @@ public class WorkDto implements Editable {
         return invoiceLength;
     }
 
-    public double getWorkLength() {
+    public Double getWorkLength() {
         return workLength;
     }
 
@@ -123,7 +123,7 @@ public class WorkDto implements Editable {
         this.invoiceLength = invoiceLength;
     }
 
-    public void setWorkLength(double workLength) {
+    public void setWorkLength(Double workLength) {
         this.workLength = workLength;
     }
 

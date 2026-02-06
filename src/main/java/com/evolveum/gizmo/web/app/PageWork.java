@@ -234,6 +234,7 @@ public class PageWork extends PageAppTemplate {
         length.setOutputMarkupId(true);
         length.add(new RangeValidator<>(0.0, 2000.0));
         length.setType(Double.class);
+        length.setRequired(true);
         item.add(length);
 
         timeFrom.add(new OnChangeUpdateBehavior() {
